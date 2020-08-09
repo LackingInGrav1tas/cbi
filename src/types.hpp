@@ -34,14 +34,6 @@ struct Value {
     } storage;
 };
 
-/*enum ObjTag {
-    OBJ_STRING
-};
-
-struct Object {
-
-};*/
-
 Value numberValue(double num);
 
 Value stringValue(char* str);

@@ -37,7 +37,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                     char *a = (char*)(l+r).c_str();
                     value_pool.push(stringValue(a));
                 } else {
-                    std::cerr << "Runtime Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -50,7 +50,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number + rhs.storage.number));
                 else {
-                    std::cerr << "Runtime Error: Could not add non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not add non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -63,7 +63,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number - rhs.storage.number));
                 else {
-                    std::cerr << "Runtime Error: Could not subtract non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not subtract non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -76,7 +76,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number * rhs.storage.number));
                 else {
-                    std::cerr << "Runtime Error: Could not multiply non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not multiply non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -89,7 +89,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number / rhs.storage.number));
                 else {
-                    std::cerr << "Runtime Error: Could not divide non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not divide non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -100,7 +100,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(num))
                     value_pool.push(numberValue(-num.storage.number));
                 else {
-                    std::cerr << "Runtime Error: Could not negate non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not negate non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -111,13 +111,13 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_BOOL(top))
                     value_pool.push(boolValue(!top.storage.boolean));
                 else {
-                    std::cerr << "Runtime Error: Could not negate non-boolean value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "Run-time Error: Could not negate non-boolean value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
             }
             default: { // error
-                std::cerr << "Runtime Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
+                std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
                 return EXIT_RT;
                 break;
             }

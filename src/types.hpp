@@ -2,7 +2,7 @@
 #define _types_h
 
 enum Command {
-    OP_BLANK, OP_PRINT_TOP, OP_CONSTANT,
+    OP_BEGIN, OP_BLANK, OP_PRINT_TOP, OP_CONSTANT,
 
     //postfix operators
     OP_NEGATE, OP_NOT,
@@ -10,11 +10,12 @@ enum Command {
     //infix operators
     OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_CONCATENATE,
 
-    OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ
+    OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
+    OP_JUMP, OP_IF, OP_ELSE
 };
 
 enum RunType {
-    NORMAL, DEBUG
+    NORMAL, DEBUG, REPL
 };
 
 enum ErrorCode {
@@ -27,16 +28,16 @@ enum Tag {
 
 struct Value {
     Tag type;
+    std::string string;
     union StorageUnit {
         double number;
         bool boolean;
-        char* string;
     } storage;
 };
 
 Value numberValue(double num);
 
-Value stringValue(char* str);
+Value stringValue(std::string str);
 
 Value boolValue(bool boolean);
 

@@ -5,17 +5,20 @@
 #include <string>
 #include <vector>
 
-//std::vector<std::string> line_lookup;
+
+std::vector<std::string> getLines(const char *filename);
 
 enum Type {
     STRING, NUMBER, TRUE, FALSE, IDENTIFIER,
 
     SET, MUT, // for variables
 
-    EQUAL, LESS, GREATER, NOT, PLUS, MINUS, STAR, SLASH, // single length operators
+    // single length operators
+    EQUAL, LESS, GREATER, NOT, PLUS, MINUS, STAR, SLASH, DOT, LEFT_PAREN, RIGHT_PAREN,
+    LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON,
 
     // multiple length operators
-    EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, CONCATENATE, PLUS_PLUS, MINUS_MINUS, PLUS_EQUALS,
+    EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, CONCATENATE, INCREMENT, DECREMENT, PLUS_EQUALS,
     MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS,
 
     // keywords
@@ -35,7 +38,16 @@ class Token {
         line = init_line;
     }
     void error(const char *message) {
-        //std::cout << line << "| " << line_lookup[line] << "\n" << message << std::endl;
+        std::vector<std::string> lines = getLines(filename);
+        std::cerr << "\n" << line+1 << "| ";
+        for (auto it = lines.begin(); it < lines.end(); it++) {
+            if (it-lines.begin() == line) {
+                std::cout << *it;
+                break;
+            }
+        }
+        std::cout << "\n" << message << std::endl;
+
     }
 };
 

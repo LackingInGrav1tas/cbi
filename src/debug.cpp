@@ -52,6 +52,39 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_CONCATENATE";
             break;
         }
+        case OP_JUMP: {
+            std::cout << "OP_JUMP to " << (int) *(op+1);
+            op++;
+            break;
+        }
+        case OP_BEGIN: {
+            std::cout << "OP_BEGIN";
+            break;
+        }
+        case OP_EQUALITY: {
+            std::cout << "OP_EQUALITY";
+            break;
+        }
+        case OP_LESS: {
+            std::cout << "OP_LESS";
+            break;
+        }
+        case OP_GREATER: {
+            std::cout << "OP_GREATER";
+            break;
+        }
+        case OP_LESS_EQ: {
+            std::cout << "OP_LESS_EQ";
+            break;
+        }
+        case OP_GREATER_EQ: {
+            std::cout << "OP_GREATER_EQ";
+            break;
+        }
+        case OP_NOT_EQ: {
+            std::cout << "OP_NOT_EQ";
+            break;
+        }
         default: {
             std::cout << "bug in opcode, could not identify command.";
             break;

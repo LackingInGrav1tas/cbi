@@ -1,17 +1,25 @@
 #include "vm.hpp"
 #include "types.hpp"
+#include "lexer.hpp"
 
 #include <iostream>
 #include <vector>
 
 int main() {
+    /*bool b = true;
+    auto a = lex(getLines("file.txt"), "file.txt", b);
+
+    for (auto it = a.begin(); it < a.end(); it++) std::cout << (*it).lexeme << " -> " << (*it).type << " | ";
+    a.back().error("error!");
+    std::cout << "\nEND OF PROGRAM";
+    /**/
     Machine vm;
     
-    vm.writeConstant(0, stringValue("this is string 1.\n"));
-    vm.writeConstant(0, stringValue("this is string 2."));
-    vm.writeOp(0, OP_CONCATENATE);
+    vm.writeConstant(0, numberValue(4));
+    vm.writeConstant(0, stringValue("abc"));
+    vm.writeOp(0, OP_LESS);
 
-    vm.writeOp(1, OP_PRINT_TOP);
+    vm.writeOp(0, OP_PRINT_TOP);
 
     vm.disassembleOpcode();
     std::cout << std::endl;
@@ -29,5 +37,5 @@ int main() {
     std::cout << std::endl;
     vm.disassembleStack();
 
-    std::cout << "\nEND OF PROGRAM";
+    std::cout << "\nEND OF PROGRAM";//*/
 }

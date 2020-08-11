@@ -1,0 +1,6 @@
+%#abc true || %
+#num 2.5 @*^(*
+if (true) {
+    set mut a = 3 + 8;
+}
+#. ##.452 ()

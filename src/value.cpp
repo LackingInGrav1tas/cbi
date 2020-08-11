@@ -13,10 +13,10 @@ Value numberValue(double num) {
     return val;
 }
 
-Value stringValue(char* str) {
+Value stringValue(std::string str) {
     Value val;
     val.type = TYPE_STRING;
-    val.storage.string = str;
+    val.string = str;
     return val;
 }
 
@@ -32,7 +32,6 @@ Value nullValue() {
     val.type = TYPE_NULL;
     val.storage.boolean = false;
     val.storage.number = 0;
-    val.storage.string = "";
     return val;
 }
 
@@ -48,7 +47,7 @@ std::string getPrintable(Value value) {
     switch (value.type) {
         case TYPE_DOUBLE: return shorten(std::to_string(value.storage.number));
         case TYPE_BOOL: return std::to_string(value.storage.boolean);
-        case TYPE_STRING: return value.storage.string;
+        case TYPE_STRING: return value.string;
         case TYPE_NULL: return "";
         default: return "error";
     }

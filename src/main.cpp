@@ -15,8 +15,6 @@ int main(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        //for (int b = 0; b < a.size(); b++) std::cout << a[b].lexeme << " ";
-
         Machine vm = compile(a, b);
         if (!b) {
             std::cerr << "\nFatal error during compile time." << std::endl;

@@ -26,7 +26,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
         std::string lexeme = "";
 
         for (auto character = LINE.begin(); character < LINE.end(); character++) { // for each character
-            std::cout << c; // debugging
             switch (c) {
                 #define ERROR(message) \
                     do { std::cerr << "\n" << (line-lines.begin())+1 << "| " << LINE << message << std::endl; \
@@ -90,7 +89,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     PUSH_TOKEN(lexeme);
                     for (; c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || 
                            c == '7' || c == '8' || c == '9'; character++) {
-                               lexeme += c;
+                        lexeme += c;
                     }
                     if (c == '.') {
                         lexeme += c;
@@ -102,6 +101,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     }
                     tokens.push_back(Token(NUMBER, lexeme, filename, line-lines.begin()));
                     lexeme.clear();
+                    character--;
                     break;
                 }
                 case '.':
@@ -270,10 +270,10 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
             }
         }
         PUSH_TOKEN(lexeme);
-        std::cout << " | tokens.s: " << tokens.size() << std::endl; // debugging
     }
     #undef c
     #undef rline
     #undef PUSH_TOKEN
+    tokens.push_back(Token(_EOF, "_EOF", filename, -1));
     return tokens;
 }

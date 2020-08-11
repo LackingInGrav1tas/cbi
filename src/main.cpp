@@ -1,23 +1,26 @@
 #include "vm.hpp"
 #include "types.hpp"
 #include "lexer.hpp"
+#include "compiler.hpp"
 
 #include <iostream>
 #include <vector>
 
 int main() {
-    /*bool b = true;
+    bool b = true;
     auto a = lex(getLines("file.txt"), "file.txt", b);
+    if (!b) {
+        std::cerr << "\nFatal error during scanning." << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    for (auto it = a.begin(); it < a.end(); it++) std::cout << (*it).lexeme << " -> " << (*it).type << " | ";
-    a.back().error("error!");
-    std::cout << "\nEND OF PROGRAM";
-    /**/
-    Machine vm;
-    
-    vm.writeConstant(0, numberValue(4));
-    vm.writeConstant(0, stringValue("abc"));
-    vm.writeOp(0, OP_LESS);
+    //for (int b = 0; b < a.size(); b++) std::cout << a[b].lexeme << " ";
+
+    Machine vm = compile(a, b);
+    if (!b) {
+        std::cerr << "\nFatal error during compile time." << std::endl;
+        return EXIT_FAILURE;
+    }
 
     vm.writeOp(0, OP_PRINT_TOP);
 
@@ -25,10 +28,10 @@ int main() {
     std::cout << std::endl;
 
     switch (vm.run(NORMAL)) {
-        case EXIT_OK: std::cout << "EXIT_OK"; break;
-        case EXIT_RT: std::cout << "EXIT_RT"; break;
-        case EXIT_CT: std::cout << "EXIT_CT"; break;
-        default: std::cout << "bug: unknown error code."; break;
+        case EXIT_OK: std::cout << "\nEXIT_OK"; break;
+        case EXIT_RT: std::cout << "\nEXIT_RT"; break;
+        case EXIT_CT: std::cout << "\nEXIT_CT"; break;
+        default: std::cout << "\nbug: unknown error code."; break;
     }
 
     std::cout << "\n" << std::endl;

@@ -22,7 +22,9 @@ enum Type {
     MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS,
 
     // keywords
-    AND, OR, ELSE, FOR, IF, TOKEN_NULL, FUN, PRINT
+    AND, OR, ELSE, FOR, IF, TOKEN_NULL, FUN, PRINT,
+
+    _EOF
 };
 
 class Token {
@@ -37,17 +39,20 @@ class Token {
         filename = init_filename;
         line = init_line;
     }
-    void error(const char *message) {
+    void error(std::string message) {
         std::vector<std::string> lines = getLines(filename);
-        std::cerr << "\n" << line+1 << "| ";
-        for (auto it = lines.begin(); it < lines.end(); it++) {
-            if (it-lines.begin() == line) {
-                std::cout << *it;
-                break;
+        if (line == -1) {
+            std::cerr << "\n" << lines.size()+1 << "| _EOF\n" << message << std::endl;
+        } else {
+            std::cerr << "\n" << line+1 << "| ";
+            for (auto it = lines.begin(); it < lines.end(); it++) {
+                if (it-lines.begin() == line) {
+                    std::cerr << *it;
+                    break;
+                }
             }
+            std::cerr << "\n" << message << std::endl;
         }
-        std::cout << "\n" << message << std::endl;
-
     }
 };
 

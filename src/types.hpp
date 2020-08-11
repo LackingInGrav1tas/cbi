@@ -1,11 +1,16 @@
 #ifndef _types_h
 #define _types_h
 
+#include <string>
+
 enum Command {
     OP_BEGIN, OP_BLANK, OP_PRINT_TOP, OP_CONSTANT,
 
-    //postfix operators
+    //prefix operators
     OP_NEGATE, OP_NOT,
+
+    //postfix
+    OP_INC, OP_DEC,
 
     //infix operators
     OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_CONCATENATE,
@@ -14,8 +19,12 @@ enum Command {
     OP_JUMP, OP_IF, OP_ELSE
 };
 
+enum Mode {
+    NORM, REPL
+};
+
 enum RunType {
-    NORMAL, DEBUG, REPL
+    NORMAL, DEBUG
 };
 
 enum ErrorCode {
@@ -29,7 +38,7 @@ enum Tag {
 struct Value {
     Tag type;
     std::string string;
-    union StorageUnit {
+    union {
         double number;
         bool boolean;
     } storage;
@@ -50,5 +59,7 @@ std::string getPrintable(Value value);
 #define IS_NUM(value) ((value).type == TYPE_DOUBLE)
 
 #define IS_STRING(value) ((value).type == TYPE_STRING)
+
+#define TRIM(string) string.substr(1, string.length()-2)
 
 #endif

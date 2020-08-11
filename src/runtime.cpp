@@ -44,7 +44,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
             case OP_CONCATENATE: { // pops the top 2 strings off the value stack, then pushes a concatenated string
                 GET_TOP();
                 if (IS_STRING(rhs) && IS_STRING(lhs)) {
-                    value_pool.push(stringValue(lhs.string + rhs.string));
+                    value_pool.push(stringValue('"' + TRIM(lhs.string) + TRIM(rhs.string) + '"'));
                 } else {
                     std::cerr << "Run-time Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;

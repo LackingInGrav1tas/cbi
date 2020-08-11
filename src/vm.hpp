@@ -14,6 +14,7 @@ class Machine {
     std::vector<int> lines = { 0 };
     std::stack<Value> value_pool;
     std::vector<Value> constants;
+    
 
     // <helper>
     void writeOp(int line, uint8_t command) {

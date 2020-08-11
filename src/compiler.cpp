@@ -29,6 +29,7 @@ static int getPrecedence(Type type) {
         case GREATER:
         case GREATER_EQUAL: return 4;
 
+        case CONCATENATE:
         case MINUS:
         case PLUS: return 5;
 
@@ -119,19 +120,49 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_DIV);
                     break;
                 }
+                case CONCATENATE: {
+                    token++;
+                    expression(getPrecedence(CONCATENATE)+1);
+                    vm.writeOp(TOKEN.line, OP_CONCATENATE);
+                    break;
+                }
+                case LESS: {
+                    token++;
+                    expression(getPrecedence(LESS)+1);
+                    vm.writeOp(TOKEN.line, OP_LESS);
+                    break;
+                }
+                case LESS_EQUAL: {
+                    token++;
+                    expression(getPrecedence(LESS_EQUAL)+1);
+                    vm.writeOp(TOKEN.line, OP_LESS_EQ);
+                    break;
+                }
+                case GREATER: {
+                    token++;
+                    expression(getPrecedence(GREATER)+1);
+                    vm.writeOp(TOKEN.line, OP_GREATER);
+                    break;
+                }
+                case GREATER_EQUAL: {
+                    token++;
+                    expression(getPrecedence(GREATER_EQUAL)+1);
+                    vm.writeOp(TOKEN.line, OP_GREATER_EQ);
+                    break;
+                }
+                case EQUAL_EQUAL: {
+                    token++;
+                    expression(getPrecedence(EQUAL_EQUAL)+1);
+                    vm.writeOp(TOKEN.line, OP_EQUALITY);
+                    break;
+                }
                 default: break;
             }
         }
     };
 
-    for (; token < tokens.end(); token++) {
-        /*
-        expression finds infix which it calls
-        then finds postfix if it exists
-        and recurses until it finds number, string, or bool
-        */
+    for (; token < tokens.end(); token++)
         expression(1);
-    }
 
     #undef TOKEN
     #undef PREV

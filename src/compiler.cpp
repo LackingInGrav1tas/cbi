@@ -46,6 +46,7 @@ static int getPrecedence(Type type) {
 
 Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     Machine vm;
+    bool panicking = false;
     auto token = tokens.begin();
     #define TOKEN (*token)
     #define PREV (*std::prev(token))
@@ -161,9 +162,57 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         }
     };
 
-    for (; token < tokens.end(); token++) // this is where the compiling starts
-        expression(1);
-    // and finishes
+    std::function<void()> declaration = [&]()->void {
+        if (TOKEN.type == SET) { // setting variable
+            token++;
+            if (TOKEN.type != IDENTIFIER) {
+                TOKEN.error("Compile-time Error: Expected an identifier.");
+                success = false;
+                return;
+            }
+            token++;
+            if (TOKEN.type == EQUAL) {
+                token++;
+                expression(1);
+            } else {
+                vm.writeConstant(TOKEN.line, nullValue());
+            }
+            token++;
+            if (TOKEN.type != SEMICOLON) {
+                TOKEN.error("Compile-time Error: Expected ; at the end of the declaration.");
+                success = false;
+                return;
+            }
+        } else if (TOKEN.type == PRINT) { // print
+            token++;
+            expression(1); // ( ... )
+            if (NEXT.type != SEMICOLON) { // ;
+                NEXT.error("Compile-time Error: Expected ; at the end of the statement.");
+                success = false;
+                return;
+            }
+            vm.writeOp(TOKEN.line, OP_PRINT_TOP);
+            token++;
+        } else {
+            token++;
+            expression(1);
+            if (NEXT.type != SEMICOLON) {
+                NEXT.error("Compile-time Error: Expected ; at the end of the statement.");
+                success = false;
+                return;
+            }
+            vm.writeOp(TOKEN.line, OP_POP_TOP);
+            token++;
+        }
+    };
+
+    for (; token < tokens.end(); token++) {// this is where the compiling starts
+        declaration();
+        if (panicking) {
+            while (TOKEN.type != SEMICOLON && TOKEN.type != _EOF) token++;
+            panicking = false;
+        }
+    } // and finishes
 
     #undef TOKEN
     #undef PREV

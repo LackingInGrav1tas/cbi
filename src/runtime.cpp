@@ -34,6 +34,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
             }
             case OP_PRINT_TOP: { // prints top of stack
                 std::cout << getPrintable(value_pool.top());
+                value_pool.pop();
                 break;
             }
             case OP_CONSTANT: { // adds constant
@@ -167,6 +168,10 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                     std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
+                break;
+            }
+            case OP_POP_TOP: {
+                value_pool.pop();
                 break;
             }
             default: { // error

@@ -8,20 +8,18 @@
 
 int main(int argc, char **argv) {
     if (argc == 2) {
-        bool b = true;
-        auto a = lex(getLines(argv[1]), argv[1], b, NORM);
-        if (!b) {
+        bool success = true;
+        auto a = lex(getLines(argv[1]), argv[1], success, NORM);
+        if (!success) {
             std::cerr << "\nFatal error during scanning." << std::endl;
             return EXIT_FAILURE;
         }
 
-        Machine vm = compile(a, b);
-        if (!b) {
+        Machine vm = compile(a, success);
+        if (!success) {
             std::cerr << "\nFatal error during compile time." << std::endl;
             return EXIT_FAILURE;
         }
-
-        vm.writeOp(0, OP_PRINT_TOP);
 
         vm.disassembleOpcode();
         std::cout << std::endl;

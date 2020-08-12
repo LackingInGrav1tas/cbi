@@ -11,12 +11,12 @@
 std::vector<std::string> getLines(const char *filename);
 
 enum Type {
-    STRING, NUMBER, TRUE, FALSE, IDENTIFIER /*this*/,
+    STRING, NUMBER, TRUE, FALSE, IDENTIFIER,
 
-    SET/*this*/, MUT/*this*/, // for variables
+    SET, MUT/*this*/, // for variables
 
     // single length operators
-    EQUAL/*this*/, LESS, GREATER, NOT/*this*/, PLUS, MINUS, STAR, SLASH, DOT/*this*/, LEFT_PAREN, RIGHT_PAREN,
+    EQUAL, LESS, GREATER, NOT/*this*/, PLUS, MINUS, STAR, SLASH, DOT/*this*/, LEFT_PAREN, RIGHT_PAREN,
     LEFT_BRACKET/*this*/, RIGHT_BRACKET/*this*/, SEMICOLON/*this*/,
 
     // multiple length operators

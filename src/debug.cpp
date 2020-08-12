@@ -85,6 +85,10 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_NOT_EQ";
             break;
         }
+        case OP_POP_TOP: {
+            std::cout << "OP_POP_TOP";
+            break;
+        }
         default: {
             std::cout << "bug in opcode, could not identify command.";
             break;

@@ -21,8 +21,6 @@ int main(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        vm.writeOp(0, OP_PRINT_TOP);
-
         vm.disassembleOpcode();
         std::cout << std::endl;
 

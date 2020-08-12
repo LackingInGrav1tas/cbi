@@ -11,35 +11,30 @@
 
 static int getPrecedence(Type type) {
     switch (type) {
-        case PLUS_EQUALS:
-        case MINUS_EQUALS:
-        case STAR_EQUALS:
-        case SLASH_EQUALS:
-        case INCREMENT:
-        case DECREMENT:
         case EQUAL: return 1;
 
         case OR: return 2;
 
+        case AND: return 3;
+
         case EQUAL_EQUAL:
-        case NOT_EQUAL: return 3;
+        case NOT_EQUAL: return 4;
 
         case LESS:
         case LESS_EQUAL:
         case GREATER:
-        case GREATER_EQUAL: return 4;
+        case GREATER_EQUAL: return 5;
 
         case CONCATENATE:
         case MINUS:
-        case PLUS: return 5;
+        case PLUS: return 6;
 
-        case STAR:
-        case SLASH: return 6;
+        case SLASH:
+        case STAR: return 7;
 
-        case NOT: return 7;
-
-        case DOT: return 8;
-
+        //case DOT:
+        //case LEFT_PAREN: return 8;
+        
         default: return 0;
     }
 }
@@ -50,6 +45,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     #define TOKEN (*token)
     #define PREV (*std::prev(token))
     #define NEXT (*std::next(token))
+
+    #define CHECK(t) (TOKEN.type == t)
 
     std::function<void(int)> expression = [&](int p)->void { // this notation used because c++ has no nested functions
         switch (TOKEN.type) {
@@ -93,7 +90,9 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 return;
             }
         }
+        std::cout << "(out of loop) " << p << "<=" << getPrecedence(NEXT.type) << " n.l: " << NEXT.lexeme << std::endl;
         while (p <= getPrecedence(NEXT.type)) {
+            std::cout << p << "<=" << getPrecedence(NEXT.type) << " n.l" << NEXT.lexeme << std::endl;
             token++;
             switch (TOKEN.type) {
                 case MINUS: { // infix subtraction - 
@@ -159,10 +158,27 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 default: break;
             }
         }
+        std::cout << "exit!" << std::endl;
     };
 
-    for (; token < tokens.end(); token++) // this is where the compiling starts
-        expression(1);
+    std::function<void()> declaration = [&]()->void {
+        if (CHECK(PRINT)) {
+            token++;
+            expression(1);
+            token++;
+            std::cout << TOKEN.lexeme << std::endl;
+            if (TOKEN.type != SEMICOLON) {
+                TOKEN.error("Expected a semicolon.");
+                success = false;
+                return;
+            }
+            vm.writeOp(TOKEN.line, OP_PRINT_TOP);
+
+        }
+    };
+
+    for (; TOKEN.type != _EOF; token++) // this is where the compiling starts
+        declaration();
     // and finishes
 
     #undef TOKEN

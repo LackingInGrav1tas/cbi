@@ -85,14 +85,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             }
             case _EOF: break;
             default: {
-                TOKEN.error("Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
+                TOKEN.error("Compile-time Error: Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
                 success = false;
                 return;
             }
         }
-        std::cout << "(out of loop) " << p << "<=" << getPrecedence(NEXT.type) << " n.l: " << NEXT.lexeme << std::endl;
         while (p <= getPrecedence(NEXT.type)) {
-            std::cout << p << "<=" << getPrecedence(NEXT.type) << " n.l" << NEXT.lexeme << std::endl;
             token++;
             switch (TOKEN.type) {
                 case MINUS: { // infix subtraction - 
@@ -158,7 +156,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 default: break;
             }
         }
-        std::cout << "exit!" << std::endl;
     };
 
     std::function<void()> declaration = [&]()->void {
@@ -166,9 +163,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             expression(1);
             token++;
-            std::cout << TOKEN.lexeme << std::endl;
             if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Expected a semicolon.");
+                TOKEN.error("Compile-time Error: Expected a semicolon.");
                 success = false;
                 return;
             }

@@ -51,9 +51,9 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     #define PREV (*std::prev(token))
     #define NEXT (*std::next(token))
 
-    std::function<void(int)> expression = [&](int p)->void { // lambdas
+    std::function<void(int)> expression = [&](int p)->void { // this notation used because c++ has no nested functions
         switch (TOKEN.type) {
-            case LEFT_PAREN: {
+            case LEFT_PAREN: { // group
                 token++;
                 expression(1);
                 if (NEXT.type != RIGHT_PAREN) {
@@ -64,93 +64,93 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 break;
             }
-            case MINUS: {
+            case MINUS: { // prefix negation -
                 token++;
                 expression(7);
                 vm.writeOp(TOKEN.line, OP_NEGATE);
                 break;
             }
-            case NUMBER: {
+            case NUMBER: { // number literal
                 vm.writeConstant(TOKEN.line, numberValue(std::stod(TOKEN.lexeme)));
                 break;
             }
-            case STRING: {
+            case STRING: { // string literal
                 vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme));
                 break;
             }
-            case TRUE: {
+            case TRUE: { // true
                 vm.writeConstant(TOKEN.line, boolValue(true));
                 break;
             }
-            case FALSE: {
+            case FALSE: { // false
                 vm.writeConstant(TOKEN.line, boolValue(false));
                 break;
             }
             case _EOF: break;
             default: {
-                TOKEN.error("Expexted an expression with token " + TOKEN.lexeme + ".");
+                TOKEN.error("Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
                 success = false;
                 return;
             }
         }
-        while (p <= getPrecedence(NEXT.type)) { // fix this
+        while (p <= getPrecedence(NEXT.type)) {
             token++;
             switch (TOKEN.type) {
-                case MINUS: {
+                case MINUS: { // infix subtraction - 
                     token++;
                     expression(getPrecedence(MINUS)+1);
                     vm.writeOp(TOKEN.line, OP_SUB);
                     break;
                 }
-                case PLUS: {
+                case PLUS: { // +
                     token++;
                     expression(getPrecedence(PLUS)+1);
                     vm.writeOp(TOKEN.line, OP_ADD);
                     break;
                 }
-                case STAR: {
+                case STAR: { // *
                     token++;
                     expression(getPrecedence(STAR)+1);
                     vm.writeOp(TOKEN.line, OP_MUL);
                     break;
                 }
-                case SLASH: {
+                case SLASH: { // /
                     token++;
                     expression(getPrecedence(SLASH)+1);
                     vm.writeOp(TOKEN.line, OP_DIV);
                     break;
                 }
-                case CONCATENATE: {
+                case CONCATENATE: { // ||
                     token++;
                     expression(getPrecedence(CONCATENATE)+1);
                     vm.writeOp(TOKEN.line, OP_CONCATENATE);
                     break;
                 }
-                case LESS: {
+                case LESS: { // <
                     token++;
                     expression(getPrecedence(LESS)+1);
                     vm.writeOp(TOKEN.line, OP_LESS);
                     break;
                 }
-                case LESS_EQUAL: {
+                case LESS_EQUAL: { // <=
                     token++;
                     expression(getPrecedence(LESS_EQUAL)+1);
                     vm.writeOp(TOKEN.line, OP_LESS_EQ);
                     break;
                 }
-                case GREATER: {
+                case GREATER: { // >
                     token++;
                     expression(getPrecedence(GREATER)+1);
                     vm.writeOp(TOKEN.line, OP_GREATER);
                     break;
                 }
-                case GREATER_EQUAL: {
+                case GREATER_EQUAL: { // >=
                     token++;
                     expression(getPrecedence(GREATER_EQUAL)+1);
                     vm.writeOp(TOKEN.line, OP_GREATER_EQ);
                     break;
                 }
-                case EQUAL_EQUAL: {
+                case EQUAL_EQUAL: { // ==
                     token++;
                     expression(getPrecedence(EQUAL_EQUAL)+1);
                     vm.writeOp(TOKEN.line, OP_EQUALITY);
@@ -161,8 +161,9 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         }
     };
 
-    for (; token < tokens.end(); token++)
+    for (; token < tokens.end(); token++) // this is where the compiling starts
         expression(1);
+    // and finishes
 
     #undef TOKEN
     #undef PREV

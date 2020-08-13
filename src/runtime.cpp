@@ -181,6 +181,11 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 globals[id] = gl_value;
                 break;
             }
+            case OP_RETRIEVE: {
+                op++;
+                value_pool.push(globals[constants[(int)OP].string]);
+                break;
+            }
             default: { // error
                 std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
                 return EXIT_RT;

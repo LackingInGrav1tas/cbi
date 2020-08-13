@@ -67,6 +67,13 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeOp(TOKEN.line, OP_NEGATE);
                 break;
             }
+            case DOLLAR: { // prefix retrieve &<identifier>
+                vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                token++;
+                vm.constants.push_back(stringValue(TOKEN.lexeme));
+                vm.writeOp(TOKEN.line, vm.constants.size()-1);
+                break;
+            }
             case NUMBER: { // number literal
                 vm.writeConstant(TOKEN.line, numberValue(std::stod(TOKEN.lexeme)));
                 break;

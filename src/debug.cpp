@@ -93,6 +93,11 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_GLOBAL";
             break;
         }
+        case OP_RETRIEVE: {
+            op++;
+            std::cout << "OP_RETRIEVE  position: " << (int) *op << "  lexeme: " << constants[*op].string;
+            break;
+        }
         default: {
             std::cout << "bug in opcode, could not identify command.";
             break;

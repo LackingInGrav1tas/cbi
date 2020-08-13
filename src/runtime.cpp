@@ -186,6 +186,17 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 value_pool.push(globals[constants[(int)OP].string]);
                 break;
             }
+            case OP_SET_GLOBAL: {
+                Value replacement = value_pool.top();
+                value_pool.pop();
+                std::map<std::string, Value>::iterator found = globals.find(value_pool.top().string);
+                if (found == globals.end()) {
+                    std::cerr << "Run-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
+                    return EXIT_RT;
+                }
+                found->second = replacement;
+                break;
+            }
             default: { // error
                 std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
                 return EXIT_RT;

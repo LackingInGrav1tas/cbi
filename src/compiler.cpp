@@ -90,6 +90,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeConstant(TOKEN.line, boolValue(false));
                 break;
             }
+            case IDENTIFIER: {
+                vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme));
+                break;
+            }
             case _EOF: break;
             default: {
                 TOKEN.error("Compile-time Error: Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
@@ -160,6 +164,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_EQUALITY);
                     break;
                 }
+                case EQUAL: {
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_SET_GLOBAL);
+                    break;
+                }
                 default: break;
             }
         }
@@ -184,13 +194,18 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             } else {
                 vm.writeConstant(TOKEN.line, nullValue());
             }
+            if (TOKEN.type != SEMICOLON) {
+                TOKEN.error("Compile-time Error: Expected a semicolon. set");
+                success = false;
+                return;
+            }
             vm.writeOp(TOKEN.line, OP_GLOBAL);
         } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
             token++;
             if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Compile-time Error: Expected a semicolon.");
+                TOKEN.error("Compile-time Error: Expected a semicolon.check print");
                 success = false;
                 return;
             }
@@ -199,7 +214,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             expression(1);
             token++;
             if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Compile-time Error: Expected a semicolon.");
+                TOKEN.error("Compile-time Error: Expected a semicolon. else");
                 success = false;
                 return;
             }

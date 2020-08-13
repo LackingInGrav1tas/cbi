@@ -55,7 +55,7 @@ class Token {
                     break;
                 }
             }
-            std::cerr << "\n" << message << std::endl;
+            std::cerr << "\n" << message << " TOKEN: " << lexeme << std::endl;
         }
     }
 };

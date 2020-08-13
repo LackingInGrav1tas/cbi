@@ -102,6 +102,10 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_SET_GLOBAL";
             break;
         }
+        case OP_IMUT: {
+            std::cout << "OP_IMUT";
+            break;
+        }
         default: {
             std::cout << "bug in opcode, could not identify command.";
             break;

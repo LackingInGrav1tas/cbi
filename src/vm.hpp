@@ -15,6 +15,7 @@ class Machine {
     std::vector<int> lines = { 0 };
     std::stack<Value> value_pool;
     std::vector<Value> constants;
+    std::vector<std::string> mutables;
     std::map<std::string, Value> globals;
 
     // <helper>

@@ -178,6 +178,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     std::function<void()> declaration = [&]()->void {
         if (CHECK(SET)) { // setting variable
             token++;
+            bool mut = true;
+            //checking mut
+            if (!CHECK(MUT)) {
+                mut = false;
+            } else {
+                token++;
+            }
+
             if (!CHECK(IDENTIFIER)) {
                 TOKEN.error("Compile-time Error: Expected an identifier.");
                 success = false;
@@ -199,6 +207,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 success = false;
                 return;
             }
+            if (!mut) vm.writeOp(TOKEN.line, OP_IMUT);
             vm.writeOp(TOKEN.line, OP_GLOBAL);
         } else if (CHECK(PRINT)) { // printing
             token++;

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <cstring>
+#include <algorithm>
 
 #include "vm.hpp"
 #include "types.hpp"
@@ -178,6 +179,9 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 value_pool.pop();
                 std::string id = value_pool.top().string;
                 value_pool.pop();
+                if (!(*(op-1) == OP_IMUT && *(op-2) != OP_CONSTANT && *(op-2) != OP_RETRIEVE && *(op-2) != OP_JUMP)) {
+                    mutables.push_back(id);
+                }
                 globals[id] = gl_value;
                 break;
             }
@@ -186,15 +190,24 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 value_pool.push(globals[constants[(int)OP].string]);
                 break;
             }
+            case OP_IMUT: break;
             case OP_SET_GLOBAL: {
                 Value replacement = value_pool.top();
                 value_pool.pop();
+
                 std::map<std::string, Value>::iterator found = globals.find(value_pool.top().string);
-                if (found == globals.end()) {
+
+                if (found == globals.end()) { // checking if the variable exists
                     std::cerr << "Run-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
                     return EXIT_RT;
                 }
-                found->second = replacement;
+
+                if (std::find(mutables.begin(), mutables.end(), found->first) == mutables.end()) { // if it's immutable
+                    std::cerr << "Run-time Error: Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;";
+                    return EXIT_RT;
+                }
+
+                found->second = replacement; // setting new value
                 break;
             }
             default: { // error

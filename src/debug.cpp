@@ -85,6 +85,14 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_NOT_EQ";
             break;
         }
+        case OP_POP_TOP: {
+            std::cout << "OP_POP_TOP";
+            break;
+        }
+        case OP_GLOBAL: {
+            std::cout << "OP_GLOBAL";
+            break;
+        }
         default: {
             std::cout << "bug in opcode, could not identify command.";
             break;
@@ -113,6 +121,14 @@ void Machine::disassembleStack() {
     for (int count = copy.size()-1; !copy.empty(); count--) {
         std::cout << count << ": " << getPrintable(copy.top()) << std::endl;
         copy.pop();
+    }
+    std::cout << "== end ==" << std::endl;
+}
+
+void Machine::disassembleGlobalMap() {
+    std::cout << "== global map ==" << std::endl;
+    for (std::map<std::string, Value>::iterator it = globals.begin(); it != globals.end(); it++) {
+        std::cout << it->first << " : " << getPrintable(it->second) << std::endl;
     }
     std::cout << "== end ==" << std::endl;
 }

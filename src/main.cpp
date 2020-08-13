@@ -36,6 +36,9 @@ int main(int argc, char **argv) {
 
         std::cout << std::endl;
         vm.disassembleStack();
+        
+        std::cout << std::endl;
+        vm.disassembleGlobalMap();
 
         std::cout << "\nEND OF PROGRAM";
     }

@@ -169,10 +169,21 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 }
                 break;
             }
+            case OP_POP_TOP: {
+                value_pool.pop();
+                break;
+            }
+            case OP_GLOBAL: {
+                Value gl_value = value_pool.top();
+                value_pool.pop();
+                std::string id = value_pool.top().string;
+                value_pool.pop();
+                globals[id] = gl_value;
+                break;
+            }
             default: { // error
                 std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
                 return EXIT_RT;
-                break;
             }
         }
         if (mode == DEBUG) { //printing out OP info

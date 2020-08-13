@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <stack>
+#include <map>
 
 #include "types.hpp"
 
@@ -14,7 +15,7 @@ class Machine {
     std::vector<int> lines = { 0 };
     std::stack<Value> value_pool;
     std::vector<Value> constants;
-    
+    std::map<std::string, Value> globals;
 
     // <helper>
     void writeOp(int line, uint8_t command) {
@@ -39,6 +40,7 @@ class Machine {
     void disassembleConstants();
     void disassembleOpcode();
     void disassembleStack();
+    void disassembleGlobalMap();
     // </debug>
 };
 

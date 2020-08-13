@@ -159,7 +159,26 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     };
 
     std::function<void()> declaration = [&]()->void {
-        if (CHECK(PRINT)) {
+        if (CHECK(SET)) { // setting variable
+            token++;
+            if (!CHECK(IDENTIFIER)) {
+                TOKEN.error("Compile-time Error: Expected an identifier.");
+                success = false;
+                return;
+            }
+
+            vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
+                                                                     // is >= 2 because of TRIM()
+            token++;
+            if (CHECK(EQUAL)) {
+                token++;
+                expression(1);
+                token++;
+            } else {
+                vm.writeConstant(TOKEN.line, nullValue());
+            }
+            vm.writeOp(TOKEN.line, OP_GLOBAL);
+        } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
             token++;
@@ -169,11 +188,19 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 return;
             }
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
-
+        } else {
+            expression(1);
+            token++;
+            if (TOKEN.type != SEMICOLON) {
+                TOKEN.error("Compile-time Error: Expected a semicolon.");
+                success = false;
+                return;
+            }
+            vm.writeOp(TOKEN.line, OP_POP_TOP);
         }
     };
 
-    for (; TOKEN.type != _EOF; token++) // this is where the compiling starts
+    for (; TOKEN.type != _EOF && token < tokens.end(); token++) // this is where the compiling starts
         declaration();
     // and finishes
 

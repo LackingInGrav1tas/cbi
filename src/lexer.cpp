@@ -8,11 +8,15 @@
 #include <fstream>
 
 // getting the lines of the file.
-std::vector<std::string> getLines(const char *filename) {
+std::vector<std::string> getLines(const char *filename, bool &success) {
     std::vector<std::string> lines;
     std::string line;
     std::ifstream file(filename);
-    while (std::getline(file, line) && file) // also checks to see if the file was successfully found
+    if (!file) {
+        success = false;
+        return lines;
+    }
+    while (std::getline(file, line)) // also checks to see if the file was successfully found
         lines.push_back(line); // pushes the line to the vector
     return lines;
 }

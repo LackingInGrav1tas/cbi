@@ -8,7 +8,7 @@
 #include <vector>
 
 
-std::vector<std::string> getLines(const char *filename);
+std::vector<std::string> getLines(const char *filename, bool &success);
 
 enum Type {
     STRING, NUMBER, TRUE, FALSE, IDENTIFIER,
@@ -44,8 +44,11 @@ class Token {
         mode = init_mode;
     }
     void error(std::string message) {
-        std::vector<std::string> lines = getLines(filename);
-        if (line == -1) {
+        bool b = true;
+        std::vector<std::string> lines = getLines(filename, b);
+        if (!b) {
+            std::cout << "Error in non-existant file." << std::endl;
+        } else if (line == -1) {
             std::cerr << "\n" << lines.size()+1 << "| _EOF\n" << message << std::endl;
         } else {
             std::cerr << "\n" << line+1 << "| ";

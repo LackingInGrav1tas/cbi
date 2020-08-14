@@ -23,3 +23,25 @@ PREFIX = "$" | "!" | "-" EXPRESSION
 LITERAL = STRING | NUMBER | TRUE | FALSE | NULL
 GROUP = "(" EXPRESSION ")"
 ```
+
+## Code Snippets ##
+
+### hello world: ###
+```
+print "hello world!";
+```
+output:
+```
+hello world!
+```
+### variable stuff: ###
+```
+set mut a; #like Rust, cbi assumes that the variable is immutable
+a = 729;
+set b = 2006; #immutable
+print $a * $b;
+```
+output:
+```
+1462374
+```

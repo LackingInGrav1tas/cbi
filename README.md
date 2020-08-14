@@ -35,6 +35,9 @@ output:
 hello world!
 ```
 ### variable stuff: ###
+
+<img width="401" alt="variables_example" src="https://user-images.githubusercontent.com/42680395/90297234-d418b280-de5b-11ea-9d29-235f253ec382.png">
+
 output:
 ```
 1462374

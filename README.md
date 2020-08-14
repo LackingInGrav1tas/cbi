@@ -4,24 +4,25 @@ Your average bytecode interpreter. C++ IR/VM instead of C because at the moment 
 Very much in development.
 
 
-## Grammar ##
-```
-DECLARATION = ( STATEMENT | SET_VARIABLE ) ";"
+## Grammar EBNF ##
+```EBNF
+<declaration> = <statement> | <set-variable>  ";" ;
 
-STATEMENT = EXPRESSION | PRINT_STATEMENT
-SET_VARIABLE = "SET" "MUT"? IDENTIFIER ( "=" EXPRESSION )?
+<statement> = <expression> | <print-statement> ;
+<set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
 
-PRINT_STATEMENT = "PRINT" EXPRESSION?
+<print-statement> = "print" [<expression>] ;
 
-EXPRESSION = OPERATION | LITERAL | GROUP
+<expression> = <operation> | <literal> | <group> ;
 
-OPERATION = INFIX | PREFIX
+<operation> = <infix> | <prefix> ;
 
-INFIX = EXPRESSION "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" EXPRESSION
-PREFIX = "$" | "!" | "-" EXPRESSION
+<infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" <expression> ;
+<prefix> = <get-var> | "!" | "-" <expression> ;
+<get-var> = "$" IDENTIFIER>;
 
-LITERAL = STRING | NUMBER | TRUE | FALSE | NULL
-GROUP = "(" EXPRESSION ")"
+<literal> = STRING | NUMBER | "true" | "false" | "null" ;
+<group> = "(" <expression> ")" ;
 ```
 
 ## Code Snippets ##

@@ -17,7 +17,7 @@ Very much in development.
 
 <operation> = <infix> | <prefix> ;
 
-<infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" <expression> ;
+<infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;
 <prefix> = <get-var> | ("!" | "-" <expression>) ;
 <get-var> = "$" IDENTIFIER>;
 

@@ -27,8 +27,7 @@ GROUP = "(" EXPRESSION ")"
 ## Code Snippets ##
 
 ### hello world: ###
-```Batch
-print "hello world!";
+```Batch print "hello world!";
 ```
 output:
 ```

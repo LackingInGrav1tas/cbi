@@ -35,16 +35,7 @@ output:
 hello world!
 ```
 ### variable stuff: ###
-```Rust
-set mut a; #like Rust, cbi assumes that the variable is immutable
-a = 729;
-set b = 2006; #immutable
-print $a * $b;
-```
 output:
 ```
 1462374
-```
-```Rust
-mut
 ```

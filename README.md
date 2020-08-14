@@ -6,10 +6,10 @@ Very much in development.
 
 ## Grammar EBNF ##
 ```EBNF
-<declaration> = <statement> | <set-variable>  ";" ;
+<declaration> = <statement> | <set-variable> ;
 
-<statement> = <expression> | <print-statement> ;
-<set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
+<statement> = <expression> | <print-statement> ";" ;
+<set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
 <print-statement> = "print" [<expression>] ;
 

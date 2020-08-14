@@ -35,7 +35,7 @@ output:
 hello world!
 ```
 ### variable stuff: ###
-```
+```Perl
 set mut a; #like Rust, cbi assumes that the variable is immutable
 a = 729;
 set b = 2006; #immutable

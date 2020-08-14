@@ -20,6 +20,13 @@ Value stringValue(std::string str) {
     return val;
 }
 
+Value idLexeme(std::string str) {
+    Value val;
+    val.type = TYPE_ID_LEXEME;
+    val.string = str;
+    return val;
+}
+
 Value boolValue(bool boolean) {
     Value val;
     val.type = TYPE_BOOL;
@@ -45,10 +52,11 @@ std::string shorten(std::string str) {
 
 std::string getPrintable(Value value) {
     switch (value.type) {
-        case TYPE_DOUBLE: return shorten(std::to_string(value.storage.number));
-        case TYPE_BOOL:   return std::to_string(value.storage.boolean);
-        case TYPE_STRING: return TRIM(value.string);
-        case TYPE_NULL:   return "";
-        default:          return "error";
+        case TYPE_DOUBLE:    return shorten(std::to_string(value.storage.number));
+        case TYPE_BOOL:      return std::to_string(value.storage.boolean);
+        case TYPE_STRING:    return TRIM(value.string);
+        case TYPE_NULL:      return "";
+        case TYPE_ID_LEXEME: return value.string;
+        default:             return "error";
     }
 }

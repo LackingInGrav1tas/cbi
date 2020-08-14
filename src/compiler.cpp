@@ -41,10 +41,19 @@ static int getPrecedence(Type type) {
 
 Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     Machine vm;
+    bool panicking = false;
     auto token = tokens.begin();
     #define TOKEN (*token)
     #define PREV (*std::prev(token))
     #define NEXT (*std::next(token))
+
+    #define ERROR(message) \
+        do { \
+            TOKEN.error(message); \
+            success = false; \
+            panicking = true; \
+            return; \
+        } while (false)
 
     #define CHECK(t) (TOKEN.type == t)
 
@@ -53,12 +62,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             case LEFT_PAREN: { // group
                 token++;
                 expression(1);
-                if (NEXT.type != RIGHT_PAREN) {
-                    NEXT.error("Compile-time Error: Expected ')' after expression.");
-                    success = false;
-                    return;
-                }
                 token++;
+                if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after expression.");
                 break;
             }
             case MINUS: { // prefix negation -
@@ -91,14 +96,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 break;
             }
             case IDENTIFIER: {
-                vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme));
+                vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
                 break;
             }
             case _EOF: break;
             default: {
-                TOKEN.error("Compile-time Error: Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
-                success = false;
-                return;
+                ERROR("Compile-time Error: Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
             }
         }
         while (p <= getPrecedence(NEXT.type)) {
@@ -187,12 +190,11 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             }
 
             if (!CHECK(IDENTIFIER)) {
-                TOKEN.error("Compile-time Error: Expected an identifier.");
-                success = false;
-                return;
+                token--;
+                ERROR("Compile-time Error: Expected an identifier.");
             }
 
-            vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
                                                                      // is >= 2 because of TRIM()
             token++;
             if (CHECK(EQUAL)) {
@@ -202,38 +204,34 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             } else {
                 vm.writeConstant(TOKEN.line, nullValue());
             }
-            if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Compile-time Error: Expected a semicolon. set");
-                success = false;
-                return;
-            }
+
+            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
+
             if (!mut) vm.writeOp(TOKEN.line, OP_IMUT);
             vm.writeOp(TOKEN.line, OP_GLOBAL);
         } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
             token++;
-            if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Compile-time Error: Expected a semicolon.check print");
-                success = false;
-                return;
-            }
+
+            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
+
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
         } else {
             expression(1);
             token++;
-            if (TOKEN.type != SEMICOLON) {
-                TOKEN.error("Compile-time Error: Expected a semicolon. else");
-                success = false;
-                return;
-            }
+            if (TOKEN.type != SEMICOLON) ERROR("Compile-time Error: Expected a semicolon.");
             vm.writeOp(TOKEN.line, OP_POP_TOP);
         }
     };
 
-    for (; TOKEN.type != _EOF && token < tokens.end(); token++) // this is where the compiling starts
+    for (; !CHECK(_EOF) && token < tokens.end(); token++) {// this is where the compiling starts
         declaration();
-    // and finishes
+        if (panicking) {
+            for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
+            panicking = false;
+        }
+    }// and finishes
 
     #undef TOKEN
     #undef PREV

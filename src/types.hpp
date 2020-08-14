@@ -32,7 +32,7 @@ enum ErrorCode {
 };
 
 enum Tag {
-    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING
+    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME
 };
 
 struct Value {
@@ -48,6 +48,8 @@ Value numberValue(double num);
 
 Value stringValue(std::string str);
 
+Value idLexeme(std::string str);
+
 Value boolValue(bool boolean);
 
 Value nullValue();
@@ -59,6 +61,8 @@ std::string getPrintable(Value value);
 #define IS_NUM(value) ((value).type == TYPE_DOUBLE)
 
 #define IS_STRING(value) ((value).type == TYPE_STRING)
+
+#define IS_ID(value) ((value).type == TYPE_ID_LEXEME)
 
 #define TRIM(string) string.substr(1, string.length()-2)
 

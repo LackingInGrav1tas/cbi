@@ -177,6 +177,10 @@ ErrorCode Machine::run(RunType mode) { // executes the program
             case OP_GLOBAL: {
                 Value gl_value = value_pool.top();
                 value_pool.pop();
+                if (!IS_ID(value_pool.top())) {
+                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
+                    return EXIT_RT;
+                }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
                 if (!(*(op-1) == OP_IMUT && *(op-2) != OP_CONSTANT && *(op-2) != OP_RETRIEVE && *(op-2) != OP_JUMP)) {
@@ -194,6 +198,11 @@ ErrorCode Machine::run(RunType mode) { // executes the program
             case OP_SET_GLOBAL: {
                 Value replacement = value_pool.top();
                 value_pool.pop();
+                
+                if (!IS_ID(value_pool.top())) {
+                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
+                    return EXIT_RT;
+                }
 
                 std::map<std::string, Value>::iterator found = globals.find(value_pool.top().string);
 

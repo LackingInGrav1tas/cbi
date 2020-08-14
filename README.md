@@ -27,7 +27,7 @@ GROUP = "(" EXPRESSION ")"
 ## Code Snippets ##
 
 ### hello world: ###
-```Perl
+```Batch
 print "hello world!";
 ```
 output:

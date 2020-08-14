@@ -27,7 +27,8 @@ GROUP = "(" EXPRESSION ")"
 ## Code Snippets ##
 
 ### hello world: ###
-```Batch print "hello world!";
+```Batch
+print "hello world!";
 ```
 output:
 ```
@@ -35,7 +36,13 @@ hello world!
 ```
 ### variable stuff: ###
 ```Batch
-set mut a; #like Rust, cbi assumes that the variable is immutable
+set 
+```
+```Rust
+mut
+```
+```Batch
+a; #like Rust, cbi assumes that the variable is immutable
 a = 729;
 set b = 2006; #immutable
 print $a * $b;

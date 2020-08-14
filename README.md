@@ -27,7 +27,7 @@ GROUP = "(" EXPRESSION ")"
 ## Code Snippets ##
 
 ### hello world: ###
-```
+```Perl
 print "hello world!";
 ```
 output:

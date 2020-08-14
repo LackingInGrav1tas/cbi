@@ -36,13 +36,7 @@ hello world!
 ```
 ### variable stuff: ###
 ```Batch
-set 
-```
-```Rust
-mut
-```
-```Batch
-a; #like Rust, cbi assumes that the variable is immutable
+set mut a; #like Rust, cbi assumes that the variable is immutable
 a = 729;
 set b = 2006; #immutable
 print $a * $b;

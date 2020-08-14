@@ -18,7 +18,7 @@ Very much in development.
 <operation> = <infix> | <prefix> ;
 
 <infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" <expression> ;
-<prefix> = <get-var> | "!" | "-" <expression> ;
+<prefix> = <get-var> | ("!" | "-" <expression>) ;
 <get-var> = "$" IDENTIFIER>;
 
 <literal> = STRING | NUMBER | "true" | "false" | "null" ;

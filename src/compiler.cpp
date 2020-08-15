@@ -219,6 +219,26 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
 
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
+        } else if (CHECK(IF)) { // if statement
+            token++;
+
+            if (!CHECK(LEFT_PAREN)) ERROR("Compile-time Error: Expected '(' after if.");
+
+            token++;
+            expression(1);
+            token++;
+
+            if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after if condition.");
+
+            vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
+            int size = vm.opcode.size();
+            int line = TOKEN.line;
+            
+            token++;
+            declaration();
+            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size());
+            vm.lines.insert(vm.lines.begin() + size, line);
+
         } else {
             expression(1);
             token++;

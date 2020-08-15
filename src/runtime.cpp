@@ -114,7 +114,18 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 }
                 break;
             }
-            case OP_JUMP: { // goto
+            case OP_JUMP_FALSE: { // goto
+                if (IS_BOOL(value_pool.top())) {
+                    if (value_pool.top().storage.boolean) {
+                        value_pool.pop();
+                        op++;
+                        break;
+                    }
+                } else if (value_pool.top().type != TYPE_NULL) {
+                    value_pool.pop();
+                    op++;
+                    break;
+                }
                 op++;
                 op = opcode.begin() + (int) OP-1;
                 break;
@@ -183,7 +194,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
-                if (!(*(op-1) == OP_IMUT && *(op-2) != OP_CONSTANT && *(op-2) != OP_RETRIEVE && *(op-2) != OP_JUMP)) {
+                if (!(*(op-1) == OP_IMUT && *(op-2) != OP_CONSTANT && *(op-2) != OP_RETRIEVE && *(op-2) != OP_JUMP_FALSE)) {
                     mutables.push_back(id);
                 }
                 globals[id] = gl_value;

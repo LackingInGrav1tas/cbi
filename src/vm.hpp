@@ -29,7 +29,7 @@ class Machine {
         writeOp(line, constants.size()-1);
     }
     void writeJump(int line, int index) {
-        writeOp(line, OP_JUMP);
+        writeOp(line, OP_JUMP_FALSE);
         writeOp(line, index);
     }
     // </helper>

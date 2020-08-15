@@ -52,8 +52,8 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_CONCATENATE";
             break;
         }
-        case OP_JUMP: {
-            std::cout << "OP_JUMP to " << (int) *(op+1);
+        case OP_JUMP_FALSE: {
+            std::cout << "OP_JUMP_FALSE to " << (int) *(op+1);
             op++;
             break;
         }

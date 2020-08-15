@@ -19,7 +19,7 @@ Very much in development.
 
 <infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;
 <prefix> = <get-var> | ("!" | "-" <expression>) ;
-<get-var> = "$" IDENTIFIER>;
+<get-var> = "$" IDENTIFIER;
 
 <literal> = STRING | NUMBER | "true" | "false" | "null" ;
 <group> = "(" <expression> ")" ;

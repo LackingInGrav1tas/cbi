@@ -7,6 +7,7 @@ Very much in development.
 ## Grammar EBNF ##
 ```EBNF
 <code> ::= <declaration>* ;
+
 <declaration> ::= <statement> | <set-variable> ;
 
 <statement> ::= (<expression> | <print-statement> ";") | <if-statement> | <code-block> ;
@@ -39,11 +40,29 @@ output:
 ```
 hello world!
 ```
-### variable stuff: ###
+### variables: ###
 
-<img width="401" alt="variables_example" src="https://user-images.githubusercontent.com/42680395/90297234-d418b280-de5b-11ea-9d29-235f253ec382.png">
+![Alt text](examples/variables_example.png?raw=true "Title")
 
 output:
 ```
 1462374
+```
+### control flow ###
+if:
+```
+if (true) print "This will print.";
+if (true) {
+    set a = " So will this.";
+    print $a;
+}
+if (false) print "This won't print.";
+if (false) {
+    set a = " Neither this.";
+    print $a;
+}
+```
+output:
+```
+This will print. So will this.
 ```

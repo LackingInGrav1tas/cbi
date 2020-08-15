@@ -222,9 +222,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 expression(1);
                 token++;
-            } else {
-                vm.writeConstant(TOKEN.line, nullValue());
-            }
+            } else vm.writeConstant(TOKEN.line, nullValue());
 
             if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
 
@@ -234,11 +232,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             bool mut = true;
             //checking mut
-            if (!CHECK(MUT)) {
+            if (!CHECK(MUT))
                 mut = false;
-            } else {
+            else
                 token++;
-            }
 
             if (!CHECK(IDENTIFIER)) {
                 token--;
@@ -252,9 +249,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 expression(1);
                 token++;
-            } else {
-                vm.writeConstant(TOKEN.line, nullValue());
-            }
+            } else vm.writeConstant(TOKEN.line, nullValue());
 
             if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
 
@@ -282,11 +277,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
             int size = vm.opcode.size();
             int line = TOKEN.line;
-            
+
             token++;
             if (!CHECK(LEFT_BRACKET))
                 declaration();
             else HANDLE_BLOCK();
+
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
             vm.lines.insert(vm.lines.begin() + size, line);
         } else if (CHECK(LEFT_BRACKET)) { // block

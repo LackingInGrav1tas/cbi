@@ -12,8 +12,9 @@ Very much in development.
 <set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
 <print-statement> = "print" [<expression>] ;
-<if-statement> = "if" "(" <expression> ")" <flexible-block> [ "else" <flexible-block> ] ;
+<if-statement> = "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
 
+<group> = "(" <expression> ")" ;
 <flexible-block> = <code-block> | <declaration> ;
 <expression> = <operation> | <literal> | <group> ;
 
@@ -25,7 +26,6 @@ Very much in development.
 <get-var> = "$" IDENTIFIER ;
 
 <literal> = STRING | NUMBER | "true" | "false" | "null" ;
-<group> = "(" <expression> ")" ;
 ```
 
 ## Code Snippets ##

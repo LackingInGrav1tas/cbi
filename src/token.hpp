@@ -24,7 +24,7 @@ enum Type {
     MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS,
 
     // keywords
-    AND, OR, ELSE, FOR, IF, TOKEN_NULL, FUN, PRINT, GLOBAL,
+    AND, OR, ELSE, FOR, IF, TOKEN_NULL, FUN, PRINT,
 
     _EOF
 };

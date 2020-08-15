@@ -2,6 +2,9 @@
 #define _types_h
 
 #include <string>
+#include <vector>
+#include <stack>
+#include <map>
 
 enum Command {
     OP_BEGIN, OP_BLANK, OP_PRINT_TOP, OP_CONSTANT,
@@ -16,7 +19,8 @@ enum Command {
     OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_CONCATENATE,
 
     OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
-    OP_JUMP_FALSE, OP_IF, OP_ELSE, OP_POP_TOP, OP_GLOBAL, OP_SET_GLOBAL, OP_IMUT, OP_RETRIEVE
+    OP_JUMP_FALSE, OP_IF, OP_ELSE, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
+    OP_BEGIN_SCOPE, OP_END_SCOPE
 };
 
 enum Mode {
@@ -42,6 +46,11 @@ struct Value {
         double number;
         bool boolean;
     } storage;
+};
+
+struct Scope {
+    std::map<std::string, Value> variables;
+    std::vector<std::string> mutables;
 };
 
 Value numberValue(double num);

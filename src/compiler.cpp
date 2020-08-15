@@ -95,7 +95,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             case DOLLAR: { // prefix retrieve &<identifier>
                 vm.writeOp(TOKEN.line, OP_RETRIEVE);
                 token++;
-                vm.constants.push_back(stringValue(TOKEN.lexeme));
+                vm.constants.push_back(idLexeme(TOKEN.lexeme));
                 vm.writeOp(TOKEN.line, vm.constants.size()-1);
                 break;
             }
@@ -191,7 +191,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 case EQUAL: {
                     token++;
                     expression(1);
-                    vm.writeOp(TOKEN.line, OP_SET_GLOBAL);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
                     break;
                 }
                 default: break;
@@ -200,35 +200,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     };
 
     std::function<void()> declaration = [&]()->void {
-        if (CHECK(GLOBAL)) { // setting global variable
-            token++;
-            bool mut = true;
-            //checking mut
-            if (!CHECK(MUT)) {
-                mut = false;
-            } else {
-                token++;
-            }
-
-            if (!CHECK(IDENTIFIER)) {
-                token--;
-                ERROR("Compile-time Error: Expected an identifier.");
-            }
-
-            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
-                                                                     // is >= 2 because of TRIM()
-            token++;
-            if (CHECK(EQUAL)) {
-                token++;
-                expression(1);
-                token++;
-            } else vm.writeConstant(TOKEN.line, nullValue());
-
-            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
-
-            if (!mut) vm.writeOp(TOKEN.line, OP_IMUT);
-            vm.writeOp(TOKEN.line, OP_GLOBAL);
-        } else if (CHECK(SET)) { // setting scoped variable
+        std::cout << "TOKEN.lexeme: " << TOKEN.lexeme << std::endl;
+        if (CHECK(SET)) { // setting scoped variable
             token++;
             bool mut = true;
             //checking mut
@@ -253,8 +226,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
 
-            if (!mut) vm.writeOp(TOKEN.line, OP_IMUT);
-            vm.writeOp(TOKEN.line, OP_GLOBAL);
+            if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
+            else vm.writeOp(TOKEN.line, OP_VARIABLE);
         } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
@@ -281,12 +254,18 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             if (!CHECK(LEFT_BRACKET))
                 declaration();
-            else HANDLE_BLOCK();
-
+            else {
+                vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+                HANDLE_BLOCK();
+                vm.writeOp(TOKEN.line, OP_END_SCOPE);
+            }
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
             vm.lines.insert(vm.lines.begin() + size, line);
         } else if (CHECK(LEFT_BRACKET)) { // block
+            std::cout << "left bracket found" << std::endl;
+            vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();
+            vm.writeOp(TOKEN.line, OP_END_SCOPE);
         } else {
             expression(1);
             token++;
@@ -295,13 +274,15 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         }
     };
 
-    for (; !CHECK(_EOF) && token < tokens.end(); token++) {// this is where the compiling starts
+    vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+    for (; !CHECK(_EOF) && token < tokens.end(); token++) {
         declaration();
         if (panicking) {
             for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
             panicking = false;
         }
-    }// and finishes
+    }
+    vm.writeOp(TOKEN.line, OP_END_SCOPE);
 
     #undef TOKEN
     #undef PREV

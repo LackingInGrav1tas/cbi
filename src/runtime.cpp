@@ -19,7 +19,7 @@ static bool valueEquals(Value lhs, Value rhs) {
 ErrorCode Machine::run(RunType mode) { // executes the program
 
     #define GET_TOP() \
-        if (value_pool.size() < 2) { std::cerr << "Run-time Error: Stack underflow." << std::endl; return EXIT_RT; } \
+        if (value_pool.size() < 2) { std::cerr << "\nRun-time Error: Stack underflow." << std::endl; return EXIT_RT; } \
         Value rhs = value_pool.top(); \
         value_pool.pop(); \
         Value lhs = value_pool.top(); \
@@ -48,7 +48,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_STRING(rhs) && IS_STRING(lhs)) {
                     value_pool.push(stringValue('"' + TRIM(lhs.string) + TRIM(rhs.string) + '"'));
                 } else {
-                    std::cerr << "Run-time Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -58,7 +58,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number + rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not add non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not add non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -68,7 +68,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number - rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not subtract non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not subtract non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -78,7 +78,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number * rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not multiply non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not multiply non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -88,7 +88,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number / rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not divide non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not divide non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -99,7 +99,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(num))
                     value_pool.push(numberValue(-num.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not negate non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not negate non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -110,7 +110,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_BOOL(top))
                     value_pool.push(boolValue(!top.storage.boolean));
                 else {
-                    std::cerr << "Run-time Error: Could not negate non-boolean value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not negate non-boolean value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -148,7 +148,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number < rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -158,7 +158,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number > rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -168,7 +168,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number <= rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -178,7 +178,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number >= rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
+                    std::cerr << "\nRun-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
                     return EXIT_RT;
                 }
                 break;
@@ -187,53 +187,90 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 value_pool.pop();
                 break;
             }
-            case OP_GLOBAL: {
+            case OP_VARIABLE: {
                 Value gl_value = value_pool.top();
                 value_pool.pop();
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
+                    std::cerr << "\nRun-time Error:  Expected an identifier." << std::endl;
                     return EXIT_RT;
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
-                if (!(*(op-1) == OP_IMUT && *(op-2) != OP_CONSTANT && *(op-2) != OP_RETRIEVE && *(op-2) != OP_JUMP_FALSE)) {
-                    mutables.push_back(id);
+                scopes.back().variables[id] = gl_value;
+                break;
+            }
+            case OP_VARIABLE_MUT: {
+                Value gl_value = value_pool.top();
+                value_pool.pop();
+                if (!IS_ID(value_pool.top())) {
+                    std::cerr << "\nRun-time Error:  Expected an identifier." << std::endl;
+                    return EXIT_RT;
                 }
-                globals[id] = gl_value;
+                std::string id = value_pool.top().string;
+                value_pool.pop();
+                scopes.back().variables[id] = gl_value;
+                scopes.back().mutables.push_back(id);
                 break;
             }
             case OP_RETRIEVE: {
                 op++;
-                value_pool.push(globals[constants[(int)OP].string]);
+
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i++) {
+                    found = scopes[i].variables.find(constants[(int)OP].string);
+                    if (found == scopes[i].variables.end()) {
+                        if (i == 0) {
+                            std::cerr << "\nRun-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << std::endl;
+                            return EXIT_RT;
+                        }
+                        continue;
+                    }
+                    value_pool.push(found->second);
+                    break;
+                }
                 break;
             }
             case OP_IMUT: break;
-            case OP_SET_GLOBAL: {
+            case OP_SET_VARIABLE: {
                 Value replacement = value_pool.top();
                 value_pool.pop();
                 
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
+                    std::cerr << "\nRun-time Error: Expected an identifier." << std::endl;
                     return EXIT_RT;
                 }
 
-                std::map<std::string, Value>::iterator found = globals.find(value_pool.top().string);
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i++) {
+                    found = scopes[i].variables.find(value_pool.top().string);
+                    if (found == scopes[i].variables.end()) {
+                        if (i == 0) {
+                            std::cerr << "\nRun-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
+                            return EXIT_RT;
+                        }
+                        continue;
+                    }
 
-                if (found == globals.end()) { // checking if the variable exists
-                    std::cerr << "Run-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
-                    return EXIT_RT;
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        std::cerr << "\nRun-time Error: Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;";
+                        return EXIT_RT;
+                    }
+
+                    found->second = replacement;
+                    break;
                 }
-
-                if (std::find(mutables.begin(), mutables.end(), found->first) == mutables.end()) { // if it's immutable
-                    std::cerr << "Run-time Error: Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;";
-                    return EXIT_RT;
-                }
-
-                found->second = replacement; // setting new value
+                break;
+            }
+            case OP_BEGIN_SCOPE: {
+                scopes.push_back(Scope());
+                break;
+            }
+            case OP_END_SCOPE: {
+                scopes.pop_back();
                 break;
             }
             default: { // error
-                std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
+                std::cerr << "\nRun-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
                 return EXIT_RT;
             }
         }

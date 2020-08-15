@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
                 std::cerr << "\nCould not access file." << std::endl;
                 return EXIT_FAILURE;
             }
-            
+
             auto tokens = lex(lines, argv[1], success, NORM); // lexing the file into tokens
             if (!success) {
                 std::cerr << "\nFatal error during scanning." << std::endl;
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
             vm.disassembleStack();
             
             std::cout << std::endl;
-            vm.disassembleGlobalMap();
+            vm.disassembleScopes();
 
             std::cout << "\nEND OF PROGRAM";
         } else {

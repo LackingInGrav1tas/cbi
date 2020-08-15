@@ -89,8 +89,8 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_POP_TOP";
             break;
         }
-        case OP_GLOBAL: {
-            std::cout << "OP_GLOBAL";
+        case OP_VARIABLE: {
+            std::cout << "OP_VARIABLE";
             break;
         }
         case OP_RETRIEVE: {
@@ -98,12 +98,20 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_RETRIEVE  position: " << (int) *op << "  lexeme: " << constants[*op].string;
             break;
         }
-        case OP_SET_GLOBAL: {
-            std::cout << "OP_SET_GLOBAL";
+        case OP_SET_VARIABLE: {
+            std::cout << "OP_SET_VARIABLE";
             break;
         }
         case OP_IMUT: {
             std::cout << "OP_IMUT";
+            break;
+        }
+        case OP_BEGIN_SCOPE: {
+            std::cout << "OP_BEGIN_SCOPE";
+            break;
+        }
+        case OP_END_SCOPE: {
+            std::cout << "OP_END_SCOPE";
             break;
         }
         default: {
@@ -138,10 +146,19 @@ void Machine::disassembleStack() {
     std::cout << "== end ==" << std::endl;
 }
 
-void Machine::disassembleGlobalMap() {
-    std::cout << "== global map ==" << std::endl;
-    for (std::map<std::string, Value>::iterator it = globals.begin(); it != globals.end(); it++) {
-        std::cout << it->first << " : " << getPrintable(it->second) << std::endl;
+void Machine::disassembleScopes() {
+    #define SCOPE_AT() scope-scopes.rbegin()
+    #define SCOPE (*scope)
+    #define VARS SCOPE.variables
+
+    for (auto scope = scopes.rbegin(); scope < scopes.rend(); scope++) {
+        std::cout << "== scope " << SCOPE_AT() << " map ==" << std::endl;
+        for (std::map<std::string, Value>::iterator it = VARS.begin(); it != VARS.end(); it++) {
+            std::cout << it->first << " : " << getPrintable(it->second) << std::endl;
+        }
+        std::cout << "== end ==" << std::endl;
     }
-    std::cout << "== end ==" << std::endl;
+
+    #undef SCOPE_AT
+    #undef VARS
 }

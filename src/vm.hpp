@@ -15,8 +15,7 @@ class Machine {
     std::vector<int> lines = { 0 };
     std::stack<Value> value_pool;
     std::vector<Value> constants;
-    std::vector<std::string> mutables;
-    std::map<std::string, Value> globals;
+    std::vector<Scope> scopes;
 
     // <helper>
     void writeOp(int line, uint8_t command) {
@@ -41,7 +40,7 @@ class Machine {
     void disassembleConstants();
     void disassembleOpcode();
     void disassembleStack();
-    void disassembleGlobalMap();
+    void disassembleScopes();
     // </debug>
 };
 

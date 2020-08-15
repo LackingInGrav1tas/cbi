@@ -49,7 +49,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "fun") tokens.push_back(Token(FUN, lexeme, filename, line-lines.begin(), mode)); \
                     else if (lexeme == "if") tokens.push_back(Token(IF, lexeme, filename, line-lines.begin(), mode)); \
                     else if (lexeme == "else") tokens.push_back(Token(ELSE, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "global") tokens.push_back(Token(GLOBAL, lexeme, filename, line-lines.begin(), mode)); \
                     else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin(), mode)); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin(), mode)); \
                     lexeme.clear(); } while (false)

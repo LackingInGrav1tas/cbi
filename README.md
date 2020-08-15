@@ -6,24 +6,25 @@ Very much in development.
 
 ## Grammar EBNF ##
 ```EBNF
-<declaration> = <statement> | <set-variable> ;
+<code> ::= <declaration>* ;
+<declaration> ::= <statement> | <set-variable> ;
 
-<statement> = (<expression> | <print-statement> ";") | <if-statement> | <code-block> ;
-<set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
+<statement> ::= (<expression> | <print-statement> ";") | <if-statement> | <code-block> ;
+<set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
-<print-statement> = "print" [<expression>] ;
-<if-statement> = "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
+<print-statement> ::= "print" [<expression>] ;
+<if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
 
-<group> = "(" <expression> ")" ;
-<flexible-block> = <code-block> | <declaration> ;
-<expression> = <operation> | <literal> | <group> ;
+<group> ::= "(" <expression> ")" ;
+<flexible-block> ::= <code-block> | <declaration> ;
+<expression> ::= <operation> | <literal> | <group> ;
 
-<code-block> = "{" <declaration>* "}" ;
-<operation> = <infix> | <prefix> ;
+<code-block> ::= "{" <code> "}" ;
+<operation> ::= <infix> | <prefix> ;
 
-<infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;
-<prefix> = <get-var> | ("!" | "-" <expression>) ;
-<get-var> = "$" IDENTIFIER ;
+<infix> ::= <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;
+<prefix> ::= <get-var> | ("!" | "-" <expression>) ;
+<get-var> ::= "$" IDENTIFIER ;
 
 <literal> = STRING | NUMBER | "true" | "false" | "null" ;
 ```

@@ -200,7 +200,37 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     };
 
     std::function<void()> declaration = [&]()->void {
-        if (CHECK(SET)) { // setting variable
+        if (CHECK(GLOBAL)) { // setting global variable
+            token++;
+            bool mut = true;
+            //checking mut
+            if (!CHECK(MUT)) {
+                mut = false;
+            } else {
+                token++;
+            }
+
+            if (!CHECK(IDENTIFIER)) {
+                token--;
+                ERROR("Compile-time Error: Expected an identifier.");
+            }
+
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
+                                                                     // is >= 2 because of TRIM()
+            token++;
+            if (CHECK(EQUAL)) {
+                token++;
+                expression(1);
+                token++;
+            } else {
+                vm.writeConstant(TOKEN.line, nullValue());
+            }
+
+            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
+
+            if (!mut) vm.writeOp(TOKEN.line, OP_IMUT);
+            vm.writeOp(TOKEN.line, OP_GLOBAL);
+        } else if (CHECK(SET)) { // setting scoped variable
             token++;
             bool mut = true;
             //checking mut

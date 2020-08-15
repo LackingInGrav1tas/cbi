@@ -34,7 +34,7 @@ Very much in development.
 
 ### hello world: ###
 ```Batch
-print "hello world!";
+![Alt text](examples/hello_world.png?raw=true "Title")
 ```
 output:
 ```
@@ -51,16 +51,7 @@ output:
 ### control flow ###
 if:
 ```
-if (true) print "This will print.";
-if (true) {
-    set a = " So will this.";
-    print $a;
-}
-if (false) print "This won't print.";
-if (false) {
-    set a = " Neither this.";
-    print $a;
-}
+![Alt text](examples/if_example.png?raw=true "Title")
 ```
 output:
 ```

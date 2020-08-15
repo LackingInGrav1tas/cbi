@@ -49,7 +49,7 @@ class Token {
         if (!b) {
             std::cout << "Error in non-existant file." << std::endl;
         } else if (line == -1) {
-            std::cerr << "\n" << lines.size()+1 << "| _EOF\n" << message << std::endl;
+            std::cerr << "\n" << lines.size()+2 << "| _EOF\n" << message << std::endl;
         } else {
             std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {

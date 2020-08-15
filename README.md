@@ -8,7 +8,7 @@ Very much in development.
 ```EBNF
 <declaration> = <statement> | <set-variable> ;
 
-<statement> = (<expression> | <print-statement> ";") | <if-statement> ;
+<statement> = (<expression> | <print-statement> ";") | <if-statement> | <code-block> ;
 <set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
 <print-statement> = "print" [<expression>] ;

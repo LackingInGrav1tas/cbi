@@ -101,9 +101,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeConstant(TOKEN.line, boolValue(false));
                 break;
             }
+            case IDENTIFIER: {
+                vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+                if (NEXT.type != EQUAL) ERROR("Compile-time Error: Stray identifier."); 
+                break;
+            }
             case _EOF: break;
             default: {
-                ERROR("Compile-time Error: Expexted an expression with token " + TOKEN.lexeme + " in line " + std::to_string(TOKEN.line) + ".");
+                ERROR("Compile-time Error: Expected an expression.");
             }
         }
         while (p <= getPrecedence(NEXT.type)) {
@@ -239,6 +244,16 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size());
             vm.lines.insert(vm.lines.begin() + size, line);
 
+        } else if (CHECK(LEFT_BRACKET)) { // block
+            token++;
+            for (; !CHECK(_EOF) && !CHECK(RIGHT_BRACKET) && token < tokens.end(); token++) {// this is where the compiling starts
+                declaration();
+                if (panicking) {
+                    for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
+                    panicking = false;
+                }
+            }
+            if (!CHECK(RIGHT_BRACKET)) ERROR("Compile-time Error: Expected '}' after block.");
         } else {
             expression(1);
             token++;

@@ -57,6 +57,20 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
     #define CHECK(t) (TOKEN.type == t)
 
+    #define HANDLE_BLOCK() \
+        /* begins with LEFT_BRACKET ends with RIGHT_BRACKET */\
+        do { \
+            token++; \
+            for (; !CHECK(_EOF) && !CHECK(RIGHT_BRACKET) && token < tokens.end(); token++) { \
+                declaration(); \
+                if (panicking) { \
+                    for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++); \
+                    panicking = false; \
+                } \
+            } \
+            if (!CHECK(RIGHT_BRACKET)) ERROR("Compile-time Error: Expected '}' after block."); \
+        } while (false)\
+
     std::function<void(int)> expression = [&](int p)->void { // this notation used because c++ has no nested functions
         switch (TOKEN.type) {
             case LEFT_PAREN: { // group
@@ -240,20 +254,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             int line = TOKEN.line;
             
             token++;
-            declaration();
-            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size());
+            if (!CHECK(LEFT_BRACKET))
+                declaration();
+            else HANDLE_BLOCK();
+            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
             vm.lines.insert(vm.lines.begin() + size, line);
 
         } else if (CHECK(LEFT_BRACKET)) { // block
-            token++;
-            for (; !CHECK(_EOF) && !CHECK(RIGHT_BRACKET) && token < tokens.end(); token++) {// this is where the compiling starts
-                declaration();
-                if (panicking) {
-                    for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
-                    panicking = false;
-                }
-            }
-            if (!CHECK(RIGHT_BRACKET)) ERROR("Compile-time Error: Expected '}' after block.");
+            HANDLE_BLOCK();
         } else {
             expression(1);
             token++;

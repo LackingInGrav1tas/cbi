@@ -72,6 +72,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeOp(TOKEN.line, OP_NEGATE);
                 break;
             }
+            case NOT: { // prefix negation -
+                token++;
+                expression(7);
+                vm.writeOp(TOKEN.line, OP_NOT);
+                break;
+            }
             case DOLLAR: { // prefix retrieve &<identifier>
                 vm.writeOp(TOKEN.line, OP_RETRIEVE);
                 token++;
@@ -93,10 +99,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             }
             case FALSE: { // false
                 vm.writeConstant(TOKEN.line, boolValue(false));
-                break;
-            }
-            case IDENTIFIER: {
-                vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
                 break;
             }
             case _EOF: break;

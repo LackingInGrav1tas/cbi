@@ -23,10 +23,6 @@ enum Command {
     OP_BEGIN_SCOPE, OP_END_SCOPE
 };
 
-enum Mode {
-    NORM, REPL
-};
-
 enum RunType {
     NORMAL, DEBUG
 };

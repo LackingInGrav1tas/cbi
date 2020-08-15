@@ -21,7 +21,7 @@ std::vector<std::string> getLines(const char *filename, bool &success) {
     return lines;
 }
 
-std::vector<Token> lex(std::vector<std::string> lines, const char* filename, bool &sucess, Mode mode) {
+std::vector<Token> lex(std::vector<std::string> lines, const char* filename, bool &sucess) {
     std::vector<Token> tokens;
 
     // for verbosity
@@ -33,24 +33,24 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
         for (auto character = LINE.begin(); character < LINE.end(); character++) { // for each character
             switch (c) {
                 #define ERROR(message) \
-                    do { std::cerr << "\n" << (line-lines.begin(), mode)+1 << "| " << LINE << message << std::endl; \
+                    do { std::cerr << "\n" << (line-lines.begin())+1 << "| " << LINE << message << std::endl; \
                     sucess = false; \
                     character = LINE.end(); } while (false)
                 #define PUSH_TOKEN(lexeme) \
                     do { if (lexeme.empty()); \
-                    else if (lexeme == "print") tokens.push_back(Token(PRINT, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "and") tokens.push_back(Token(AND, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "or") tokens.push_back(Token(OR, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "set") tokens.push_back(Token(SET, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "mut") tokens.push_back(Token(MUT, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "true") tokens.push_back(Token(TRUE, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "false") tokens.push_back(Token(FALSE, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "fun") tokens.push_back(Token(FUN, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "if") tokens.push_back(Token(IF, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "else") tokens.push_back(Token(ELSE, lexeme, filename, line-lines.begin(), mode)); \
-                    else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin(), mode)); \
-                    else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin(), mode)); \
+                    else if (lexeme == "print") tokens.push_back(Token(PRINT, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "and") tokens.push_back(Token(AND, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "or") tokens.push_back(Token(OR, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "set") tokens.push_back(Token(SET, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "mut") tokens.push_back(Token(MUT, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "true") tokens.push_back(Token(TRUE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "false") tokens.push_back(Token(FALSE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "fun") tokens.push_back(Token(FUN, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "if") tokens.push_back(Token(IF, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "else") tokens.push_back(Token(ELSE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin())); \
+                    else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 
                 // alphabet
@@ -85,7 +85,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                         break;
                     }
                     lexeme.push_back(current);
-                    tokens.push_back(Token(STRING, lexeme, filename, line - lines.begin(), mode));
+                    tokens.push_back(Token(STRING, lexeme, filename, line - lines.begin()));
                     lexeme.clear();
                     break;
                 }
@@ -104,14 +104,14 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                                lexeme += c;
                         }
                     }
-                    tokens.push_back(Token(NUMBER, lexeme, filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(NUMBER, lexeme, filename, line-lines.begin()));
                     lexeme.clear();
                     character--;
                     break;
                 }
                 case '.':
                     PUSH_TOKEN(lexeme);
-                    if (character+1 == LINE.end()) tokens.push_back(Token(DOT, ".", filename, line-lines.begin(), mode));
+                    if (character+1 == LINE.end()) tokens.push_back(Token(DOT, ".", filename, line-lines.begin()));
                     else {
                         character++;
                         if (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' ||
@@ -121,10 +121,10 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                                c == '7' || c == '8' || c == '9'; character++) {
                                lexeme += c;
                             }
-                            tokens.push_back(Token(NUMBER, "0" + lexeme, filename, line-lines.begin(), mode));
+                            tokens.push_back(Token(NUMBER, "0" + lexeme, filename, line-lines.begin()));
                             lexeme.clear();
                         } else {
-                            tokens.push_back(Token(DOT, ".", filename, line-lines.begin(), mode));
+                            tokens.push_back(Token(DOT, ".", filename, line-lines.begin()));
                             character--;
                         }
                     }
@@ -136,32 +136,32 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 // necessarily one character operators
                 case ';': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(SEMICOLON, ";", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(SEMICOLON, ";", filename, line-lines.begin()));
                     break;
                 }
                 case '$': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(DOLLAR, ";", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(DOLLAR, ";", filename, line-lines.begin()));
                     break;
                 }
                 case '(': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(LEFT_PAREN, "(", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(LEFT_PAREN, "(", filename, line-lines.begin()));
                     break;
                 }
                 case ')': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(RIGHT_PAREN, ")", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(RIGHT_PAREN, ")", filename, line-lines.begin()));
                     break;
                 }
                 case '{': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(LEFT_BRACKET, "{", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(LEFT_BRACKET, "{", filename, line-lines.begin()));
                     break;
                 }
                 case '}': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(RIGHT_BRACKET, "}", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(RIGHT_BRACKET, "}", filename, line-lines.begin()));
                     break;
                 }
                 // necessarily two character operators
@@ -174,7 +174,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                         ERROR("\nSyntax Error: Expected '||' character but only found '|'");
                         break;
                     }
-                    tokens.push_back(Token(CONCATENATE, "||", filename, line-lines.begin(), mode));
+                    tokens.push_back(Token(CONCATENATE, "||", filename, line-lines.begin()));
                     character++;
                     break;
                 }
@@ -182,95 +182,95 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 case '=': { // =, ==
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(EQUAL, "=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(EQUAL, "=", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(EQUAL_EQUAL, "==", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(EQUAL_EQUAL, "==", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(EQUAL, "=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(EQUAL, "=", filename, line-lines.begin()));
                     break;
                 }
                 case '<': { // <, <=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(LESS, "<", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(LESS, "<", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(LESS_EQUAL, "==", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(LESS_EQUAL, "==", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(LESS, "=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(LESS, "=", filename, line-lines.begin()));
                     break;
                 }
                 case '>': { // >, >=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(GREATER, ">", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(GREATER, ">", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(GREATER_EQUAL, ">=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(GREATER_EQUAL, ">=", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(GREATER, ">", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(GREATER, ">", filename, line-lines.begin()));
                     break;
                 }
                 case '!': { // !, !=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(NOT, "!", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(NOT, "!", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(NOT_EQUAL, "!=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(NOT_EQUAL, "!=", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(NOT, "!", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(NOT, "!", filename, line-lines.begin()));
                     break;
                 }
                 case '+': { // +, +=, ++
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(PLUS, "+", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(PLUS, "+", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(PLUS_EQUALS, "+=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(PLUS_EQUALS, "+=", filename, line-lines.begin()));
                         character++;
                     } else if (*(character+1) == '+') {
-                        tokens.push_back(Token(INCREMENT, "++", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(INCREMENT, "++", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(PLUS, "+", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(PLUS, "+", filename, line-lines.begin()));
                     break;
                 }
                 case '-': { // -, -=, --
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(MINUS, "-", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(MINUS, "-", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(MINUS_EQUALS, "-=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(MINUS_EQUALS, "-=", filename, line-lines.begin()));
                         character++;
                     } else if (*(character+1) == '-') {
-                        tokens.push_back(Token(DECREMENT, "--", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(DECREMENT, "--", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(MINUS, "-", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(MINUS, "-", filename, line-lines.begin()));
                     break;
                 }
                 case '*': { // *, *=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(STAR, "*", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(STAR, "*", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(STAR_EQUALS, "*=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(STAR_EQUALS, "*=", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(STAR, "*", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(STAR, "*", filename, line-lines.begin()));
                     break;
                 }
                 case '/': { // /, /=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
-                        tokens.push_back(Token(SLASH, "/", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(SLASH, "/", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
-                        tokens.push_back(Token(SLASH_EQUALS, "/=", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(SLASH_EQUALS, "/=", filename, line-lines.begin()));
                         character++;
                     } else
-                        tokens.push_back(Token(SLASH, "/", filename, line-lines.begin(), mode));
+                        tokens.push_back(Token(SLASH, "/", filename, line-lines.begin()));
                     break;
                 }
                 default: {
@@ -284,6 +284,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
     #undef c
     #undef rline
     #undef PUSH_TOKEN
-    tokens.push_back(Token(_EOF, "_EOF", filename, -1, mode));
+    tokens.push_back(Token(_EOF, "_EOF", filename, -1));
     return tokens;
 }

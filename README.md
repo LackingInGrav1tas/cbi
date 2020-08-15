@@ -33,14 +33,14 @@ Very much in development.
 ## Code Snippets ##
 
 ### hello world: ###
-![Alt text](examples/hello_world.png?raw=true "Title")
+![Alt text](examples/hello_world.png?raw=true "Hello World")
 output:
 ```
 hello world!
 ```
 ### variables: ###
 
-![Alt text](examples/variables_example.png?raw=true "Title")
+![Alt text](examples/variable_example.png?raw=true "Variables")
 
 output:
 ```
@@ -48,7 +48,7 @@ output:
 ```
 ### control flow ###
 if:
-![Alt text](examples/if_example.png?raw=true "Title")
+![Alt text](examples/if_example.png?raw=true "If")
 output:
 ```
 This will print. So will this.

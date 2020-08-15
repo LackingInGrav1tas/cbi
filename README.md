@@ -33,9 +33,7 @@ Very much in development.
 ## Code Snippets ##
 
 ### hello world: ###
-```Batch
 ![Alt text](examples/hello_world.png?raw=true "Title")
-```
 output:
 ```
 hello world!
@@ -50,9 +48,7 @@ output:
 ```
 ### control flow ###
 if:
-```
 ![Alt text](examples/if_example.png?raw=true "Title")
-```
 output:
 ```
 This will print. So will this.

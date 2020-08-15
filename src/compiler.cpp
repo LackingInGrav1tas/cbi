@@ -259,7 +259,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             else HANDLE_BLOCK();
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
             vm.lines.insert(vm.lines.begin() + size, line);
-
         } else if (CHECK(LEFT_BRACKET)) { // block
             HANDLE_BLOCK();
         } else {

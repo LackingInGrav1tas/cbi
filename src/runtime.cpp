@@ -128,6 +128,7 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 }
                 op++;
                 op = opcode.begin() + (int) OP-1;
+                value_pool.pop();
                 break;
             }
             case OP_BEGIN: break; // because of jump quirk

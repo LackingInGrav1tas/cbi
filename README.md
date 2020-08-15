@@ -8,13 +8,16 @@ Very much in development.
 ```EBNF
 <declaration> = <statement> | <set-variable> ;
 
-<statement> = <expression> | <print-statement> ";" ;
+<statement> = (<expression> | <print-statement> ";") | <if-statement> ;
 <set-variable> = "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
 <print-statement> = "print" [<expression>] ;
+<if-statement> = "if" "(" <expression> ")" <flexible-block> [ "else" <flexible-block> ] ;
 
+<flexible-block> = <code-block> | <declaration> ;
 <expression> = <operation> | <literal> | <group> ;
 
+<code-block> = "{" <declaration>* "}" ;
 <operation> = <infix> | <prefix> ;
 
 <infix> = <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;

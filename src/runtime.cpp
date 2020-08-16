@@ -16,7 +16,7 @@ static bool valueEquals(Value lhs, Value rhs) {
     return true; // this would be if both are null
 }
 
-ErrorCode Machine::run(RunType mode) { // executes the program
+ErrorCode Machine::run() { // executes the program
 
     #define GET_TOP() \
         if (value_pool.size() < 2) { std::cerr << "\nRun-time Error: Stack underflow." << std::endl; return EXIT_RT; } \
@@ -25,7 +25,6 @@ ErrorCode Machine::run(RunType mode) { // executes the program
         Value lhs = value_pool.top(); \
         value_pool.pop()
 
-    if (mode == DEBUG) std::cout << "== runtime debug mode ==";
 
     for (auto op = opcode.begin(); op < opcode.end(); op++) {
         #define OP (*op)
@@ -274,12 +273,8 @@ ErrorCode Machine::run(RunType mode) { // executes the program
                 return EXIT_RT;
             }
         }
-        if (mode == DEBUG) { //printing out OP info
-            disassembleOp(op, constants, lines, op-opcode.begin());
-        }
     }
     #undef OP
     #undef GET_TOP
-    if (mode == DEBUG) std::cout << "\n== end ==" << std::endl;
     return EXIT_OK;
 }

@@ -5,18 +5,24 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 int main(int argc, char **argv) {
     try {
-        if (argc == 2) {
+        if (2 <= argc <= 3) {
+            bool debugmode = false;
             bool success = true;
+            if (argc == 3)
+            if ((std::string)argv[2] == "-debug")
+                debugmode = true;
+
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
             if (!success) {
                 std::cerr << "\nCould not access file." << std::endl;
                 return EXIT_FAILURE;
             }
 
-            auto tokens = lex(lines, argv[1], success, NORM); // lexing the file into tokens
+            auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
             if (!success) {
                 std::cerr << "\nFatal error during scanning." << std::endl;
                 return EXIT_FAILURE;
@@ -28,26 +34,27 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
             }
 
-            vm.disassembleOpcode();
-            std::cout << std::endl;
-
-            switch (vm.run(NORMAL)) { // running the opcode
-                case EXIT_OK: std::cout << "\nEXIT_OK"; break;
-                case EXIT_RT: std::cout << "\nEXIT_RT"; break;
-                case EXIT_CT: std::cout << "\nEXIT_CT"; break;
-                default: std::cout << "\nbug: unknown error code."; break;
+            if (debugmode) {
+                vm.disassembleOpcode();
+                std::cout << std::endl;
             }
 
-            std::cout << "\n" << std::endl;
-            vm.disassembleConstants();
+            if (debugmode) {
+                switch (vm.run()) { // running the opcode
+                    case EXIT_OK: std::cout << "\nEXIT_OK"; break;
+                    case EXIT_RT: std::cout << "\nEXIT_RT"; break;
+                    case EXIT_CT: std::cout << "\nEXIT_CT"; break;
+                    default: std::cout << "\nbug: unknown error code."; break;
+                }
+            } else {
+                vm.run();
+            }
 
-            std::cout << std::endl;
-            vm.disassembleStack();
-            
-            std::cout << std::endl;
-            vm.disassembleScopes();
-
-            std::cout << "\nEND OF PROGRAM";
+            if (debugmode) {
+                std::cout << "\n" << std::endl;
+                vm.disassembleConstants();
+                std::cout << "\nEND OF PROGRAM";
+            }
         } else {
             std::cerr << "The accepted format for cbi is: " << argv[0] << " d:/path/to/file.cbi";
             return EXIT_FAILURE;

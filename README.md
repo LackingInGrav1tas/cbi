@@ -27,7 +27,7 @@ Very much in development.
 <prefix> ::= <get-var> | ("!" | "-" <expression>) ;
 <get-var> ::= "$" IDENTIFIER ;
 
-<literal> = STRING | NUMBER | "true" | "false" | "null" ;
+<literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
 ```
 
 ## Code Snippets ##

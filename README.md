@@ -37,7 +37,7 @@ Very much in development.
 
 output:
 ```
-hello world!
+Hello world!
 ```
 ### variables: ###
 

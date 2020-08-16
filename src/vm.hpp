@@ -34,7 +34,7 @@ class Machine {
     // </helper>
 
     //in runtime
-    ErrorCode run();
+    ErrorCode run(RunType mode);
 
     // <debug>
     void disassembleConstants();

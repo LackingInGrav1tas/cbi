@@ -32,14 +32,16 @@ enum Type {
 class Token {
     public:
     Type type;
+    Mode mode;
     std::string lexeme;
     const char *filename;
     int line;
-    Token(Type init_type, std::string init_lexeme, const char *init_filename, int init_line) {
+    Token(Type init_type, std::string init_lexeme, const char *init_filename, int init_line, Mode init_mode) {
         type = init_type;
         lexeme = init_lexeme;
         filename = init_filename;
         line = init_line;
+        mode = init_mode;
     }
     void error(std::string message) {
         bool b = true;

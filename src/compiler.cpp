@@ -200,6 +200,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     };
 
     std::function<void()> declaration = [&]()->void {
+        std::cout << "TOKEN.lexeme: " << TOKEN.lexeme << std::endl;
         if (CHECK(SET)) { // setting scoped variable
             token++;
             bool mut = true;
@@ -261,6 +262,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
             vm.lines.insert(vm.lines.begin() + size, line);
         } else if (CHECK(LEFT_BRACKET)) { // block
+            std::cout << "left bracket found" << std::endl;
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();
             vm.writeOp(TOKEN.line, OP_END_SCOPE);

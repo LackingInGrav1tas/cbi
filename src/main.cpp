@@ -8,11 +8,7 @@
 
 int main(int argc, char **argv) {
     try {
-        if (argc >= 2) {
-            bool debugmode = false;
-            if (argc == 3)
-            if ((std::string)argv[2] == "-debug")
-                debugmode = true;
+        if (argc == 2) {
             bool success = true;
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
             if (!success) {
@@ -20,7 +16,7 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
             }
 
-            auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
+            auto tokens = lex(lines, argv[1], success, NORM); // lexing the file into tokens
             if (!success) {
                 std::cerr << "\nFatal error during scanning." << std::endl;
                 return EXIT_FAILURE;
@@ -32,27 +28,26 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
             }
 
-            if (debugmode) {
-                vm.disassembleOpcode();
-                std::cout << std::endl;
-            }
+            vm.disassembleOpcode();
+            std::cout << std::endl;
 
-            if (debugmode) {
-                switch (vm.run()) { // running the opcode
+            switch (vm.run(NORMAL)) { // running the opcode
                 case EXIT_OK: std::cout << "\nEXIT_OK"; break;
                 case EXIT_RT: std::cout << "\nEXIT_RT"; break;
                 case EXIT_CT: std::cout << "\nEXIT_CT"; break;
                 default: std::cout << "\nbug: unknown error code."; break;
-                }
-            } else {
-                vm.run();
             }
 
-            if (debugmode) {
-                std::cout << "\n" << std::endl;
-                vm.disassembleConstants();
-                std::cout << "\nEND OF PROGRAM";
-            }
+            std::cout << "\n" << std::endl;
+            vm.disassembleConstants();
+
+            std::cout << std::endl;
+            vm.disassembleStack();
+            
+            std::cout << std::endl;
+            vm.disassembleScopes();
+
+            std::cout << "\nEND OF PROGRAM";
         } else {
             std::cerr << "The accepted format for cbi is: " << argv[0] << " d:/path/to/file.cbi";
             return EXIT_FAILURE;

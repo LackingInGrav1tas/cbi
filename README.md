@@ -33,7 +33,7 @@ Very much in development.
 ## Code Snippets ##
 
 ### hello world: ###
-![Alt text](examples/hello_world.png?raw=true "Hello World")
+![Hello_World](examples/hello_world.png?raw=true "Hello World")
 
 output:
 ```
@@ -41,7 +41,7 @@ Hello world!
 ```
 ### variables: ###
 
-![Alt text](examples/variable_example.png?raw=true "Variables")
+![Variables](examples/variable_example.png?raw=true "Variables")
 
 output:
 ```
@@ -49,7 +49,7 @@ output:
 ```
 ### control flow ###
 if:
-![Alt text](examples/if_example.png?raw=true "If")
+![If](examples/if_example.png?raw=true "If")
 
 output:
 ```

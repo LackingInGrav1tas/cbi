@@ -215,7 +215,7 @@ ErrorCode Machine::run() { // executes the program
                 op++;
 
                 std::map<std::string, Value>::iterator found;
-                for (int i = scopes.size()-1; i >= 0; i++) {
+                for (int i = scopes.size()-1; i >= 0; i--) {
                     found = scopes[i].variables.find(constants[(int)OP].string);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
@@ -240,8 +240,9 @@ ErrorCode Machine::run() { // executes the program
                 }
 
                 std::map<std::string, Value>::iterator found;
-                for (int i = scopes.size()-1; i >= 0; i++) {
-                    found = scopes[i].variables.find(value_pool.top().string);
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    std::string a = value_pool.top().string;
+                    found = scopes[i].variables.find(a);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
                             std::cerr << "\nRun-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
@@ -254,7 +255,6 @@ ErrorCode Machine::run() { // executes the program
                         std::cerr << "\nRun-time Error: Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;";
                         return EXIT_RT;
                     }
-
                     found->second = replacement;
                     break;
                 }

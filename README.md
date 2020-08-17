@@ -13,7 +13,7 @@ Very much in development.
 <statement> ::= (<expression> | <print-statement> ";") | <if-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ";" ;
 
-<print-statement> ::= "print" [<expression>] ;
+<print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
 
 <group> ::= "(" <expression> ")" ;

@@ -93,6 +93,10 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             std::cout << "OP_VARIABLE";
             break;
         }
+        case OP_VARIABLE_MUT: {
+            std::cout << "OP_VARIABLE_MUT";
+            break;
+        }
         case OP_RETRIEVE: {
             op++;
             std::cout << "OP_RETRIEVE  position: " << (int) *op << "  lexeme: " << constants[*op].string;

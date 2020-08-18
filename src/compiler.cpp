@@ -258,8 +258,28 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 HANDLE_BLOCK();
                 vm.writeOp(TOKEN.line, OP_END_SCOPE);
             }
-            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
-            vm.lines.insert(vm.lines.begin() + size, line);
+            token++;
+            if (!CHECK(ELSE)) { // "if" <flexible-block>
+                vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
+                vm.lines.insert(vm.lines.begin() + size, line);
+                token--;
+            } else { // "if" <flexible-block> else <flexible-block>
+                vm.writeOp(TOKEN.line, OP_JUMP);
+                int elsesize = vm.opcode.size();
+                int elseline = TOKEN.line;
+                vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+2);
+                vm.lines.insert(vm.lines.begin() + size, line);
+                token++;
+                if (!CHECK(LEFT_BRACKET))
+                    declaration();
+                else {
+                    vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+                    HANDLE_BLOCK();
+                    vm.writeOp(TOKEN.line, OP_END_SCOPE);
+                }
+                vm.opcode.insert(vm.opcode.begin() + elsesize, vm.opcode.size()+1);
+                vm.lines.insert(vm.lines.begin() + elsesize, elseline);
+            }
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();

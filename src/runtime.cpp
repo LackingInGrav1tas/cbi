@@ -44,12 +44,7 @@ ErrorCode Machine::run() { // executes the program
             }
             case OP_CONCATENATE: { // pops the top 2 strings off the value stack, then pushes a concatenated string
                 GET_TOP();
-                if (IS_STRING(rhs) && IS_STRING(lhs)) {
-                    value_pool.push(stringValue('"' + TRIM(lhs.string) + TRIM(rhs.string) + '"'));
-                } else {
-                    std::cerr << "\nRun-time Error: Could not concatenate non-string value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return EXIT_RT;
-                }
+                value_pool.push(stringValue('"' + getPrintable(lhs) + getPrintable(rhs) + '"'));
                 break;
             }
             case OP_ADD: { // pops the top 2 numbers off the value stack, then pushes the sum
@@ -106,10 +101,21 @@ ErrorCode Machine::run() { // executes the program
             case OP_NOT: { // !top
                 Value top = value_pool.top();
                 value_pool.pop();
-                if (IS_BOOL(top))
+                if (IS_BOOL(top)) {
                     value_pool.push(boolValue(!top.storage.boolean));
-                else {
-                    std::cerr << "\nRun-time Error: Could not negate non-boolean value in line " << lines[op-opcode.begin()] << "."; // need better
+                } else if (top.type == TYPE_NULL) {
+                    value_pool.push(boolValue(true));
+                } else if (IS_STRING(top)) {
+                    if (top.string == R"("")") {
+                        value_pool.push(boolValue(true));
+                    } else {
+                        value_pool.push(boolValue(false));
+                    }
+                } else if (IS_NUM(top)) {
+                    if (top.storage.number == 0) value_pool.push(boolValue(true));
+                    else value_pool.push(boolValue(false));
+                } else {
+                    std::cerr << "Run-time Error: Cannot negate unreferenced variable." << std::endl;
                     return EXIT_RT;
                 }
                 break;
@@ -129,6 +135,11 @@ ErrorCode Machine::run() { // executes the program
                 op++;
                 op = opcode.begin() + (int) OP-1;
                 value_pool.pop();
+                break;
+            }
+            case OP_JUMP: { // goto
+                op++;
+                op = opcode.begin() + (int) OP-1;
                 break;
             }
             case OP_BEGIN: break; // because of jump quirk

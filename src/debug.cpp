@@ -57,6 +57,11 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             op++;
             break;
         }
+        case OP_JUMP: {
+            std::cout << "OP_JUMP to " << (int) *(op+1);
+            op++;
+            break;
+        }
         case OP_BEGIN: {
             std::cout << "OP_BEGIN";
             break;

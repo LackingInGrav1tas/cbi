@@ -33,24 +33,34 @@ Very much in development.
 ## Code Snippets ##
 
 ### hello world: ###
-![Hello_World](examples/hello_world.png?raw=true "Hello World")
-
+```
+print "Hello, World!";
+```
 output:
 ```
-Hello world!
+Hello, World!
 ```
 ### variables: ###
-
-![Variables](examples/variable_example.png?raw=true "Variables")
-
+```
+set mut a; # similar to Rust, the variable is assumed to be immutable. mut specifies it's state.
+a = 729;
+set b = 2600; # immutable
+print $a * $b; # $ retrieves the variable's value
+```
 output:
 ```
-407218
+1895400
 ```
 ### control flow ###
-
-![If](examples/if_example.png?raw=true "If")
-
+```
+set mut a; # scope is accessable through the if statement
+if (true) {
+    a = "This will print.";
+} else {
+    a = "This won't."
+}
+print a;
+```
 output:
 ```
 This will print. So will this.

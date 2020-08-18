@@ -29,8 +29,7 @@ enum Type {
     _EOF
 };
 
-class Token {
-    public:
+struct Token {
     Type type;
     std::string lexeme;
     const char *filename;

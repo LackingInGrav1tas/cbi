@@ -59,9 +59,9 @@ if (true) {
 } else {
     a = "This won't."
 }
-print a;
+print $a;
 ```
 output:
 ```
-This will print. So will this.
+This will print.
 ```

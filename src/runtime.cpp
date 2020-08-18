@@ -16,6 +16,20 @@ static bool valueEquals(Value lhs, Value rhs) {
     return true; // this would be if both are null
 }
 
+static bool valueToBool(Value value) {
+    if (IS_NUM(value)) {
+        return (bool) value.storage.number;
+    } else if (IS_STRING(value)) {
+        if (value.string == R"("")") {
+            return false;
+        } else {
+            return true;
+        }
+    } else if (IS_BOOL(value)) {
+        return value.storage.boolean;
+    } else return false;
+}
+
 ErrorCode Machine::run() { // executes the program
 
     #define GET_TOP() \
@@ -279,8 +293,18 @@ ErrorCode Machine::run() { // executes the program
                 scopes.pop_back();
                 break;
             }
+            case OP_AND: {
+                GET_TOP();
+                value_pool.push(boolValue(valueToBool(lhs) && valueToBool(rhs)));
+                break;
+            }
+            case OP_OR: {
+                GET_TOP();
+                value_pool.push(boolValue(valueToBool(lhs) || valueToBool(rhs)));
+                break;
+            }
             default: { // error
-                std::cerr << "\nRun-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << "." << std::endl;
+                std::cerr << "\nRun-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << "." << std::endl;
                 return EXIT_RT;
             }
         }

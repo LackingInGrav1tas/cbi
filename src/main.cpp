@@ -24,13 +24,13 @@ int main(int argc, char **argv) {
 
             auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
             if (!success) {
-                std::cerr << "\nFatal error during scanning." << std::endl;
+                std::cerr << "\nFatal error(s) during scanning." << std::endl;
                 return EXIT_FAILURE;
             }
 
             Machine vm = compile(tokens, success); // compiling the tokens to bytecode
             if (!success) {
-                std::cerr << "\nFatal error during compile time." << std::endl;
+                std::cerr << "\nFatal error(s) during compile time." << std::endl;
                 return EXIT_FAILURE;
             }
 

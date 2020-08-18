@@ -44,9 +44,9 @@ class Token {
     void error(std::string message) {
         bool b = true;
         std::vector<std::string> lines = getLines(filename, b);
-        if (!b) {
-            std::cout << "Error in non-existant file." << std::endl;
-        } else if (line == -1) {
+        if (line == -1) {
+            std::cout << "Error in non-existent file." << std::endl;
+        } else if (!b) {
             std::cerr << "\n" << lines.size()+2 << "| _EOF\n" << message << std::endl;
         } else {
             std::cerr << "\n" << line+1 << "| ";

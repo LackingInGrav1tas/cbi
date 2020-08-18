@@ -62,7 +62,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 case 'E': case 'F': case 'G': case 'H': case 'I': case 'J':
                 case 'K': case 'L': case 'M': case 'N': case 'O': case 'P':
                 case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V':
-                case 'W': case 'X': case 'Y': case 'Z': {
+                case 'W': case 'X': case 'Y': case 'Z': case '_': {
                     lexeme += c;
                     break;
                 }
@@ -79,7 +79,16 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     PUSH_TOKEN(lexeme);
                     lexeme += c;
                     character++;
-                    for (; c != current && character < LINE.end(); character++) lexeme += c;
+                    for (; c != current && character < LINE.end(); character++) {
+                        if (lexeme.length() > 1) {
+                            if (lexeme.back() == '\\' && c == 'n') {
+                                lexeme.pop_back();
+                                lexeme.push_back('\n');
+                                continue;
+                            }
+                        }
+                        lexeme += c;
+                    }
                     if (character == LINE.end()) {
                         ERROR("\nSyntax Error: Unending string.");
                         break;

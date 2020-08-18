@@ -272,7 +272,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         }
     };
 
-    vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+    vm.writeOp(-1, OP_BEGIN_SCOPE);
     for (; !CHECK(_EOF) && token < tokens.end(); token++) {
         declaration();
         if (panicking) {
@@ -280,7 +280,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             panicking = false;
         }
     }
-    vm.writeOp(TOKEN.line, OP_END_SCOPE);
+    vm.writeOp(-1, OP_END_SCOPE);
 
     #undef TOKEN
     #undef PREV

@@ -11,8 +11,8 @@
 
 class Machine {
     public:
-    std::vector<uint8_t> opcode = { OP_BEGIN };
-    std::vector<int> lines = { 0 };
+    std::vector<uint8_t> opcode;
+    std::vector<int> lines;
     std::stack<Value> value_pool;
     std::vector<Value> constants;
     std::vector<Scope> scopes;

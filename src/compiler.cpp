@@ -188,6 +188,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_EQUALITY);
                     break;
                 }
+                case NOT_EQUAL: {
+                    token++;
+                    expression(getPrecedence(NOT_EQUAL)+1);
+                    vm.writeOp(TOKEN.line, OP_NOT_EQ);
+                    break;
+                }
                 case EQUAL: {
                     token++;
                     expression(1);
@@ -239,8 +245,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
             else vm.writeOp(TOKEN.line, OP_VARIABLE);
-
-
         } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
@@ -249,8 +253,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
 
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
-
-
         } else if (CHECK(IF)) { // if statement
             token++;
 
@@ -296,14 +298,38 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.opcode.insert(vm.opcode.begin() + elsesize+1, vm.opcode.size()+1);
                 vm.lines.insert(vm.lines.begin() + elsesize+1, elseline);
             }
+        } else if (CHECK(WHILE)) { // while statement
+            token++;
 
+            if (!CHECK(LEFT_PAREN)) ERROR("Compile-time Error: Expected '(' after while.");
+            token++;
+            expression(1);
+            token++;
+            if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after while condition.");
 
+            int presize = vm.opcode.size();
+            vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
+            int size = vm.opcode.size();
+            int line = TOKEN.line;
+
+            token++;
+            if (!CHECK(LEFT_BRACKET))
+                declaration();
+            else {
+                vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+                HANDLE_BLOCK();
+                vm.writeOp(TOKEN.line, OP_END_SCOPE);
+            }
+
+            vm.writeOp(TOKEN.line, OP_JUMP); // jumping the beginning
+            vm.writeOp(TOKEN.line, presize-2);
+
+            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1); // skipping past the bytecodes
+            vm.lines.insert(vm.lines.begin() + size, line);
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();
             vm.writeOp(TOKEN.line, OP_END_SCOPE);
-
-
         } else {
             expression(1);
             token++;

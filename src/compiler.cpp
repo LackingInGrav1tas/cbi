@@ -329,6 +329,20 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1); // skipping past the bytecodes
             vm.lines.insert(vm.lines.begin() + size, line);
+
+        } else if (CHECK(FOR)) {
+            vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+            token++;
+            if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after for.");
+            token++;
+            if (CHECK(SEMICOLON)) {
+
+            } else if (CHECK(SET)) {
+
+            } else {
+
+            }
+            vm.writeOp(TOKEN.line, OP_END_SCOPE);
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();

@@ -285,7 +285,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     break;
                 }
                 default: {
-                    ERROR("\nSyntax Error: Unrecognized character.");
+                    ERROR("\nSyntax Error: Unrecognized character: " + c);
                     break;
                 }
             }

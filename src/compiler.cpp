@@ -3,6 +3,8 @@
 #include "vm.hpp"
 #include "types.hpp"
 #include "lexer.hpp"
+#include "color.hpp"
+
 
 #include <string>
 #include <vector>
@@ -51,6 +53,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         do { \
             TOKEN.error(message); \
             success = false; \
+            std::cerr.setstate(std::ios_base::failbit); \
             panicking = true; \
             return; \
         } while (false)
@@ -68,7 +71,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     panicking = false; \
                 } \
             } \
-            if (!CHECK(RIGHT_BRACKET)) ERROR("Compile-time Error: Expected '}' after block."); \
+            if (!CHECK(RIGHT_BRACKET)) ERROR(" Expected '}' after block."); \
         } while (false)\
 
     std::function<void(int)> expression = [&](int p)->void { // this notation used because c++ has no nested functions
@@ -77,7 +80,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 expression(1);
                 token++;
-                if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after expression.");
+                if (!CHECK(RIGHT_PAREN)) ERROR(" Expected ')' after expression.");
                 break;
             }
             case MINUS: { // prefix negation -
@@ -107,22 +110,22 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeConstant(TOKEN.line, stringValue(TOKEN.lexeme));
                 break;
             }
-            case TRUE: { // true
+            case TOKEN_TRUE: { // true
                 vm.writeConstant(TOKEN.line, boolValue(true));
                 break;
             }
-            case FALSE: { // false
+            case TOKEN_FALSE: { // false
                 vm.writeConstant(TOKEN.line, boolValue(false));
                 break;
             }
             case IDENTIFIER: {
                 vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
-                if (NEXT.type != EQUAL) ERROR("Compile-time Error: Stray identifier."); 
+                if (NEXT.type != EQUAL) ERROR(" Stray identifier."); 
                 break;
             }
             case _EOF: break;
             default: {
-                ERROR("Compile-time Error: Expected an expression.");
+                ERROR(" Expected an expression.");
             }
         }
         while (p <= getPrecedence(NEXT.type)) {
@@ -229,7 +232,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             if (!CHECK(IDENTIFIER)) {
                 token--;
-                ERROR("Compile-time Error: Expected an identifier.");
+                ERROR(" Expected an identifier.");
             }
 
             vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
@@ -241,7 +244,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
             } else vm.writeConstant(TOKEN.line, nullValue());
 
-            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
 
             if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
             else vm.writeOp(TOKEN.line, OP_VARIABLE);
@@ -250,19 +253,19 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             expression(1);
             token++;
 
-            if (!CHECK(SEMICOLON)) ERROR("Compile-time Error: Expected a semicolon.");
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
 
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
         } else if (CHECK(IF)) { // if statement
             token++;
 
-            if (!CHECK(LEFT_PAREN)) ERROR("Compile-time Error: Expected '(' after if.");
+            if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after if.");
 
             token++;
             expression(1);
             token++;
 
-            if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after if condition.");
+            if (!CHECK(RIGHT_PAREN)) ERROR(" Expected ')' after if condition.");
 
             vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
             int size = vm.opcode.size();
@@ -301,12 +304,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         } else if (CHECK(WHILE)) { // while statement
             token++;
 
-            if (!CHECK(LEFT_PAREN)) ERROR("Compile-time Error: Expected '(' after while.");
+            if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after while.");
             int presize = vm.opcode.size();
             token++;
             expression(1);
             token++;
-            if (!CHECK(RIGHT_PAREN)) ERROR("Compile-time Error: Expected ')' after while condition.");
+            if (!CHECK(RIGHT_PAREN)) ERROR(" Expected ')' after while condition.");
 
             vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
             int size = vm.opcode.size();
@@ -333,7 +336,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         } else {
             expression(1);
             token++;
-            if (TOKEN.type != SEMICOLON) ERROR("Compile-time Error: Expected a semicolon.");
+            if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
             vm.writeOp(TOKEN.line, OP_POP_TOP);
         }
     };
@@ -342,7 +345,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     for (; !CHECK(_EOF) && token < tokens.end(); token++) {
         declaration();
         if (panicking) {
-            for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
+            //for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
+            std::cerr.clear();
             panicking = false;
         }
     }

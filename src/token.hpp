@@ -2,6 +2,7 @@
 #define _token_h
 
 #include "types.hpp"
+#include "color.hpp"
 
 #include <iostream>
 #include <string>
@@ -11,7 +12,7 @@
 std::vector<std::string> getLines(const char *filename, bool &success);
 
 enum Type {
-    STRING, NUMBER, TRUE, FALSE, IDENTIFIER,
+    STRING, NUMBER, TOKEN_TRUE, TOKEN_FALSE, IDENTIFIER,
 
     SET, MUT, // for variables
 
@@ -41,21 +42,25 @@ struct Token {
         line = init_line;
     }
     void error(std::string message) {
+        std::cout << "\n";
         bool b = true;
         std::vector<std::string> lines = getLines(filename, b);
         if (line == -1) {
-            std::cout << "Error in non-existent file." << std::endl;
+            COLOR("Error in non-existent file.", 4);
         } else if (!b) {
-            std::cerr << "\n" << lines.size()+2 << "| _EOF\n" << message << std::endl;
+            std::cerr << "\n" << lines.size()+2 << "| _EOF\n";
+            COLOR("Compile-time Error:", 4);
+            std::cerr << message;
         } else {
-            std::cerr << "\n" << line+1 << "| ";
+            COLOR("\n" + std::to_string(line+1) + "| ", 7);
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {
                     std::cerr << *it;
                     break;
                 }
             }
-            std::cerr << "\n" << message << " TOKEN: " << lexeme << std::endl;
+            COLOR("\nCompile-time Error:", 4);
+            std::cerr << message << " TOKEN: " << lexeme;
         }
     }
 };

@@ -1,6 +1,7 @@
 #include "lexer.hpp"
 #include "token.hpp"
 #include "types.hpp"
+#include "color.hpp"
 
 #include <iostream>
 #include <string>
@@ -44,8 +45,8 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "set") tokens.push_back(Token(SET, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "mut") tokens.push_back(Token(MUT, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "true") tokens.push_back(Token(TRUE, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "false") tokens.push_back(Token(FALSE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "true") tokens.push_back(Token(TOKEN_TRUE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "false") tokens.push_back(Token(TOKEN_FALSE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "fun") tokens.push_back(Token(FUN, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "if") tokens.push_back(Token(IF, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "else") tokens.push_back(Token(ELSE, lexeme, filename, line-lines.begin())); \

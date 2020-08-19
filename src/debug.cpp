@@ -6,121 +6,122 @@
 
 #include "vm.hpp"
 #include "types.hpp"
+#include "color.hpp"
 
 void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> constants, std::vector<int> lines, int position) {
     printf("\n| byte %04d lines %04d | ", position, lines[position]);
-    //std::cout << "\n| byte " << position << " lines " << lines[position]<< "|  ";
     switch (*op) {
         case OP_BLANK: {
-            std::cout << "OP_BLANK";
+            //std::cout << "OP_BLANK";
+            COLOR("OP_BLANK", 9);
             break;
         }
         case OP_CONSTANT: {
             op++;
-            std::cout << "OP_CONSTANT  position: " << (int) *op << "  value: " << getPrintable(constants[*op]);
+            COLOR("OP_CONSTANT", 9);
+            std::cout << "  position: " << (int) *op << "  value: " << getPrintable(constants[*op]);
             break;
         }
         case OP_PRINT_TOP: {
-            std::cout << "OP_PRINT_TOP";
+            COLOR("OP_PRINT_TOP", 9);
             break;
         }
         case OP_NEGATE: {
-            std::cout << "OP_NEGATE";
+            COLOR("OP_NEGATE", 9);
             break;
         }
         case OP_NOT: {
-            std::cout << "OP_NOT";
+            COLOR("OP_NOT", 9);
             break;
         }
         case OP_ADD: {
-            std::cout << "OP_ADD";
+            COLOR("OP_ADD", 9);
             break;
         }
         case OP_SUB: {
-            std::cout << "OP_SUB";
+            COLOR("OP_SUB", 9);
             break;
         }
         case OP_MUL: {
-            std::cout << "OP_MUL";
+            COLOR("OP_MUL", 9);
             break;
         }
         case OP_DIV: {
-            std::cout << "OP_DIV";
+            COLOR("OP_DIV", 9);
             break;
         }
         case OP_CONCATENATE: {
-            std::cout << "OP_CONCATENATE";
+            COLOR("OP_CONCATENATE", 9);
             break;
         }
         case OP_JUMP_FALSE: {
-            std::cout << "OP_JUMP_FALSE to " << (int) *(op+1);
+            COLOR("OP_JUMP_FALSE", 9);
+            std::cout << " to " << (int) *(op+1);
             op++;
             break;
         }
         case OP_JUMP: {
-            std::cout << "OP_JUMP to " << (int) *(op+1);
+            COLOR("OP_JUMP", 9);
+            std::cout << " to " << (int) *(op+1);
             op++;
             break;
         }
-        case OP_BEGIN: {
-            std::cout << "OP_BEGIN";
-            break;
-        }
         case OP_EQUALITY: {
-            std::cout << "OP_EQUALITY";
+            COLOR("OP_EQUALITY", 9);
             break;
         }
         case OP_LESS: {
-            std::cout << "OP_LESS";
+            COLOR("OP_LESS", 9);
             break;
         }
         case OP_GREATER: {
-            std::cout << "OP_GREATER";
+            COLOR("OP_GREATER", 9);
             break;
         }
         case OP_LESS_EQ: {
-            std::cout << "OP_LESS_EQ";
+            COLOR("OP_LESS_EQ", 9);
             break;
         }
         case OP_GREATER_EQ: {
-            std::cout << "OP_GREATER_EQ";
+            COLOR("OP_GREATER_EQ", 9);
             break;
         }
         case OP_NOT_EQ: {
-            std::cout << "OP_NOT_EQ";
+            COLOR("OP_NOT_EQ", 9);
             break;
         }
         case OP_POP_TOP: {
-            std::cout << "OP_POP_TOP";
+            COLOR("OP_POP_TOP", 9);
             break;
         }
         case OP_VARIABLE: {
-            std::cout << "OP_VARIABLE";
+            COLOR("OP_VARIABLE", 9);
             break;
         }
         case OP_VARIABLE_MUT: {
-            std::cout << "OP_VARIABLE_MUT";
+            COLOR("OP_VARIABLE_MUT", 9);
             break;
         }
         case OP_RETRIEVE: {
             op++;
-            std::cout << "OP_RETRIEVE  position: " << (int) *op << "  lexeme: " << constants[*op].string;
+            COLOR("OP_RETRIEVE", 9);
+            std::cout << "  position: " << (int) *op << "  lexeme: " << constants[*op].string;
             break;
         }
         case OP_SET_VARIABLE: {
-            std::cout << "OP_SET_VARIABLE";
+            COLOR("OP_SET_VARIABLE", 9);
             break;
         }
         case OP_IMUT: {
-            std::cout << "OP_IMUT";
+            COLOR("OP_IMUT", 9);
             break;
         }
         case OP_BEGIN_SCOPE: {
-            std::cout << "OP_BEGIN_SCOPE";
+            COLOR("OP_BEGIN_SCOPE", 9);
             break;
         }
         case OP_END_SCOPE: {
-            std::cout << "OP_END_SCOPE";
+            COLOR("OP_END_SCOPE", 9);
             break;
         }
         default: {

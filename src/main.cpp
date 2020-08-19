@@ -1,3 +1,4 @@
+#include "color.hpp"
 #include "vm.hpp"
 #include "types.hpp"
 #include "lexer.hpp"
@@ -15,52 +16,56 @@ int main(int argc, char **argv) {
             if (argc == 3)
             if ((std::string)argv[2] == "-debug")
                 debugmode = true;
-
+    
+            if (debugmode) {
+                COLOR("Reading file...\n", 9);
+            }
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
             if (!success) {
-                std::cerr << "\nCould not access file." << std::endl;
+                COLOR("\nCould not access file\n", 4);
                 return EXIT_FAILURE;
             }
 
+            if (debugmode) COLOR("Lexing file...\n", 9);
             auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
             if (!success) {
-                std::cerr << "\nFatal error(s) during scanning." << std::endl;
+                COLOR("\n\nFatal error(s) during scanning.\n", 4);
                 return EXIT_FAILURE;
             }
 
+            if (debugmode) COLOR("Compiling opcode...\n", 9);
             Machine vm = compile(tokens, success); // compiling the tokens to bytecode
             if (!success) {
-                std::cerr << "\nFatal error(s) during compile time." << std::endl;
+                COLOR("\n\nFatal error(s) during compile time.\n", 4);
+                if (debugmode) COLOR("EXIT_CT", 4);
                 return EXIT_FAILURE;
             }
 
             if (debugmode) {
+                if (debugmode) COLOR("Disassembling opcode...\n", 9);
                 vm.disassembleOpcode();
-                std::cout << std::endl;
+                std::cout << "\n" << std::endl;
+                vm.disassembleConstants();
             }
 
             if (debugmode) {
+                std::cout << "\n== runtime ==" << std::endl;
                 switch (vm.run()) { // running the opcode
                     case EXIT_OK: std::cout << "\nEXIT_OK"; break;
                     case EXIT_RT: std::cout << "\nEXIT_RT"; break;
                     case EXIT_CT: std::cout << "\nEXIT_CT"; break;
                     default: std::cout << "\nbug: unknown error code."; break;
                 }
+                std::cout << "\n== end ==";
             } else {
                 vm.run();
             }
-
-            if (debugmode) {
-                std::cout << "\n" << std::endl;
-                vm.disassembleConstants();
-                std::cout << "\nEND OF PROGRAM";
-            }
         } else {
-            std::cerr << "The accepted format for cbi is: " << argv[0] << " d:/path/to/file.cbi";
+            COLOR("The accepted format for cbi is: " + (std::string) argv[0] + " d:/path/to/file.cbi", 4);
             return EXIT_FAILURE;
         }
     } catch (...) {
-        std::cerr << "\nAn unexpected fatal error has occurred." << std::endl;
+        COLOR("\nAn unexpected fatal error has occurred.", 4);
         return EXIT_FAILURE;
     }
 }

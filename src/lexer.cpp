@@ -1,7 +1,6 @@
 #include "lexer.hpp"
 #include "token.hpp"
 #include "types.hpp"
-#include "color.hpp"
 
 #include <iostream>
 #include <string>

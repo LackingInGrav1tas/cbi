@@ -1,4 +1,3 @@
-#include "color.hpp"
 #include "vm.hpp"
 #include "types.hpp"
 #include "lexer.hpp"
@@ -18,31 +17,30 @@ int main(int argc, char **argv) {
                 debugmode = true;
     
             if (debugmode) {
-                COLOR("Reading file...\n", 9);
+                std::cout << "Reading file..." << std::endl;
             }
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
             if (!success) {
-                COLOR("\nCould not access file\n", 4);
+                std::cerr << "\nCould not access file" << std::endl;
                 return EXIT_FAILURE;
             }
 
-            if (debugmode) COLOR("Lexing file...\n", 9);
+            if (debugmode) std::cout << "Lexing file..." << std::endl;
             auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
             if (!success) {
-                COLOR("\n\nFatal error(s) during scanning.\n", 4);
+                std::cout << "\n\nFatal error(s) during scanning.\n" << std::endl;
                 return EXIT_FAILURE;
             }
 
-            if (debugmode) COLOR("Compiling opcode...\n", 9);
+            if (debugmode) std::cout << "Compiling opcode..." << std::endl;
             Machine vm = compile(tokens, success); // compiling the tokens to bytecode
             if (!success) {
-                COLOR("\n\nFatal error(s) during compile time.\n", 4);
-                if (debugmode) COLOR("EXIT_CT", 4);
-                return EXIT_FAILURE;
+                std::cout << "\n\nFatal error(s) during compile time.\n" << std::endl;
+                if (debugmode) std::cout << "EXIT_CT" << std::endl;
             }
 
             if (debugmode) {
-                if (debugmode) COLOR("Disassembling opcode...\n", 9);
+                if (debugmode) std::cout << "Disassembling opcode..." << std::endl;
                 vm.disassembleOpcode();
                 std::cout << "\n" << std::endl;
                 vm.disassembleConstants();
@@ -61,11 +59,11 @@ int main(int argc, char **argv) {
                 vm.run();
             }
         } else {
-            COLOR("The accepted format for cbi is: " + (std::string) argv[0] + " d:/path/to/file.cbi", 4);
+            std::cout << "The accepted format for cbi is: " + (std::string) argv[0] + " d:/path/to/file.cbi" << std::endl;
             return EXIT_FAILURE;
         }
     } catch (...) {
-        COLOR("\nAn unexpected fatal error has occurred.", 4);
+        std::cout << "\nAn unexpected fatal error has occurred." << std::endl;
         return EXIT_FAILURE;
     }
 }

@@ -2,7 +2,6 @@
 #define _token_h
 
 #include "types.hpp"
-#include "color.hpp"
 
 #include <iostream>
 #include <string>
@@ -46,20 +45,20 @@ struct Token {
         bool b = true;
         std::vector<std::string> lines = getLines(filename, b);
         if (line == -1) {
-            COLOR("Error in non-existent file.", 4);
+            std::cerr << "Error in non-existent file." << std::endl;
         } else if (!b) {
             std::cerr << "\n" << lines.size()+2 << "| _EOF\n";
-            COLOR("Compile-time Error:", 4);
+            std::cerr << "Compile-time Error:" << std::endl;
             std::cerr << message;
         } else {
-            COLOR("\n" + std::to_string(line+1) + "| ", 7);
+            std::cout << "\n" << line+1 << "| " << std::endl;
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {
                     std::cerr << *it;
                     break;
                 }
             }
-            COLOR("\nCompile-time Error:", 4);
+            std::cerr << "\nCompile-time Error:" << std::endl;
             std::cerr << message << " TOKEN: " << lexeme;
         }
     }

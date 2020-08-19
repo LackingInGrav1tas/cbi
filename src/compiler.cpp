@@ -3,8 +3,6 @@
 #include "vm.hpp"
 #include "types.hpp"
 #include "lexer.hpp"
-#include "color.hpp"
-
 
 #include <string>
 #include <vector>

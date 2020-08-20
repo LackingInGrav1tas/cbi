@@ -303,7 +303,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
 
             if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after while.");
-            int presize = vm.opcode.size();
+            int presize = vm.opcode.size(); // before the condition
             token++;
             expression(1);
             token++;
@@ -311,7 +311,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
             int size = vm.opcode.size();
-            int line = TOKEN.line;
+            vm.opcode.push_back(uint8_t());
+            vm.lines.push_back(TOKEN.line);
 
             token++;
             if (!CHECK(LEFT_BRACKET))
@@ -325,9 +326,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.writeOp(TOKEN.line, OP_JUMP); // jumping the beginning
             vm.writeOp(TOKEN.line, presize);
 
-            vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1); // skipping past the bytecodes
-            vm.lines.insert(vm.lines.begin() + size, line);
-
+            vm.opcode[size] = vm.opcode.size(); // skipping past the bytecodes
         } else if (CHECK(FOR)) {
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             token++;

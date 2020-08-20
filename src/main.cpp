@@ -54,10 +54,14 @@ int main(int argc, char **argv) {
                     case EXIT_CT: std::cout << "\nEXIT_CT"; break;
                     default: std::cout << "\nbug: unknown error code."; break;
                 }
-                std::cout << "\n== end ==";
+                std::cout << "\n== end ==\n\n";
+                vm.disassembleStack(); // this and
+                std::cout << std::endl;
+                vm.disassembleScopes(); // this should be empty if everything goes right
             } else {
                 vm.run();
             }
+
         } else {
             std::cout << "The accepted format for cbi is: " + (std::string) argv[0] + " d:/path/to/file.cbi" << std::endl;
             return EXIT_FAILURE;

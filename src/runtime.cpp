@@ -31,7 +31,6 @@ static bool valueToBool(Value value) {
 }
 
 ErrorCode Machine::run() { // executes the program
-
     #define GET_TOP() \
         if (value_pool.size() < 2) { std::cerr << " Run-time Error: Stack underflow." << std::endl; return EXIT_RT; } \
         Value rhs = value_pool.top(); \
@@ -244,7 +243,8 @@ ErrorCode Machine::run() { // executes the program
                     found = scopes[i].variables.find(constants[(int)OP].string);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << std::endl;
+                            std::cerr << "Run-time Error (for $): Cannot access variable out of scope, " << constants[(int)OP].string << ", " << (int)OP << std::endl;
+                            disassembleScopes();
                             return EXIT_RT;
                         }
                         continue;

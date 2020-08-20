@@ -42,9 +42,6 @@ ErrorCode Machine::run() { // executes the program
     for (auto op = opcode.begin(); op < opcode.end(); op++) {
         #define OP (*op)
         switch (OP) {
-            case OP_BLANK: { // n/a
-                break;
-            }
             case OP_PRINT_TOP: { // prints top of stack
                 std::cout << getPrintable(value_pool.top());
                 value_pool.pop();

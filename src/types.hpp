@@ -7,7 +7,7 @@
 #include <map>
 
 enum Command {
-    OP_BEGIN, OP_BLANK, OP_PRINT_TOP, OP_CONSTANT,
+    OP_BEGIN, OP_PRINT_TOP, OP_CONSTANT,
 
     //prefix operators
     OP_NEGATE, OP_NOT,

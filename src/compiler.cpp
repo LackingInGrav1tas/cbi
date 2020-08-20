@@ -267,7 +267,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
             int size = vm.opcode.size();
-            int line = TOKEN.line;
+            vm.opcode.push_back(uint8_t());
+            vm.lines.push_back(TOKEN.line);
 
             token++;
             if (!CHECK(LEFT_BRACKET))
@@ -279,15 +280,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             }
             token++;
             if (!CHECK(ELSE)) { // "if" <flexible-block>
-                vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+1);
-                vm.lines.insert(vm.lines.begin() + size, line);
+                vm.opcode[size] = vm.opcode.size();
                 token--;
             } else { // "if" <flexible-block> else <flexible-block>
                 vm.writeOp(TOKEN.line, OP_JUMP);
                 int elsesize = vm.opcode.size();
-                int elseline = TOKEN.line;
-                vm.opcode.insert(vm.opcode.begin() + size, vm.opcode.size()+2);
-                vm.lines.insert(vm.lines.begin() + size, line);
+                vm.opcode.push_back(uint8_t());
+                vm.lines.push_back(TOKEN.line);
+                vm.opcode[size] = vm.opcode.size();
                 token++;
                 if (!CHECK(LEFT_BRACKET))
                     declaration();
@@ -296,8 +296,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     HANDLE_BLOCK();
                     vm.writeOp(TOKEN.line, OP_END_SCOPE);
                 }
-                vm.opcode.insert(vm.opcode.begin() + elsesize+1, vm.opcode.size()+1);
-                vm.lines.insert(vm.lines.begin() + elsesize+1, elseline);
+                vm.opcode[elsesize] = vm.opcode.size();
             }
         } else if (CHECK(WHILE)) { // while statement
             token++;

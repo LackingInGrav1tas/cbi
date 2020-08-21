@@ -96,6 +96,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             case DOLLAR: { // prefix retrieve &<identifier>
                 vm.writeOp(TOKEN.line, OP_RETRIEVE);
                 token++;
+                if (TOKEN.type != IDENTIFIER) ERROR("Cannot retrieve non-identifier.");
                 vm.constants.push_back(idLexeme(TOKEN.lexeme));
                 vm.writeOp(TOKEN.line, vm.constants.size()-1);
                 break;
@@ -218,35 +219,46 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         }
     };
 
+    auto expStatement = [&]() {
+        expression(1);
+        token++;
+        if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
+        vm.writeOp(TOKEN.line, OP_POP_TOP);
+    };
+
+    auto setVariable = [&]() {
+        token++;
+        bool mut = true;
+        //checking mut
+        if (!CHECK(MUT))
+            mut = false;
+        else
+            token++;
+
+        if (!CHECK(IDENTIFIER)) {
+            token--;
+            ERROR(" Expected an identifier.");
+        }
+
+        vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
+                                                                    // is >= 2 because of TRIM()
+        token++;
+        if (CHECK(EQUAL)) {
+            token++;
+            expression(1);
+            token++;
+        } else vm.writeConstant(TOKEN.line, nullValue());
+
+        if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+
+        if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
+        else vm.writeOp(TOKEN.line, OP_VARIABLE);
+    };
+
     std::function<void()> declaration = [&]()->void {
         if (CHECK(SET)) { // setting scoped variable
-            token++;
-            bool mut = true;
-            //checking mut
-            if (!CHECK(MUT))
-                mut = false;
-            else
-                token++;
-
-            if (!CHECK(IDENTIFIER)) {
-                token--;
-                ERROR(" Expected an identifier.");
-            }
-
-            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
-                                                                     // is >= 2 because of TRIM()
-            token++;
-            if (CHECK(EQUAL)) {
-                token++;
-                expression(1);
-                token++;
-            } else vm.writeConstant(TOKEN.line, nullValue());
-
-            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
-
-            if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
-            else vm.writeOp(TOKEN.line, OP_VARIABLE);
-        } else if (CHECK(PRINT)) { // printing
+            setVariable();
+        }else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
             token++;
@@ -265,7 +277,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             if (!CHECK(RIGHT_PAREN)) ERROR(" Expected ')' after if condition.");
 
-            vm.writeOp(TOKEN.line, OP_JUMP_FALSE);
+            vm.writeOp(TOKEN.line, OP_JUMP_FALSE_IFv);
             int size = vm.opcode.size();
             vm.opcode.push_back(uint8_t());
             vm.lines.push_back(TOKEN.line);
@@ -299,6 +311,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.opcode[elsesize] = vm.opcode.size();
             }
         } else if (CHECK(WHILE)) { // while statement
+            vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             token++;
 
             if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after while.");
@@ -316,38 +329,25 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             if (!CHECK(LEFT_BRACKET))
                 declaration();
-            else {
-                vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
+            else
                 HANDLE_BLOCK();
-                vm.writeOp(TOKEN.line, OP_END_SCOPE);
-            }
 
             vm.writeOp(TOKEN.line, OP_JUMP); // jumping the beginning
             vm.writeOp(TOKEN.line, presize);
 
-            vm.opcode[size] = vm.opcode.size(); // skipping past the bytecodes
-        } else if (CHECK(FOR)) {
-            vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
-            token++;
-            if (!CHECK(LEFT_PAREN)) ERROR(" Expected '(' after for.");
-            token++;
-            if (CHECK(SEMICOLON)) {
+            vm.opcode[size] = vm.opcode.size(); // skipping past the bytecode
 
-            } else if (CHECK(SET)) {
-
-            } else {
-
-            }
             vm.writeOp(TOKEN.line, OP_END_SCOPE);
+        } else if (CHECK(BREAK)) {
+            vm.writeOp(TOKEN.line, OP_BREAK);
+            token++;
+            if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();
             vm.writeOp(TOKEN.line, OP_END_SCOPE);
         } else {
-            expression(1);
-            token++;
-            if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
-            vm.writeOp(TOKEN.line, OP_POP_TOP);
+            expStatement();
         }
     };
 

@@ -10,13 +10,12 @@ Very much in development.
 
 <declaration> ::= <statement> | ( <set-variable> ";" ) ;
 
-<statement> ::= (<expression> | <print-statement> ";") | <if-statement> | <while-statement> | <for-statement> | <code-block> ;
+<statement> ::= (<expression> | <print-statement> | "break" ";") | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
 
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
-<while-statement> ::= "while" <group> <flexible-block> ["nobreak" <flexible-block>] ;
-<for-statement> ::= "for" "(" [<set-variable>] ";" [<expression>] ";" [<expression>] ")" <flexible-block> ["nobreak" <flexible-block>] ;
+<while-statement> ::= "while" <group> <flexible-block> ;
 
 <flexible-block> ::= <code-block> | <declaration> ;
 <expression> ::= <operation> | <literal> | <group> | IDENTIFIER ;

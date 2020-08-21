@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
             if (!success) {
                 std::cout << "\n\nFatal error(s) during compile time.\n" << std::endl;
                 if (debugmode) std::cout << "EXIT_CT" << std::endl;
+                return EXIT_FAILURE;
             }
 
             if (debugmode) {

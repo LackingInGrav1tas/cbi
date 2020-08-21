@@ -147,10 +147,41 @@ ErrorCode Machine::run() { // executes the program
                 value_pool.pop();
                 break;
             }
+            case OP_JUMP_FALSE_IFv: { // goto
+                if (IS_BOOL(value_pool.top())) {
+                    if (value_pool.top().storage.boolean) {
+                        value_pool.pop();
+                        op++;
+                        break;
+                    }
+                } else if (value_pool.top().type != TYPE_NULL) {
+                    value_pool.pop();
+                    op++;
+                    break;
+                }
+                op++;
+                op = opcode.begin() + (int) OP-1;
+                value_pool.pop();
+                break;
+            }
             case OP_JUMP: { // goto
                 op++;
                 op = opcode.begin() + (int) OP-1;
                 break;
+            }
+            case OP_BREAK: { // breaks out of the nearest thing
+                int position = op-opcode.begin();
+                for (; OP != OP_JUMP_FALSE; op--)
+                    if (op <= opcode.begin()) {
+                        std::cerr << "\nRun-time Error: Misplaced break.";
+                        return EXIT_RT;
+                    }
+                op++;
+                if ((int) OP-1 < position) { // so while(...); break; doesnt work
+                    std::cerr << "\nRun-time Error: Misplaced break.";
+                    return EXIT_RT;
+                }
+                op = opcode.begin() + (int) OP-1;
             }
             case OP_BEGIN: break; // because of jump quirk
             case OP_EQUALITY: { // ==
@@ -211,7 +242,7 @@ ErrorCode Machine::run() { // executes the program
                 Value gl_value = value_pool.top();
                 value_pool.pop();
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
+                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
                     return EXIT_RT;
                 }
                 std::string id = value_pool.top().string;

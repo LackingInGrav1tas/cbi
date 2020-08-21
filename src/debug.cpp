@@ -22,10 +22,12 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_MUL: std::cout << "OP_MUL"; break;
         case OP_DIV: std::cout << "OP_DIV"; break;
         case OP_CONCATENATE: std::cout << "OP_CONCATENATE"; break;
+        case OP_JUMP_FALSE_IFv:
         case OP_JUMP_FALSE:
             std::cout << "OP_JUMP_FALSE" << " to " << (int) *(op+1);
             op++;
             break;
+        case OP_BREAK: std::cout << "OP_BREAK"; break;
         case OP_JUMP:
             std::cout << "OP_JUMP" << " to " << (int) *(op+1);
             op++;

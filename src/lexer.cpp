@@ -185,6 +185,14 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                         ERROR("\nSyntax Error: Expected '||' character but only found '|'");
                         break;
                     }
+                    character++;
+                    if (character == LINE.end()-1) {
+                    } else if (*(character+1) == '=') {
+                        tokens.push_back(Token(CONCAT_EQUALS, "||=", filename, line-lines.begin()));
+                        character++;
+                        break;
+                    }
+                    character--;
                     tokens.push_back(Token(CONCATENATE, "||", filename, line-lines.begin()));
                     character++;
                     break;
@@ -234,15 +242,12 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                         tokens.push_back(Token(NOT, "!", filename, line-lines.begin()));
                     break;
                 }
-                case '+': { // +, +=, ++
+                case '+': { // +, +=
                     PUSH_TOKEN(lexeme);
                     if (character == LINE.end()-1)
                         tokens.push_back(Token(PLUS, "+", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
                         tokens.push_back(Token(PLUS_EQUALS, "+=", filename, line-lines.begin()));
-                        character++;
-                    } else if (*(character+1) == '+') {
-                        tokens.push_back(Token(INCREMENT, "++", filename, line-lines.begin()));
                         character++;
                     } else
                         tokens.push_back(Token(PLUS, "+", filename, line-lines.begin()));
@@ -254,9 +259,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                         tokens.push_back(Token(MINUS, "-", filename, line-lines.begin()));
                     else if (*(character+1) == '=') {
                         tokens.push_back(Token(MINUS_EQUALS, "-=", filename, line-lines.begin()));
-                        character++;
-                    } else if (*(character+1) == '-') {
-                        tokens.push_back(Token(DECREMENT, "--", filename, line-lines.begin()));
                         character++;
                     } else
                         tokens.push_back(Token(MINUS, "-", filename, line-lines.begin()));

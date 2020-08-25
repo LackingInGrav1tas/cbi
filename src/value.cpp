@@ -42,6 +42,15 @@ Value nullValue() {
     return val;
 }
 
+Value funcValue(Function *opcode) {
+    Value val;
+
+    val.type = TYPE_FUN;
+    val.storage.fn = 1;
+
+    return val;
+}
+
 std::string shorten(std::string str) {
     while (str.back() == '0')
         str.pop_back();

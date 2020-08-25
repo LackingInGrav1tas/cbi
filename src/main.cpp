@@ -7,8 +7,10 @@
 #include <vector>
 #include <fstream>
 
+std::vector<Function> functions;
+
 int main(int argc, char **argv) {
-    try {
+    //try {
         if (2 <= argc <= 3) {
             bool debugmode = false;
             bool success = true;
@@ -67,8 +69,8 @@ int main(int argc, char **argv) {
             std::cout << "The accepted format for cbi is: " + (std::string) argv[0] + " d:/path/to/file.cbi" << std::endl;
             return EXIT_FAILURE;
         }
-    } catch (...) {
-        std::cout << "\nAn unexpected fatal error has occurred." << std::endl;
-        return EXIT_FAILURE;
-    }
+    //} catch (...) {
+    //    std::cout << "\nAn unexpected fatal error has occurred." << std::endl;
+    //    return EXIT_FAILURE;
+    //}
 }

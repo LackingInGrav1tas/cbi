@@ -49,7 +49,7 @@ ErrorCode Machine::run() { // executes the program
             }
             case OP_CONSTANT: { // adds constant
                 op++;
-                value_pool.push(constants[OP]);
+                value_pool.push(constants[(int)OP]);
                 break;
             }
             case OP_CONCATENATE: { // pops the top 2 strings off the value stack, then pushes a concatenated string
@@ -235,7 +235,7 @@ ErrorCode Machine::run() { // executes the program
                 break;
             }
             case OP_POP_TOP: {
-                value_pool.pop();
+                if (value_pool.size() > 0) value_pool.pop();
                 break;
             }
             case OP_VARIABLE: {
@@ -261,6 +261,17 @@ ErrorCode Machine::run() { // executes the program
                 value_pool.pop();
                 scopes.back().variables[id] = gl_value;
                 scopes.back().mutables.push_back(id);
+                break;
+            }
+            case OP_DECL_FN: { // format: identifier constant, decl, size
+                if (!IS_ID(value_pool.top())) {
+                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
+                    return EXIT_RT;
+                }
+                std::string id = value_pool.top().string;
+                value_pool.pop();
+                op++;
+                fn_scopes.back()[id] = fn_pool[(int)OP];
                 break;
             }
             case OP_RETRIEVE: {
@@ -315,10 +326,12 @@ ErrorCode Machine::run() { // executes the program
             }
             case OP_BEGIN_SCOPE: {
                 scopes.push_back(Scope());
+                fn_scopes.push_back(std::map<std::string, Function>());
                 break;
             }
             case OP_END_SCOPE: {
                 scopes.pop_back();
+                fn_scopes.pop_back();
                 break;
             }
             case OP_AND: {
@@ -329,6 +342,34 @@ ErrorCode Machine::run() { // executes the program
             case OP_OR: {
                 GET_TOP();
                 value_pool.push(boolValue(valueToBool(lhs) || valueToBool(rhs)));
+                break;
+            }
+            case OP_CALL: {
+                if (!IS_ID(value_pool.top())) {
+                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
+                    return EXIT_RT;
+                }
+                std::string id = value_pool.top().string;
+                value_pool.pop();
+                std::map<std::string, Function>::iterator found;
+                for (int i = fn_scopes.size()-1; i >= 0; i--) {
+                    found = fn_scopes[i].find(id);
+                    if (found == fn_scopes[i].end()) {
+                        if (i == 0) {
+                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << ", " << (int)OP << std::endl;
+                            disassembleScopes();
+                            return EXIT_RT;
+                        }
+                        continue;
+                    }
+                    Function fn = found->second;
+                    Machine call;
+                    call.opcode = fn.opcode;
+                    call.lines = fn.lines;
+                    call.constants = fn.constants;
+                    call.run();
+                    break;
+                }
                 break;
             }
             default: { // error

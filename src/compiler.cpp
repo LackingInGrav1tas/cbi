@@ -1,7 +1,7 @@
+#include "types.hpp"
 #include "token.hpp"
 #include "compiler.hpp"
 #include "vm.hpp"
-#include "types.hpp"
 #include "lexer.hpp"
 
 #include <string>
@@ -11,6 +11,11 @@
 
 static int getPrecedence(Type type) {
     switch (type) {
+        case CONCAT_EQUALS:
+        case STAR_EQUALS:
+        case SLASH_EQUALS:
+        case PLUS_EQUALS:
+        case MINUS_EQUALS:
         case EQUAL: return 1;
 
         case OR: return 2;
@@ -33,6 +38,7 @@ static int getPrecedence(Type type) {
         case STAR: return 7;
 
         //case DOT:
+        case NOT: return 9;
         //case LEFT_PAREN: return 8;
         
         default: return 0;
@@ -96,7 +102,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             case DOLLAR: { // prefix retrieve &<identifier>
                 vm.writeOp(TOKEN.line, OP_RETRIEVE);
                 token++;
-                if (TOKEN.type != IDENTIFIER) ERROR("Cannot retrieve non-identifier.");
+                if (TOKEN.type != IDENTIFIER) ERROR(" Cannot retrieve non-identifier.");
                 vm.constants.push_back(idLexeme(TOKEN.lexeme));
                 vm.writeOp(TOKEN.line, vm.constants.size()-1);
                 break;
@@ -119,7 +125,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             }
             case IDENTIFIER: {
                 vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
-                if (NEXT.type != EQUAL) ERROR(" Stray identifier."); 
+                if (NEXT.type != EQUAL && NEXT.type != PLUS_EQUALS && NEXT.type != MINUS_EQUALS
+                && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS
+                && !(NEXT.type == NOT && (*(token+2)).type == LEFT_PAREN))
+                    ERROR(" Stray identifier.");
                 break;
             }
             case _EOF: break;
@@ -202,6 +211,66 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
                     break;
                 }
+                case PLUS_EQUALS: {
+                    uint8_t first = vm.opcode.back();
+
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    vm.writeOp(TOKEN.line, (int) first);
+                    
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_ADD);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
+                    break;
+                }
+                case MINUS_EQUALS: {
+                    uint8_t first = vm.opcode.back();
+
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    vm.writeOp(TOKEN.line, (int) first);
+                    
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_SUB);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
+                    break;
+                }
+                case STAR_EQUALS: {
+                    uint8_t first = vm.opcode.back();
+
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    vm.writeOp(TOKEN.line, (int) first);
+                    
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_MUL);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
+                    break;
+                }
+                case SLASH_EQUALS: {
+                    uint8_t first = vm.opcode.back();
+
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    vm.writeOp(TOKEN.line, (int) first);
+                    
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_DIV);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
+                    break;
+                }
+                case CONCAT_EQUALS: {
+                    uint8_t first = vm.opcode.back();
+
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    vm.writeOp(TOKEN.line, (int) first);
+                    
+                    token++;
+                    expression(1);
+                    vm.writeOp(TOKEN.line, OP_CONCATENATE);
+                    vm.writeOp(TOKEN.line, OP_SET_VARIABLE);
+                    break;
+                }
                 case AND: {
                     token++;
                     expression(getPrecedence(AND)+1);
@@ -213,6 +282,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     expression(getPrecedence(OR)+1);
                     vm.writeOp(TOKEN.line, OP_OR);
                     break;
+                }
+                case NOT: {
+                    token++;
+                    if (TOKEN.type != LEFT_PAREN) ERROR(" Expected '('.");
+                    token++;
+                    if (TOKEN.type != RIGHT_PAREN) ERROR(" Expected ')'.");
+                    vm.writeOp(TOKEN.line, OP_CALL);
+                    return;
                 }
                 default: break;
             }
@@ -258,7 +335,49 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     std::function<void()> declaration = [&]()->void {
         if (CHECK(SET)) { // setting scoped variable
             setVariable();
-        }else if (CHECK(PRINT)) { // printing
+        } else if (CHECK(FUN)) {
+            token++;
+
+            std::string id = TOKEN.lexeme;
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+            
+            token++;
+            if (TOKEN.type != LEFT_PAREN) ERROR(" Expected a '('.");
+
+            token++;
+            if (TOKEN.type != RIGHT_PAREN) ERROR(" Expected a ')'.");
+            if (NEXT.type != LEFT_BRACKET) ERROR(" Expected a '{'.");
+
+            vm.writeOp(TOKEN.line, OP_DECL_FN);
+            vm.writeOp(TOKEN.line, vm.fn_pool.size());
+
+            int nests = 0;
+            std::vector<Token> function_body;
+            while (true) {
+                token++;
+                function_body.push_back(TOKEN);
+                if (TOKEN.type == LEFT_BRACKET)
+                    nests++;
+                else if (TOKEN.type == RIGHT_BRACKET) {
+                    if (nests == 1) break;
+                    nests--;
+                }
+            }
+
+            Machine body_as_M = compile(function_body, success);
+            if (!success) {
+                success = false;
+                std::cerr.setstate(std::ios_base::failbit);
+                panicking = true;
+                return;
+            }
+
+            Function fn;
+            fn.opcode = body_as_M.opcode;
+            fn.lines = body_as_M.lines;
+            fn.constants = body_as_M.constants;
+            vm.fn_pool.push_back(fn);
+        } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);
             token++;
@@ -355,7 +474,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     for (; !CHECK(_EOF) && token < tokens.end(); token++) {
         declaration();
         if (panicking) {
-            //for (; !CHECK(_EOF) && !CHECK(SEMICOLON) && token < tokens.end(); token++);
             std::cerr.clear();
             panicking = false;
         }

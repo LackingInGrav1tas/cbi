@@ -25,7 +25,7 @@ Very much in development.
 <code-block> ::= "{" <code> "}" ;
 <operation> ::= <infix> | <prefix> ;
 
-<infix> ::= <expression> "-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" <expression> ;
+<infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||") "=" ) <expression> ;
 <prefix> ::= <get-var> | ("!" | "-" <expression>) ;
 <get-var> ::= "$" IDENTIFIER ;
 

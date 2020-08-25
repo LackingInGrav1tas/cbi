@@ -20,11 +20,11 @@ enum Command {
 
     OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
     OP_JUMP_FALSE, OP_JUMP_FALSE_IFv, OP_IF, OP_ELSE, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
-    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK
+    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN
 };
 
 enum RunType {
-    NORMAL, DEBUG
+    RT_MAIN, RT_FN
 };
 
 enum ErrorCode {
@@ -32,17 +32,42 @@ enum ErrorCode {
 };
 
 enum Tag {
-    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME
+    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME, TYPE_FUN
 };
 
 struct Value {
     Tag type;
     std::string string;
     union {
+        int fn;
         double number;
         bool boolean;
     } storage;
 };
+
+struct Function {
+    std::vector<uint8_t> opcode;
+    std::vector<int> lines;
+    std::vector<Value> constants;
+
+    void writeOp(int line, uint8_t command) {
+        opcode.push_back(command);
+        lines.push_back(line);
+    }
+    void writeConstant(int line, Value value) {
+        writeOp(line, OP_CONSTANT);
+        constants.push_back(value);
+        writeOp(line, constants.size()-1);
+    }
+    void writeJump(int line, int index) {
+        writeOp(line, OP_JUMP_FALSE);
+        writeOp(line, index);
+    }
+};
+
+extern std::vector<Function> functions;
+
+Value funcValue(Function *opcode);
 
 struct Scope {
     std::map<std::string, Value> variables;

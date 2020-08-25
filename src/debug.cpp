@@ -24,12 +24,12 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_CONCATENATE: std::cout << "OP_CONCATENATE"; break;
         case OP_JUMP_FALSE_IFv:
         case OP_JUMP_FALSE:
-            std::cout << "OP_JUMP_FALSE" << " to " << (int) *(op+1);
+            std::cout << "OP_JUMP_FALSE to " << (int) *(op+1);
             op++;
             break;
         case OP_BREAK: std::cout << "OP_BREAK"; break;
         case OP_JUMP:
-            std::cout << "OP_JUMP" << " to " << (int) *(op+1);
+            std::cout << "OP_JUMP to " << (int) *(op+1);
             op++;
             break;
         case OP_EQUALITY: std::cout << "OP_EQUALITY"; break;
@@ -39,6 +39,11 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_GREATER_EQ: std::cout << "OP_GREATER_EQ"; break;
         case OP_NOT_EQ: std::cout << "OP_NOT_EQ"; break;
         case OP_POP_TOP: std::cout << "OP_POP_TOP"; break;
+        case OP_DECL_FN: {
+            op++;
+            std::cout << "OP_DECL_FN with " << (int)*op;
+            break;
+        }
         case OP_VARIABLE: std::cout << "OP_VARIABLE"; break;
         case OP_VARIABLE_MUT: std::cout << "OP_VARIABLE_MUT"; break;
         case OP_RETRIEVE:
@@ -50,6 +55,7 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_IMUT: std::cout << "OP_IMUT"; break;
         case OP_BEGIN_SCOPE: std::cout << "OP_BEGIN_SCOPE"; break;
         case OP_END_SCOPE: std::cout << "OP_END_SCOPE"; break;
+        case OP_CALL: std::cout << "OP_CALL"; break;
         default:
             std::cout << "bug in opcode, could not identify command.";
             break;

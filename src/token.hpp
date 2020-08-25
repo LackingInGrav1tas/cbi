@@ -20,8 +20,8 @@ enum Type {
     LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON, DOLLAR,
 
     // multiple length operators
-    EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, CONCATENATE, INCREMENT, DECREMENT, PLUS_EQUALS,
-    MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS,
+    EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, CONCATENATE, PLUS_EQUALS,
+    MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS, CONCAT_EQUALS,
 
     // keywords
     AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK,
@@ -41,25 +41,22 @@ struct Token {
         line = init_line;
     }
     void error(std::string message) {
-        std::cout << "\n";
+        std::cerr << "\n";
         bool b = true;
         std::vector<std::string> lines = getLines(filename, b);
         if (line == -1) {
             std::cerr << "Error in non-existent file." << std::endl;
         } else if (!b) {
-            std::cerr << "\n" << lines.size()+2 << "| _EOF\n";
-            std::cerr << "Compile-time Error:" << std::endl;
-            std::cerr << message;
+            std::cerr << "\n" << lines.size()+2 << "| _EOF\nCompile-time Error:" << message;
         } else {
-            std::cout << "\n" << line+1 << "| " << std::endl;
+            std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {
                     std::cerr << *it;
                     break;
                 }
             }
-            std::cerr << "\nCompile-time Error:" << std::endl;
-            std::cerr << message << " TOKEN: " << lexeme;
+            std::cerr << "\nCompile-time Error:" << message << " TOKEN: " << lexeme;
         }
     }
 };

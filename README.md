@@ -19,15 +19,17 @@ Very much in development.
 <while-statement> ::= "while" <group> <flexible-block> ;
 
 <flexible-block> ::= <code-block> | <declaration> ;
-<expression> ::= <operation> | <literal> | <group> | IDENTIFIER ;
+<expression> ::= <operation> | <literal> | <group> | <fn-call> | IDENTIFIER ;
 
 <group> ::= "(" <expression> ")" ;
+<fn-call> ::= IDENTIFIER "!" "(" <expression>* ")" ;    (*foo!()*)
 
 <code-block> ::= "{" <code> "}" ;
 <operation> ::= <infix> | <prefix> ;
 
 <infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||") "=" ) <expression> ;
 <prefix> ::= <get-var> | ("!" | "-" <expression>) ;
+
 <get-var> ::= "$" IDENTIFIER ;
 
 <literal> ::= STRING | NUMBER | "true" | "false" | "null" ;

@@ -8,10 +8,11 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> ";" ) ;
+<declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | "break" ";") | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
+<fn-declaration> ::= "fn" IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
 
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;

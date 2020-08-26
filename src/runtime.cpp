@@ -235,7 +235,7 @@ ErrorCode Machine::run() { // executes the program
                 break;
             }
             case OP_POP_TOP: {
-                if (value_pool.size() > 0) value_pool.pop();
+                if (value_pool.size() > 0) value_pool.pop(); // the if statement is for function calls as exp stmts
                 break;
             }
             case OP_VARIABLE: {

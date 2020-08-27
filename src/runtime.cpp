@@ -367,6 +367,8 @@ ErrorCode Machine::run() { // executes the program
                     call.lines = fn.lines;
                     call.constants = fn.constants;
                     call.scopes = fn.scopes;
+                    call.fn_pool = fn_pool; // the best i can do atm
+                    call.fn_scopes = fn_scopes; // ^
                     if (call.run() == EXIT_RT) return EXIT_RT;
                     break;
                 }

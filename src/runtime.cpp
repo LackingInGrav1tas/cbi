@@ -271,6 +271,7 @@ ErrorCode Machine::run() { // executes the program
                 std::string id = value_pool.top().string;
                 value_pool.pop();
                 op++;
+                fn_pool[(int)OP].scopes = scopes;
                 fn_scopes.back()[id] = fn_pool[(int)OP];
                 break;
             }
@@ -282,8 +283,7 @@ ErrorCode Machine::run() { // executes the program
                     found = scopes[i].variables.find(constants[(int)OP].string);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error (for $): Cannot access variable out of scope, " << constants[(int)OP].string << ", " << (int)OP << std::endl;
-                            disassembleScopes();
+                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << std::endl;
                             return EXIT_RT;
                         }
                         continue;
@@ -356,8 +356,7 @@ ErrorCode Machine::run() { // executes the program
                     found = fn_scopes[i].find(id);
                     if (found == fn_scopes[i].end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << ", " << (int)OP << std::endl;
-                            disassembleScopes();
+                            std::cerr << "Run-time Error: Cannot call function out of scope, " << id << std::endl;
                             return EXIT_RT;
                         }
                         continue;
@@ -367,7 +366,8 @@ ErrorCode Machine::run() { // executes the program
                     call.opcode = fn.opcode;
                     call.lines = fn.lines;
                     call.constants = fn.constants;
-                    call.run();
+                    call.scopes = fn.scopes;
+                    if (call.run() == EXIT_RT) return EXIT_RT;
                     break;
                 }
                 break;

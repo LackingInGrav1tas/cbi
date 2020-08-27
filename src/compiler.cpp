@@ -100,11 +100,26 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 break;
             }
             case DOLLAR: { // prefix retrieve &<identifier>
-                vm.writeOp(TOKEN.line, OP_RETRIEVE);
                 token++;
-                if (TOKEN.type != IDENTIFIER) ERROR(" Cannot retrieve non-identifier.");
-                vm.constants.push_back(idLexeme(TOKEN.lexeme));
-                vm.writeOp(TOKEN.line, vm.constants.size()-1);
+                if (!CHECK(IDENTIFIER)) ERROR(" Cannot retrieve non-identifier.");
+                token++;
+                if (!CHECK(DOT)) {
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                    token--;
+                    vm.constants.push_back(idLexeme(TOKEN.lexeme));
+                    vm.writeOp(TOKEN.line, vm.constants.size()-1);
+                } else {
+                    vm.writeOp(TOKEN.line, OP_GET_FROM_C_SCOPE);
+                    
+                    vm.writeOp(TOKEN.line, vm.constants.size());
+                    vm.constants.push_back(stringValue(PREV.lexeme)); // prev.l == struct_name
+
+                    token++;
+
+                    if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+                    vm.writeOp(TOKEN.line, vm.constants.size());
+                    vm.constants.push_back(stringValue(TOKEN.lexeme)); // TOKEN.l == member_name
+                }
                 break;
             }
             case NUMBER: { // number literal
@@ -299,7 +314,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     auto expStatement = [&]() {
         expression(1);
         token++;
-        if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
+        if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
         vm.writeOp(TOKEN.line, OP_POP_TOP);
     };
 
@@ -355,10 +370,13 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             std::vector<Token> function_body;
             while (true) {
                 token++;
+
+                if (CHECK(FUN)) ERROR(" cbi does not support nested functions.");
+
                 function_body.push_back(TOKEN);
-                if (TOKEN.type == LEFT_BRACKET)
+                if (CHECK(LEFT_BRACKET))
                     nests++;
-                else if (TOKEN.type == RIGHT_BRACKET) {
+                else if (CHECK(RIGHT_BRACKET)) {
                     if (nests == 1) break;
                     nests--;
                 }
@@ -460,7 +478,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         } else if (CHECK(BREAK)) {
             vm.writeOp(TOKEN.line, OP_BREAK);
             token++;
-            if (TOKEN.type != SEMICOLON) ERROR(" Expected a semicolon.");
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();

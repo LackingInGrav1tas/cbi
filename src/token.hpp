@@ -24,7 +24,7 @@ enum Type {
     MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS, CONCAT_EQUALS,
 
     // keywords
-    AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK,
+    AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK, C_SCOPE, NEW,
 
     _EOF
 };
@@ -49,6 +49,7 @@ struct Token {
         } else if (!b) {
             std::cerr << "\n" << lines.size()+2 << "| _EOF\nCompile-time Error:" << message;
         } else {
+            std::cerr << "\n" << filename << ": Compile-time Error:" << message << " TOKEN: " << lexeme;
             std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {
@@ -56,7 +57,6 @@ struct Token {
                     break;
                 }
             }
-            std::cerr << "\nCompile-time Error:" << message << " TOKEN: " << lexeme;
         }
     }
 };

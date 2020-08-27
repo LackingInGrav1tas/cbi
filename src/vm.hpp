@@ -16,6 +16,7 @@ class Machine {
     std::vector<int> lines;
     std::stack<Value> value_pool;
     std::vector<Scope> scopes;
+
     // seperated functions from variables because its much easier to not have functions be included as values
     std::vector<std::map<std::string, Function>> fn_scopes;
     std::vector<Function> fn_pool;

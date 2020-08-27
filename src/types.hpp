@@ -20,7 +20,7 @@ enum Command {
 
     OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
     OP_JUMP_FALSE, OP_JUMP_FALSE_IFv, OP_IF, OP_ELSE, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
-    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN
+    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN, OP_GET_FROM_C_SCOPE, OP_NEW_STRUCT
 };
 
 enum RunType {
@@ -45,10 +45,17 @@ struct Value {
     } storage;
 };
 
+
+struct Scope {
+    std::map<std::string, Value> variables;
+    std::vector<std::string> mutables;
+};
+
 struct Function {
     std::vector<uint8_t> opcode;
     std::vector<int> lines;
     std::vector<Value> constants;
+    std::vector<Scope> scopes;
 
     void writeOp(int line, uint8_t command) {
         opcode.push_back(command);
@@ -65,14 +72,7 @@ struct Function {
     }
 };
 
-extern std::vector<Function> functions;
-
 Value funcValue(Function *opcode);
-
-struct Scope {
-    std::map<std::string, Value> variables;
-    std::vector<std::string> mutables;
-};
 
 Value numberValue(double num);
 

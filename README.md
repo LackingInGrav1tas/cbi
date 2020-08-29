@@ -21,8 +21,8 @@ Very much in development.
 <flexible-block> ::= <code-block> | <declaration> ;
 <expression> ::= <operation> | <literal> | <group> | <fn-call> | IDENTIFIER ;
 
-<group> ::= "(" <expression> ")" ;
-<fn-call> ::= IDENTIFIER "!" "(" <expression>* ")" ;    (*foo!()*)
+<group> ::= "(" <expression> ")" ; (* 5*(2+8) *)
+<fn-call> ::= "@" IDENTIFIER "(" <expression>* ")" ;    (* @foo() *)
 
 <code-block> ::= "{" <code> "}" ;
 <operation> ::= <infix> | <prefix> ;
@@ -30,7 +30,7 @@ Very much in development.
 <infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||") "=" ) <expression> ;
 <prefix> ::= <get-var> | ("!" | "-" <expression>) ;
 
-<get-var> ::= "$" IDENTIFIER ;
+<get-var> ::= "$" IDENTIFIER ; (* $var_name *)
 
 <literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
 ```

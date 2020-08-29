@@ -140,9 +140,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             case IDENTIFIER: {
                 vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
                 if (NEXT.type != EQUAL && NEXT.type != PLUS_EQUALS && NEXT.type != MINUS_EQUALS
-                && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS
-                && !(NEXT.type == NOT && (*(token+2)).type == LEFT_PAREN))
-                    ERROR(" Stray identifier.");
+                && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS)
+                    ERROR(" Stray identifier. If you wanted to access the variables value, use $" + TOKEN.lexeme + ".");
                 break;
             }
             case AT: { // change to prefix @ so params work
@@ -155,7 +154,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 while (true) {
                     if (CHECK(RIGHT_PAREN)) break;
                     expression(1);
-                    //vm.writeOp(0, OP_PRINT_TOP);
                     token++;
                     if (CHECK(COMMA)) {
                         token++;
@@ -167,7 +165,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
                 vm.writeConstant(TOKEN.line, idLexeme(id));
                 vm.writeOp(TOKEN.line, OP_CALL);
-                return;
+                break;
             }
             case _EOF: break;
             default: {
@@ -330,7 +328,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         expression(1);
         token++;
         if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
-        vm.writeOp(TOKEN.line, OP_EMPTY_STACK);
+        vm.writeOp(TOKEN.line, OP_EMPTY_STACK); 
     };
 
     auto setVariable = [&]() {
@@ -432,6 +430,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
 
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
+        } else if (CHECK(RETURN)) {
+            token++;
+            expression(1);
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeOp(TOKEN.line, OP_RETURN_TOP);
         } else if (CHECK(IF)) { // if statement
             token++;
 

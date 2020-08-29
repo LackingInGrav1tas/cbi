@@ -38,7 +38,18 @@ class Machine {
     // </helper>
 
     //in runtime
-    ErrorCode run();
+    Value run();
+
+    Machine from(Function fn) {
+        Machine call;
+        call.opcode = fn.opcode;
+        call.lines = fn.lines;
+        call.constants = fn.constants;
+        call.scopes = scopes;
+        call.fn_pool = fn_pool; // the best i can do atm
+        call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes}; // ^
+        return call;
+    }
 
     // <debug>
     void disassembleConstants();

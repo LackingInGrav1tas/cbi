@@ -51,6 +51,18 @@ Value funcValue(Function *opcode) {
     return val;
 }
 
+Value exitRT() {
+    Value v;
+    v.type = TYPE_RT_ERROR;
+    return v;
+}
+
+Value exitOK() {
+    Value v;
+    v.type = TYPE_OK;
+    return v;
+}
+
 std::string shorten(std::string str) {
     while (str.back() == '0')
         str.pop_back();

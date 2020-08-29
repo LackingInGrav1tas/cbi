@@ -70,10 +70,9 @@ int main(int argc, char **argv) {
             if (debugmode) {
                 std::cout << "\n== runtime ==" << std::endl;
                 saved_time = NOW();
-                switch (vm.run()) { // running the opcode
-                    case EXIT_OK: std::cout << "\nEXIT_OK"; break;
-                    case EXIT_RT: std::cout << "\nEXIT_RT"; break;
-                    case EXIT_CT: std::cout << "\nEXIT_CT"; break;
+                switch (vm.run().type) { // running the opcode
+                    case TYPE_OK: std::cout << "\nEXIT_OK"; break;
+                    case TYPE_RT_ERROR: std::cout << "\nEXIT_RT"; break;
                     default: std::cout << "\nbug: unknown error code."; break;
                 }
                 int pt = PASSED_TIME();

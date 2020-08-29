@@ -17,19 +17,16 @@ enum Command {
 
     OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
     OP_JUMP_FALSE, OP_JUMP_FALSE_IFv, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
-    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN, OP_GET_FROM_C_SCOPE, OP_NEW_STRUCT, OP_EMPTY_STACK
+    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN, OP_GET_FROM_C_SCOPE, OP_NEW_STRUCT, OP_EMPTY_STACK,
+    OP_RETURN_TOP
 };
 
 enum RunType {
     RT_MAIN, RT_FN
 };
 
-enum ErrorCode {
-    EXIT_OK, EXIT_RT, EXIT_CT
-};
-
 enum Tag {
-    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME, TYPE_FUN
+    TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME, TYPE_FUN, TYPE_RT_ERROR, TYPE_OK
 };
 
 struct Value {
@@ -41,7 +38,6 @@ struct Value {
         bool boolean;
     } storage;
 };
-
 
 struct Scope {
     std::map<std::string, Value> variables;
@@ -67,6 +63,10 @@ Value idLexeme(std::string str);
 Value boolValue(bool boolean);
 
 Value nullValue();
+
+Value exitRT();
+
+Value exitOK();
 
 std::string getPrintable(Value value);
 

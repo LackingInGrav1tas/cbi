@@ -32,7 +32,7 @@ static bool valueToBool(Value value) {
 
 Value Machine::run() { // executes the program
     #define GET_TOP() \
-        if (value_pool.size() < 2) { std::cerr << " Run-time Error: Stack underflow." << std::endl; return exitRT(); } \
+        if (value_pool.size() < 2) { std::cerr << "Run-time Error: Stack underflow." << std::endl; return exitRT(); } \
         Value rhs = value_pool.top(); \
         value_pool.pop(); \
         Value lhs = value_pool.top(); \

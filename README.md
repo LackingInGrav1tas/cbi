@@ -59,14 +59,43 @@ output:
 ### control flow ###
 ```
 set mut a; # scope is accessable through the if statement
-if (true) {
+set condition = 3;
+if (condition == 3) // like C family languages, brackets are not needed for one line blocks.
     a = "This will print.";
-} else {
+else if (condition == 2)
     a = "This won't."
-}
+else 
+    a = "Neither will this.";
+
 print $a;
 ```
 output:
 ```
 This will print.
 ```
+
+### Functions ###
+```
+fn getnum(x) {
+    return $x * 3.78;
+}
+
+print @getnum(45);
+```
+output:
+```
+170.1
+```
+The way that parameters are handled can lead to strange errors, ex:
+```
+fn getnum(x) {
+    return $x * 3.78;
+}
+
+print 45 + @getnum();
+```
+output:
+```
+Run-time Error: Stack underflow.
+```
+The stack underflow happens when handling OP_ADD. This occurs because parameters are taken off the top of the stack. This means that when 45 is seen during compile time it is pushed to the stack first during runtime. It is then taken as the parameter for OP_CALL on getnum. After this, OP_ADD finds that there is only 1 value on the stack, causing the error. This could be fixed with a seperate param stack, but isn't really necessary.

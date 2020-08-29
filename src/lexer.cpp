@@ -157,6 +157,16 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     tokens.push_back(Token(DOLLAR, ";", filename, line-lines.begin()));
                     break;
                 }
+                case '@': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(AT, "@", filename, line-lines.begin()));
+                    break;
+                }
+                case ',': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(COMMA, ",", filename, line-lines.begin()));
+                    break;
+                }
                 case '(': {
                     PUSH_TOKEN(lexeme);
                     tokens.push_back(Token(LEFT_PAREN, "(", filename, line-lines.begin()));

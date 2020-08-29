@@ -56,6 +56,8 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_BEGIN_SCOPE: std::cout << "OP_BEGIN_SCOPE"; break;
         case OP_END_SCOPE: std::cout << "OP_END_SCOPE"; break;
         case OP_CALL: std::cout << "OP_CALL"; break;
+        case OP_EMPTY_STACK: std::cout << "OP_EMPTY_STACK"; break;
+        case OP_GET_FROM_C_SCOPE: std::cout << "OP_GET_FROM_C_SCOPE"; break;
         default:
             std::cout << "bug in opcode, could not identify command.";
             break;

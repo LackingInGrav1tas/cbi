@@ -12,15 +12,12 @@ enum Command {
     //prefix operators
     OP_NEGATE, OP_NOT,
 
-    //postfix
-    OP_INC, OP_DEC,
-
     //infix operators
     OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_CONCATENATE, OP_AND, OP_OR,
 
     OP_EQUALITY, OP_LESS, OP_GREATER, OP_LESS_EQ, OP_GREATER_EQ, OP_NOT_EQ,
-    OP_JUMP_FALSE, OP_JUMP_FALSE_IFv, OP_IF, OP_ELSE, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
-    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN, OP_GET_FROM_C_SCOPE, OP_NEW_STRUCT
+    OP_JUMP_FALSE, OP_JUMP_FALSE_IFv, OP_POP_TOP, OP_VARIABLE, OP_SET_VARIABLE, OP_IMUT, OP_RETRIEVE, OP_VARIABLE_MUT,
+    OP_BEGIN_SCOPE, OP_END_SCOPE, OP_JUMP, OP_BREAK, OP_CALL, OP_DECL_FN, OP_GET_FROM_C_SCOPE, OP_NEW_STRUCT, OP_EMPTY_STACK
 };
 
 enum RunType {
@@ -56,20 +53,7 @@ struct Function {
     std::vector<int> lines;
     std::vector<Value> constants;
     std::vector<Scope> scopes;
-
-    void writeOp(int line, uint8_t command) {
-        opcode.push_back(command);
-        lines.push_back(line);
-    }
-    void writeConstant(int line, Value value) {
-        writeOp(line, OP_CONSTANT);
-        constants.push_back(value);
-        writeOp(line, constants.size()-1);
-    }
-    void writeJump(int line, int index) {
-        writeOp(line, OP_JUMP_FALSE);
-        writeOp(line, index);
-    }
+    std::vector<std::string> param_ids;
 };
 
 Value funcValue(Function *opcode);

@@ -366,12 +366,26 @@ ErrorCode Machine::run() { // executes the program
                     call.opcode = fn.opcode;
                     call.lines = fn.lines;
                     call.constants = fn.constants;
-                    call.scopes = fn.scopes;
+                    call.scopes = scopes;
                     call.fn_pool = fn_pool; // the best i can do atm
-                    call.fn_scopes = fn_scopes; // ^
+                    call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes}; // ^
+                    if (value_pool.size() < fn.param_ids.size()) {
+                        std::cerr << "Run-time Error: Expected more parameters during call of function " << id << ". got: " << value_pool.size() << ", rec: " << fn.param_ids.size() << std::endl;
+                        return EXIT_RT;
+                    }
+                    for (int p = fn.param_ids.size()-1; p >= 0; p--) {
+                        call.scopes.back().variables[fn.param_ids[p]] = value_pool.top();
+                        value_pool.pop();
+                        call.scopes.back().mutables.push_back(fn.param_ids[p]);
+                    }
                     if (call.run() == EXIT_RT) return EXIT_RT;
+                    scopes = call.scopes;
                     break;
                 }
+                break;
+            }
+            case OP_EMPTY_STACK: {
+                value_pool.empty();
                 break;
             }
             default: { // error

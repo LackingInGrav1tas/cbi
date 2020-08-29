@@ -38,7 +38,6 @@ static int getPrecedence(Type type) {
         case STAR: return 7;
 
         //case DOT:
-        case NOT: return 9;
         //case LEFT_PAREN: return 8;
         
         default: return 0;
@@ -145,6 +144,30 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 && !(NEXT.type == NOT && (*(token+2)).type == LEFT_PAREN))
                     ERROR(" Stray identifier.");
                 break;
+            }
+            case AT: { // change to prefix @ so params work
+                token++;
+                if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+                std::string id = TOKEN.lexeme;
+                token++;
+                if (!CHECK(LEFT_PAREN)) ERROR(" Expected '('.");
+                token++;
+                while (true) {
+                    if (CHECK(RIGHT_PAREN)) break;
+                    expression(1);
+                    //vm.writeOp(0, OP_PRINT_TOP);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (CHECK(RIGHT_PAREN)) ERROR(" Expected an expression.");
+                    }
+                }
+
+                if (!CHECK(RIGHT_PAREN)) ERROR(" Expected ')'.");
+
+                vm.writeConstant(TOKEN.line, idLexeme(id));
+                vm.writeOp(TOKEN.line, OP_CALL);
+                return;
             }
             case _EOF: break;
             default: {
@@ -298,14 +321,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_OR);
                     break;
                 }
-                case NOT: {
-                    token++;
-                    if (TOKEN.type != LEFT_PAREN) ERROR(" Expected '('.");
-                    token++;
-                    if (TOKEN.type != RIGHT_PAREN) ERROR(" Expected ')'.");
-                    vm.writeOp(TOKEN.line, OP_CALL);
-                    return;
-                }
                 default: break;
             }
         }
@@ -315,7 +330,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         expression(1);
         token++;
         if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
-        vm.writeOp(TOKEN.line, OP_POP_TOP);
+        vm.writeOp(TOKEN.line, OP_EMPTY_STACK);
     };
 
     auto setVariable = [&]() {
@@ -355,12 +370,27 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
             std::string id = TOKEN.lexeme;
             vm.writeConstant(TOKEN.line, idLexeme(id));
-            
+
+            Function fn;
+
             token++;
             if (TOKEN.type != LEFT_PAREN) ERROR(" Expected a '('.");
 
             token++;
-            if (TOKEN.type != RIGHT_PAREN) ERROR(" Expected a ')'.");
+
+            while (true) {
+                if (CHECK(IDENTIFIER)) {
+                    fn.param_ids.push_back(TOKEN.lexeme);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+                    }
+                } else if (CHECK(RIGHT_PAREN)) break;
+                else ERROR(" Expected valid parameters.");
+            }
+
+            if (!CHECK(RIGHT_PAREN)) ERROR(" Expected a ')'.");
             if (NEXT.type != LEFT_BRACKET) ERROR(" Expected a '{'.");
 
             vm.writeOp(TOKEN.line, OP_DECL_FN);
@@ -390,7 +420,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 return;
             }
 
-            Function fn;
             fn.opcode = body_as_M.opcode;
             fn.lines = body_as_M.lines;
             fn.constants = body_as_M.constants;

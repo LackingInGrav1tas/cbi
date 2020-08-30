@@ -31,8 +31,15 @@ static bool valueToBool(Value value) {
 }
 
 Value Machine::run() { // executes the program
+    #define ERROR(message) \
+        do { \
+            std::cerr << "Run-time Error in line " << lines[op-opcode.begin()] << ": " << message; \
+            std::cerr.flush(); \
+            return exitRT(); \
+        } while (false)
+
     #define GET_TOP() \
-        if (value_pool.size() < 2) { std::cerr << "Run-time Error: Stack underflow." << std::endl; return exitRT(); } \
+        if (value_pool.size() < 2) { ERROR("Stack underflow."); } \
         Value rhs = value_pool.top(); \
         value_pool.pop(); \
         Value lhs = value_pool.top(); \
@@ -65,8 +72,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number + rhs.storage.number));
                 else {
-                    std::cerr << "\nRun-time Error: Could not add non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not add non-number value.");
                 }
                 break;
             }
@@ -75,8 +81,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number - rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not subtract non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not subtract non-number value.");
                 }
                 break;
             }
@@ -85,8 +90,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number * rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not multiply non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not multiply non-number value.");
                 }
                 break;
             }
@@ -95,8 +99,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(numberValue(lhs.storage.number / rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not divide non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Run-time Error: Could not divide non-number value.");
                 }
                 break;
             }
@@ -105,8 +108,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(top))
                     value_pool.push(numberValue(-top.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not negate non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not negate non-number value.");
                 }
                 break;
             }
@@ -126,8 +128,7 @@ Value Machine::run() { // executes the program
                     if (top.storage.number == 0) value_pool.push(boolValue(true));
                     else value_pool.push(boolValue(false));
                 } else {
-                    std::cerr << "Run-time Error: Cannot negate unreferenced variable." << std::endl;
-                    return exitRT();
+                    ERROR("Cannot negate unreferenced variable.");
                 }
                 break;
             }
@@ -174,13 +175,11 @@ Value Machine::run() { // executes the program
                 int position = op-opcode.begin();
                 for (; OP != OP_JUMP_FALSE; op--)
                     if (op <= opcode.begin()) {
-                        std::cerr << "\nRun-time Error: Misplaced break.";
-                        return exitRT();
+                        ERROR("Misplaced break.");
                     }
                 op++;
                 if ((int) OP-1 < position) { // so while(...); break; doesnt work
-                    std::cerr << "\nRun-time Error: Misplaced break.";
-                    return exitRT();
+                    ERROR("Misplaced break.");
                 }
                 op = opcode.begin() + (int) OP-1;
             }
@@ -200,8 +199,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number < rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not solve with non-number value.");
                 }
                 break;
             }
@@ -210,8 +208,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number > rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not solve with non-number value.");
                 }
                 break;
             }
@@ -220,8 +217,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number <= rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not solve with non-number value.");
                 }
                 break;
             }
@@ -230,8 +226,7 @@ Value Machine::run() { // executes the program
                 if (IS_NUM(rhs) && IS_NUM(lhs))
                     value_pool.push(boolValue(lhs.storage.number >= rhs.storage.number));
                 else {
-                    std::cerr << "Run-time Error: Could not solve with non-number value in line " << lines[op-opcode.begin()] << "."; // need better
-                    return exitRT();
+                    ERROR("Could not solve with non-number value.");
                 }
                 break;
             }
@@ -243,8 +238,7 @@ Value Machine::run() { // executes the program
                 Value gl_value = value_pool.top();
                 value_pool.pop();
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
-                    return exitRT();
+                    ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
@@ -254,8 +248,7 @@ Value Machine::run() { // executes the program
             case OP_VARIABLE_MUT: {
                 TOP();
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error:  Expected an identifier." << std::endl;
-                    return exitRT();
+                    ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
@@ -265,8 +258,7 @@ Value Machine::run() { // executes the program
             }
             case OP_DECL_FN: { // format: identifier constant, decl, size
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
-                    return exitRT();
+                    ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
@@ -283,8 +275,7 @@ Value Machine::run() { // executes the program
                     found = scopes[i].variables.find(constants[(int)OP].string);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << constants[(int)OP].string << std::endl;
-                            return exitRT();
+                            ERROR("Cannot access variable out of scope, " << constants[(int)OP].string << ".");
                         }
                         continue;
                     }
@@ -298,8 +289,7 @@ Value Machine::run() { // executes the program
                 TOP();
                 
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
-                    return exitRT();
+                    ERROR("Expected an identifier.");
                 }
 
                 std::map<std::string, Value>::iterator found;
@@ -308,15 +298,13 @@ Value Machine::run() { // executes the program
                     found = scopes[i].variables.find(a);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error: Cannot access variable out of scope, " << value_pool.top().string << std::endl;
-                            return exitRT();
+                            ERROR("Cannot access variable out of scope, " << value_pool.top().string << ".");
                         }
                         continue;
                     }
 
                     if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
-                        std::cerr << "Run-time Error: Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;";
-                        return exitRT();
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
                     }
                     found->second = top;
                     break;
@@ -345,8 +333,7 @@ Value Machine::run() { // executes the program
             }
             case OP_CALL: {
                 if (!IS_ID(value_pool.top())) {
-                    std::cerr << "Run-time Error: Expected an identifier." << std::endl;
-                    return exitRT();
+                    ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
                 value_pool.pop();
@@ -355,8 +342,7 @@ Value Machine::run() { // executes the program
                     found = fn_scopes[i].find(id);
                     if (found == fn_scopes[i].end()) {
                         if (i == 0) {
-                            std::cerr << "Run-time Error: Cannot call function out of scope, " << id << std::endl;
-                            return exitRT();
+                            ERROR("Cannot call function out of scope, " << id << ".");
                         }
                         continue;
                     }
@@ -364,8 +350,7 @@ Value Machine::run() { // executes the program
                     Machine call = Machine::from(fn); // setting opcode/constant pool/etc.
 
                     if (value_pool.size() < fn.param_ids.size()) { // checking params
-                        std::cerr << "Run-time Error: Expected more parameters during call of function " << id << ". got: " << value_pool.size() << ", rec: " << fn.param_ids.size() << std::endl;
-                        return exitRT();
+                        ERROR("Expected more parameters during call of function " << id << ". Received: " << value_pool.size() << ", Expected: " << fn.param_ids.size());
                     }
                     for (int p = fn.param_ids.size()-1; p >= 0; p--) { // setting params
                         call.scopes.back().variables[fn.param_ids[p]] = value_pool.top();
@@ -388,9 +373,8 @@ Value Machine::run() { // executes the program
                 TOP();
                 return top;
             }
-            default: { // error
-                std::cerr << "Run-time Error: Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << "." << std::endl;
-                return exitRT();
+            default: {
+                ERROR("Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << ".");
             }
         }
     }

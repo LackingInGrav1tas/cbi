@@ -37,7 +37,7 @@ Very much in development.
 
 ## Code Snippets ##
 
-### hello world: ###
+### Hello World: ###
 ```
 print "Hello, World!";
 ```
@@ -45,7 +45,7 @@ output:
 ```
 Hello, World!
 ```
-### variables: ###
+### Variables: ###
 ```
 set mut a; # similar to Rust, the variable is assumed to be immutable. mut specifies it's state.
 a = 729;
@@ -56,7 +56,7 @@ output:
 ```
 1895400
 ```
-### control flow ###
+### Control Flow ###
 ```
 set mut a; # scope is accessable through the if statement
 set condition = 3;
@@ -73,7 +73,32 @@ output:
 ```
 This will print.
 ```
+while loop:
+```
+set mut i = 0;
+while ($i < 5) {
+    i += 1;
+    print $i || "\n";
+}
+```
+or
+```
+fn body() {
+    i += 1;
+    print $i || "\n";
+}
+set mut i = 0;
+while ($i < 5) @body();
+```
+output:
+```
+1
+2
+3
+4
+5
 
+```
 ### Functions ###
 ```
 fn getnum(x) {

@@ -98,4 +98,4 @@ output:
 ```
 Run-time Error: Stack underflow.
 ```
-The stack underflow happens when handling OP_ADD. This occurs because parameters are taken off the top of the stack. This means that when 45 is seen during compile time it is pushed to the stack first during runtime. It is then taken as the parameter for OP_CALL on getnum. After this, OP_ADD finds that there is only 1 value on the stack, causing the error. This could be fixed with a seperate param stack, but isn't really necessary.
+The stack underflow happens when handling OP_ADD. This occurs because of how function calls are compiled. The compiler doesn't check for arity because functions can be called before they are defined. When the 45 is found by the compiler, it is pushed to the opcode as a OP_CONSTANT number value. It is then taken as the parameter for OP_CALL on getnum (When a call is reached it assumes that it's params are on the stack). After this, OP_ADD finds that there is only 1 value on the stack, causing the error. This could be fixed with a seperate param stack, but isn't really necessary.

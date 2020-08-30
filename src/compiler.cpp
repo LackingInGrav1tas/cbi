@@ -3,6 +3,7 @@
 #include "compiler.hpp"
 #include "vm.hpp"
 #include "lexer.hpp"
+#include "color.hpp"
 
 #include <string>
 #include <vector>
@@ -534,6 +535,8 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     #undef TOKEN
     #undef PREV
     #undef NEXT
+    #undef ERROR
+    #undef CHECK
 
     return vm;
 }

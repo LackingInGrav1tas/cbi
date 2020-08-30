@@ -2,6 +2,7 @@
 #include "types.hpp"
 #include "lexer.hpp"
 #include "compiler.hpp"
+#include "color.hpp"
 
 #include <iostream>
 #include <vector>

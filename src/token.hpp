@@ -2,6 +2,7 @@
 #define _token_h
 
 #include "types.hpp"
+#include "color.hpp"
 
 #include <iostream>
 #include <string>
@@ -49,7 +50,9 @@ struct Token {
         } else if (!b) {
             std::cerr << "\n" << lines.size()+2 << "| _EOF\nCompile-time Error:" << message;
         } else {
-            std::cerr << "\n" << filename << ": Compile-time Error:" << message << " TOKEN: " << lexeme;
+            std::cerr << "\n" << filename << ": ";
+            COLOR("Compile-time Error", 4);
+            std::cerr << ":" << message << " TOKEN: " << lexeme;
             std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {

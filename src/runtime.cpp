@@ -5,6 +5,7 @@
 #include <cstring>
 #include <algorithm>
 
+#include "color.hpp"
 #include "vm.hpp"
 #include "types.hpp"
 
@@ -33,7 +34,8 @@ static bool valueToBool(Value value) {
 Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
-            std::cerr << "Run-time Error in line " << lines[op-opcode.begin()] << ": " << message; \
+            COLOR("Run-time Error", 4); \
+            std::cerr << " in line " << lines[op-opcode.begin()] << ": " << message; \
             std::cerr.flush(); \
             return exitRT(); \
         } while (false)
@@ -380,5 +382,7 @@ Value Machine::run() { // executes the program
     }
     #undef OP
     #undef GET_TOP
+    #undef TOP
+    #undef ERROR
     return exitOK();
 }

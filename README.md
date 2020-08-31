@@ -10,7 +10,7 @@ Very much in development.
 
 <declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> ;
 
-<statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
+<statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
 <fn-declaration> ::= "fn" IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
 
@@ -127,7 +127,18 @@ The stack underflow happens when handling OP_ADD. This occurs because of how fun
 ### User Input ###
 gets:
 ```
-set mut input;
+set mut input; #needs to be mutable
 gets input;
 print $input;
 ```
+Sets the variable input to the user's input.
+```gets``` is handled by (and works similar to)
+```C++
+std::string input;
+std::getline(std::cin, input);
+```
+```getc``` works the same as ```gets``` in cbi, but is handled differently in runtime. ```getc``` uses
+```C++
+(char)getch()
+```
+The important difference is that ```getc``` has no buffer, whereas ```gets``` needs to find the enter key to return.

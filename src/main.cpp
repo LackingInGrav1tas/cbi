@@ -20,10 +20,10 @@ int main(int argc, char **argv) {
             if (argc == 3) {
                 if ((std::string)argv[2] == "-d" || (std::string)argv[2] == "-debug")
                     debugmode = true;
-                if ((std::string)argv[2] == "-h" || (std::string)argv[2] == "-help") {
-                    std::cout << "Documentation: https://github.com/LackingInGrav1tas/cbi\n" << std::endl;
-                    return 0;
-                }
+            }
+            if ((std::string)argv[1] == "-h" || (std::string)argv[1] == "-help") {
+                std::cout << "Documentation: https://github.com/LackingInGrav1tas/cbi" << std::endl;
+                return 0;
             }
     
             std::chrono::steady_clock::time_point saved_time;

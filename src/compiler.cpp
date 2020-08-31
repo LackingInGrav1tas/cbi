@@ -525,6 +525,22 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
             vm.writeOp(TOKEN.line, OP_DISASSEMBLE_STACK);
+        } else if (CHECK(GETS)) {
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+            std::string id = TOKEN.lexeme;
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+            vm.writeOp(TOKEN.line, OP_GETS);
+        } else if (CHECK(GETCH)) {
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+            std::string id = TOKEN.lexeme;
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+            vm.writeOp(TOKEN.line, OP_GETCH);
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();

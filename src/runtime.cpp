@@ -4,6 +4,7 @@
 #include <stack>
 #include <cstring>
 #include <algorithm>
+#include <conio.h>
 
 #include "color.hpp"
 #include "vm.hpp"
@@ -374,6 +375,52 @@ Value Machine::run() { // executes the program
             case OP_RETURN_TOP: {
                 TOP();
                 return top;
+            }
+            case OP_GETS: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    std::string a = top.string;
+                    found = scopes[i].variables.find(a);
+                    if (found == scopes[i].variables.end()) {
+                        if (i == 0) {
+                            ERROR("Cannot access variable out of scope, " << top.string << ".");
+                        }
+                        continue;
+                    }
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
+                    }
+                    std::string input;
+                    std::getline(std::cin, input);
+                    found->second = stringValue(std::string("\"") + input + "\"");
+                    break;
+                }
+                break;
+            }
+            case OP_GETCH: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    std::string a = top.string;
+                    found = scopes[i].variables.find(a);
+                    if (found == scopes[i].variables.end()) {
+                        if (i == 0) {
+                            ERROR("Cannot access variable out of scope, " << top.string << ".");
+                        }
+                        continue;
+                    }
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
+                    }
+                    found->second = stringValue(std::string("\"") + (char)getch() + "\"");
+                    break;
+                }
+                break;
             }
 
             case OP_DISASSEMBLE_CONSTANTS: {

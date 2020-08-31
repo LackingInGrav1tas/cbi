@@ -26,7 +26,7 @@ enum Type {
 
     // keywords
     AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK, C_SCOPE, NEW, RETURN,
-    DIS_C, DIS_ST, DIS_SC,
+    DIS_C, DIS_ST, DIS_SC, GETS, GETCH,
 
     _EOF
 };

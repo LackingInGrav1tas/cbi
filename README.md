@@ -12,7 +12,7 @@ Very much in development.
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
-<fn-declaration> ::= "fn" IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
+<fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
 
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;

@@ -55,6 +55,9 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "scope") tokens.push_back(Token(C_SCOPE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "new") tokens.push_back(Token(NEW, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "return") tokens.push_back(Token(RETURN, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "disassemble_constants") tokens.push_back(Token(DIS_C, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "disassemble_stack") tokens.push_back(Token(DIS_ST, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "disassemble_scopes") tokens.push_back(Token(DIS_SC, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

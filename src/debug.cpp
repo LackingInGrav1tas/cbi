@@ -4,6 +4,7 @@
 #include <stack>
 #include <stdio.h>
 
+#include "color.hpp"
 #include "vm.hpp"
 #include "types.hpp"
 
@@ -12,53 +13,60 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
     switch (*op) {
         case OP_CONSTANT:
             op++;
-            std::cout << "OP_CONSTANT  position: " << (int) *op << "  value: " << getPrintable(constants[*op]);
+            COLOR("OP_CONSTANT", DISPLAY_AQUA);
+            std::cout << "  position: " << (int) *op << "  value: " << getPrintable(constants[*op]);
             break;
-        case OP_PRINT_TOP: std::cout << "OP_PRINT_TOP"; break;
-        case OP_NEGATE: std::cout << "OP_NEGATE"; break;
-        case OP_NOT: std::cout << "OP_NOT"; break;
-        case OP_ADD: std::cout << "OP_ADD"; break;
-        case OP_SUB: std::cout << "OP_SUB";  break;
-        case OP_MUL: std::cout << "OP_MUL"; break;
-        case OP_DIV: std::cout << "OP_DIV"; break;
-        case OP_CONCATENATE: std::cout << "OP_CONCATENATE"; break;
+        case OP_PRINT_TOP: COLOR("OP_PRINT_TOP", DISPLAY_AQUA); break;
+        case OP_NEGATE: COLOR("OP_NEGATE", DISPLAY_AQUA); break;
+        case OP_NOT: COLOR("OP_NOT", DISPLAY_AQUA); break;
+        case OP_ADD: COLOR("OP_ADD", DISPLAY_AQUA); break;
+        case OP_SUB: COLOR("OP_SUB", DISPLAY_AQUA); break;
+        case OP_MUL: COLOR("OP_MUL", DISPLAY_AQUA); break;
+        case OP_DIV: COLOR("OP_DIV", DISPLAY_AQUA); break;
+        case OP_CONCATENATE: COLOR("OP_CONCATENATE", DISPLAY_AQUA); break;
         case OP_JUMP_FALSE_IFv:
         case OP_JUMP_FALSE:
-            std::cout << "OP_JUMP_FALSE to " << (int) *(op+1);
+            COLOR("OP_JUMP_FALSE)", DISPLAY_AQUA);
+            std::cout << " to " << (int) *(op+1);
             op++;
             break;
-        case OP_BREAK: std::cout << "OP_BREAK"; break;
+        case OP_BREAK: COLOR("OP_BREAK", DISPLAY_AQUA); break;
         case OP_JUMP:
-            std::cout << "OP_JUMP to " << (int) *(op+1);
+            COLOR("OP_JUMP", DISPLAY_AQUA);
+            std::cout << " to " << (int) *(op+1);
             op++;
             break;
-        case OP_EQUALITY: std::cout << "OP_EQUALITY"; break;
-        case OP_LESS: std::cout << "OP_LESS"; break;
-        case OP_GREATER: std::cout << "OP_GREATER"; break;
-        case OP_LESS_EQ: std::cout << "OP_LESS_EQ"; break;
-        case OP_GREATER_EQ: std::cout << "OP_GREATER_EQ"; break;
-        case OP_NOT_EQ: std::cout << "OP_NOT_EQ"; break;
-        case OP_POP_TOP: std::cout << "OP_POP_TOP"; break;
+        case OP_EQUALITY: COLOR("OP_EQUALITY", DISPLAY_AQUA); break;
+        case OP_LESS: COLOR("OP_LESS", DISPLAY_AQUA); break;
+        case OP_GREATER: COLOR("OP_GREATER", DISPLAY_AQUA); break;
+        case OP_LESS_EQ: COLOR("OP_LESS_EQ", DISPLAY_AQUA); break;
+        case OP_GREATER_EQ: COLOR("OP_GREATER_EQ", DISPLAY_AQUA); break;
+        case OP_NOT_EQ: COLOR("OP_NOT_EQ", DISPLAY_AQUA); break;
+        case OP_POP_TOP: COLOR("OP_POP_TOP", DISPLAY_AQUA); break;
         case OP_DECL_FN: {
             op++;
-            std::cout << "OP_DECL_FN with " << (int)*op;
+            COLOR("OP_DECL_FN", DISPLAY_AQUA);
+            std::cout << " with " << (int)*op;
             break;
         }
-        case OP_VARIABLE: std::cout << "OP_VARIABLE"; break;
-        case OP_VARIABLE_MUT: std::cout << "OP_VARIABLE_MUT"; break;
+        case OP_VARIABLE: COLOR("OP_VARIABLE", DISPLAY_AQUA); break;
+        case OP_VARIABLE_MUT: COLOR("OP_VARIABLE_MUT", DISPLAY_AQUA); break;
         case OP_RETRIEVE:
             op++;
-            std::cout << "OP_RETRIEVE";
+            COLOR("OP_RETRIEVE", DISPLAY_AQUA);
             std::cout << "  position: " << (int) *op << "  lexeme: " << constants[*op].string;
             break;
-        case OP_SET_VARIABLE: std::cout << "OP_SET_VARIABLE"; break;
-        case OP_IMUT: std::cout << "OP_IMUT"; break;
-        case OP_BEGIN_SCOPE: std::cout << "OP_BEGIN_SCOPE"; break;
-        case OP_END_SCOPE: std::cout << "OP_END_SCOPE"; break;
-        case OP_CALL: std::cout << "OP_CALL"; break;
-        case OP_EMPTY_STACK: std::cout << "OP_EMPTY_STACK"; break;
-        case OP_GET_FROM_C_SCOPE: std::cout << "OP_GET_FROM_C_SCOPE"; break;
-        case OP_RETURN_TOP: std::cout << "OP_RETURN_TOP"; break;
+        case OP_SET_VARIABLE: COLOR("OP_SET_VARIABLE", DISPLAY_AQUA); break;
+        case OP_IMUT: COLOR("OP_IMUT", DISPLAY_AQUA); break;
+        case OP_BEGIN_SCOPE: COLOR("OP_BEGIN_SCOPE", DISPLAY_AQUA); break;
+        case OP_END_SCOPE: COLOR("OP_END_SCOPE", DISPLAY_AQUA); break;
+        case OP_CALL: COLOR("OP_CALL", DISPLAY_AQUA); break;
+        case OP_EMPTY_STACK: COLOR("OP_EMPTY_STACK", DISPLAY_AQUA); break;
+        case OP_GET_FROM_C_SCOPE: COLOR("OP_GET_FROM_C_SCOPE", DISPLAY_AQUA); break;
+        case OP_RETURN_TOP: COLOR("OP_RETURN_TOP", DISPLAY_AQUA); break;
+        case OP_DISASSEMBLE_CONSTANTS: COLOR("OP_DISASSEMBLE_CONSTANTS", DISPLAY_AQUA); break;
+        case OP_DISASSEMBLE_SCOPES: COLOR("OP_DISASSEMBLE_SCOPES", DISPLAY_AQUA); break;
+        case OP_DISASSEMBLE_STACK: COLOR("OP_DISASSEMBLE_STACK", DISPLAY_AQUA); break;
         default:
             std::cout << "bug in opcode, could not identify command.";
             break;
@@ -67,27 +75,27 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
 }
 
 void Machine::disassembleOpcode() {
-    std::cout << "== opcode ==";
+    COLOR("\n== opcode ==", DISPLAY_YELLOW);
     for (auto op = opcode.begin(); op < opcode.end(); op++) {
         disassembleOp(op, constants, lines, op-opcode.begin());
     }
-    std::cout << "\n== end ==" << std::endl;
+    COLOR("\n== end ==\n", DISPLAY_YELLOW);
 }
 
 void Machine::disassembleConstants() {
-    std::cout << "== constants ==" << std::endl;
+    COLOR("\n== constants ==\n", DISPLAY_YELLOW);
     for (int i = 0; i < constants.size(); i++) std::cout << i << ": " << getPrintable(constants[i]) << std::endl;
-    std::cout << "== end ==" << std::endl;
+    COLOR("== end ==\n", DISPLAY_YELLOW);
 }
 
 void Machine::disassembleStack() {
-    std::cout << "== stack ==" << std::endl;
+    COLOR("\n== stack ==\n", DISPLAY_YELLOW);
     std::stack<Value> copy = value_pool;
     for (int count = copy.size()-1; !copy.empty(); count--) {
         std::cout << count << ": " << getPrintable(copy.top()) << std::endl;
         copy.pop();
     }
-    std::cout << "== end ==" << std::endl;
+    COLOR("== end ==\n", DISPLAY_YELLOW);
 }
 
 void Machine::disassembleScopes() {
@@ -96,13 +104,14 @@ void Machine::disassembleScopes() {
     #define VARS SCOPE.variables
 
     for (auto scope = scopes.rbegin(); scope < scopes.rend(); scope++) {
-        std::cout << "== scope " << SCOPE_AT() << " map ==" << std::endl;
+        COLOR(std::string("\n== scope ") + std::to_string(SCOPE_AT()) + " map ==\n", DISPLAY_YELLOW);
         for (std::map<std::string, Value>::iterator it = VARS.begin(); it != VARS.end(); it++) {
             std::cout << it->first << " : " << getPrintable(it->second) << std::endl;
         }
-        std::cout << "== end ==" << std::endl;
+        COLOR("== end ==\n", DISPLAY_YELLOW);
     }
 
     #undef SCOPE_AT
+    #undef SCOPE
     #undef VARS
 }

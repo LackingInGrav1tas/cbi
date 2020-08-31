@@ -34,7 +34,7 @@ static bool valueToBool(Value value) {
 Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
-            COLOR("Run-time Error", 4); \
+            COLOR("Run-time Error", DISPLAY_RED); \
             std::cerr << " in line " << lines[op-opcode.begin()] << ": " << message; \
             std::cerr.flush(); \
             return exitRT(); \
@@ -375,6 +375,20 @@ Value Machine::run() { // executes the program
                 TOP();
                 return top;
             }
+
+            case OP_DISASSEMBLE_CONSTANTS: {
+                disassembleConstants();
+                break;
+            }
+            case OP_DISASSEMBLE_SCOPES: {
+                disassembleScopes();
+                break;
+            }
+            case OP_DISASSEMBLE_STACK: {
+                disassembleStack();
+                break;
+            }
+
             default: {
                 ERROR("Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << ".");
             }

@@ -26,6 +26,7 @@ enum Type {
 
     // keywords
     AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK, C_SCOPE, NEW, RETURN,
+    DIS_C, DIS_ST, DIS_SC,
 
     _EOF
 };
@@ -51,7 +52,7 @@ struct Token {
             std::cerr << "\n" << lines.size()+2 << "| _EOF\nCompile-time Error:" << message;
         } else {
             std::cerr << "\n" << filename << ": ";
-            COLOR("Compile-time Error", 4);
+            COLOR("Compile-time Error", DISPLAY_RED);
             std::cerr << ":" << message << " TOKEN: " << lexeme;
             std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {

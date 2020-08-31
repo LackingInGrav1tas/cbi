@@ -9,8 +9,6 @@
 #include <fstream>
 #include <chrono>
 
-std::vector<Function> functions;
-
 int main(int argc, char **argv) {
     try {
         if (2 <= argc <= 3) {
@@ -19,9 +17,14 @@ int main(int argc, char **argv) {
             bool debugmode = false;
             bool success = true;
             int total_relevant_time = 0;
-            if (argc == 3)
-            if ((std::string)argv[2] == "-debug")
-                debugmode = true;
+            if (argc == 3) {
+                if ((std::string)argv[2] == "-d" || (std::string)argv[2] == "-debug")
+                    debugmode = true;
+                if ((std::string)argv[2] == "-h" || (std::string)argv[2] == "-help") {
+                    std::cout << "Documentation: https://github.com/LackingInGrav1tas/cbi\n" << std::endl;
+                    return 0;
+                }
+            }
     
             std::chrono::steady_clock::time_point saved_time;
             if (debugmode) {
@@ -42,7 +45,7 @@ int main(int argc, char **argv) {
             }
             auto tokens = lex(lines, argv[1], success); // lexing the file into tokens
             if (!success) {
-                std::cout << "\n\nFatal error(s) during scanning.\n" << std::endl;
+                COLOR("\n\nFatal error(s) during scanning.\n", DISPLAY_RED);
                 return EXIT_FAILURE;
             }
 
@@ -54,7 +57,7 @@ int main(int argc, char **argv) {
             }
             Machine vm = compile(tokens, success); // compiling the tokens to bytecode
             if (!success) {
-                std::cout << "\n\nFatal error(s) during compile time.\n" << std::endl;
+                COLOR("\n\nFatal error(s) during compile time.\n", DISPLAY_RED);
                 if (debugmode) std::cout << "EXIT_CT" << std::endl;
                 return EXIT_FAILURE;
             }
@@ -62,29 +65,30 @@ int main(int argc, char **argv) {
             if (debugmode) {
                 int pt = PASSED_TIME();
                 total_relevant_time += pt;
-                std::cout << pt << " microseconds\nDisassembling opcode... " << std::endl;
+                std::cout << pt << " microseconds\nDisassembling opcode... ";
                 vm.disassembleOpcode();
-                std::cout << std::endl;
                 vm.disassembleConstants();
             }
 
             if (debugmode) {
-                std::cout << "\n== runtime ==" << std::endl;
+                COLOR("\n== runtime ==\n", DISPLAY_GREEN);
                 saved_time = NOW();
-                switch (vm.run().type) { // running the opcode
+                Tag result = vm.run().type;
+                switch (result) { // running the opcode
                     case TYPE_OK: std::cout << "\nEXIT_OK"; break;
                     case TYPE_RT_ERROR: std::cout << "\nEXIT_RT"; break;
                     default: std::cout << "\nbug: unknown error code."; break;
                 }
                 int pt = PASSED_TIME();
                 total_relevant_time += pt;
-                std::cout << "\n== end ==\nTime spent in runtime: " << pt << " microseconds.\n\n";
+                COLOR("\n== end ==", DISPLAY_GREEN);
+                std::cout << "\nTime spent in runtime: " << pt << " microseconds.\n";
                 vm.disassembleStack(); // this and
-                std::cout << std::endl;
                 vm.disassembleScopes(); // this should be empty if everything goes right
                 std::cout << "Total relevant time taken: \n" << total_relevant_time << " microseconds\n" << total_relevant_time*0.000001 << " seconds";
+                return result;
             } else {
-                vm.run();
+                return vm.run().type;
             }
 #undef NOW
 #undef PASSED_TIME
@@ -93,7 +97,7 @@ int main(int argc, char **argv) {
             return EXIT_FAILURE;
         }
     } catch (...) {
-        std::cout << "\nAn unexpected fatal error has occurred." << std::endl;
+        COLOR("\nAn unexpected fatal error has occurred.", DISPLAY_RED);
         return EXIT_FAILURE;
     }
 }

@@ -10,7 +10,7 @@ Very much in development.
 
 <declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> ;
 
-<statement> ::= (<expression> | <print-statement> | "break" ";") | <if-statement> | <while-statement> | <code-block> ;
+<statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
 <fn-declaration> ::= "fn" IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
 

@@ -513,6 +513,18 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.writeOp(TOKEN.line, OP_BREAK);
             token++;
             if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+        } else if (CHECK(DIS_C)) {
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeOp(TOKEN.line, OP_DISASSEMBLE_CONSTANTS);
+        } else if (CHECK(DIS_SC)) {
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeOp(TOKEN.line, OP_DISASSEMBLE_SCOPES);
+        } else if (CHECK(DIS_ST)) {
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
+            vm.writeOp(TOKEN.line, OP_DISASSEMBLE_STACK);
         } else if (CHECK(LEFT_BRACKET)) { // block
             vm.writeOp(TOKEN.line, OP_BEGIN_SCOPE);
             HANDLE_BLOCK();

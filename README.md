@@ -49,7 +49,7 @@ Hello, World!
 ```
 set mut a; # similar to Rust, the variable is assumed to be immutable. mut specifies it's state.
 a = 729;
-set b = 2600; # immutable
+set b: NUM = 2600; # b is required to be a number value
 print $a * $b; # $ retrieves the variable's value
 ```
 output:
@@ -144,3 +144,13 @@ std::getline(std::cin, input);
 (char)getch()
 ```
 The important difference is that ```getc``` has no buffer, whereas ```gets``` needs to find the enter key to return.
+### Conversion ###
+as
+```
+print 50 * "46.4" as NUM;
+```
+output:
+```
+2320
+```
+```as```'s precedence is greater than ```+```/```-``` and ```*```/```/```.

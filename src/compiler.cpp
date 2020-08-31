@@ -380,25 +380,29 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         vm.writeConstant(TOKEN.line, idLexeme(id)); // note: this won't show up in debug if the lexeme
                                                                     // is >= 2 because of TRIM()
         token++;
+        bool found_equal = false;
         if (CHECK(EQUAL)) {
+            found_equal = true;
             token++;
             expression(1);
             token++;
         } else vm.writeConstant(TOKEN.line, nullValue());
 
-        switch (expected) {
-            case NUM:
-                vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
-                break;
-            case STR:
-                vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
-                break;
-            case _BOOL:
-                vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
-                break;
-            case _VOID:
-                vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
-                break;
+        if (found_equal) {
+            switch (expected) {
+                case NUM:
+                    vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
+                    break;
+                case STR:
+                    vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
+                    break;
+                case _BOOL:
+                    vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
+                    break;
+                case _VOID:
+                    vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
+                    break;
+            }
         }
 
         if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");

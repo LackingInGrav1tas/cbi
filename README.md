@@ -111,6 +111,8 @@ output:
 ```
 170.1
 ```
+Scope can be modified by using the ```aware``` or ```blind``` keywords after ```fn```. When a function is called without these keywords, it is given the first layer of scope to access/modify. When a function is called with ```aware```, the function is given full access to the scope at the point of the function call. ```blind``` functions aren't given any scope at all.
+
 The way that parameters are handled can lead to strange errors, ex:
 ```
 fn getnum(x) {

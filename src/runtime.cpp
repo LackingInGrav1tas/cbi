@@ -351,7 +351,6 @@ Value Machine::run() { // executes the program
                     }
                     Function fn = found->second;
                     Machine call = Machine::from(fn); // setting opcode/constant pool/etc.
-
                     if (value_pool.size() < fn.param_ids.size()) { // checking params
                         ERROR("Expected more parameters during call of function " << id << ". Received: " << value_pool.size() << ", Expected: " << fn.param_ids.size());
                     }
@@ -363,7 +362,14 @@ Value Machine::run() { // executes the program
                     Value call_run = call.run();
                     if (call_run.type == TYPE_RT_ERROR) return exitRT();
                     else if (call_run.type != TYPE_OK) value_pool.push(call_run);
-                    scopes = call.scopes;
+                    switch (fn.type) {
+                        case FN_AWARE:
+                            scopes = call.scopes;
+                            break;
+                        case FN_NORMAL:
+                            scopes[0] = call.scopes[0];
+                            break;
+                    }
                     break;
                 }
                 break;

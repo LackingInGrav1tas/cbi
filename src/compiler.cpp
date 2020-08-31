@@ -365,12 +365,21 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         if (CHECK(SET)) { // setting scoped variable
             setVariable();
         } else if (CHECK(FUN)) {
+            Function fn;
             token++;
 
+            if (CHECK(AWARE)) {
+                token++;
+                fn.type = FN_AWARE;
+            } else if (CHECK(BLIND)) {
+                token++;
+                fn.type = FN_BLIND;
+            } else {
+                fn.type = FN_NORMAL;
+            }
+            if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
             std::string id = TOKEN.lexeme;
             vm.writeConstant(TOKEN.line, idLexeme(id));
-
-            Function fn;
 
             token++;
             if (TOKEN.type != LEFT_PAREN) ERROR(" Expected a '('.");
@@ -401,7 +410,6 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
 
                 if (CHECK(FUN)) ERROR(" cbi does not support nested functions.");
-
                 function_body.push_back(TOKEN);
                 if (CHECK(LEFT_BRACKET))
                     nests++;

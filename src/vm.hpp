@@ -45,9 +45,20 @@ class Machine {
         call.opcode = fn.opcode;
         call.lines = fn.lines;
         call.constants = fn.constants;
-        call.scopes = scopes;
-        call.fn_pool = fn_pool; // the best i can do atm
-        call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes}; // ^
+        switch (fn.type) {
+            case FN_AWARE:
+                call.scopes = scopes;
+                call.fn_pool = fn_pool;
+                call.fn_scopes = fn_scopes;
+                break;
+            case FN_NORMAL:
+                call.scopes = std::vector<Scope>{scopes[0]};
+                call.fn_pool = fn_pool;
+                call.fn_scopes = fn_scopes;
+                break;
+            default:
+                break;
+        }
         return call;
     }
 

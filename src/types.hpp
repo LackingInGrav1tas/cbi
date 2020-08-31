@@ -21,10 +21,6 @@ enum Command {
     OP_RETURN_TOP, OP_DISASSEMBLE_STACK, OP_DISASSEMBLE_SCOPES, OP_DISASSEMBLE_CONSTANTS, OP_GETS, OP_GETCH
 };
 
-enum RunType {
-    RT_MAIN, RT_FN
-};
-
 enum Tag {
     TYPE_OK, TYPE_RT_ERROR, TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME, TYPE_FUN
 };
@@ -44,7 +40,14 @@ struct Scope {
     std::vector<std::string> mutables;
 };
 
+enum FunctionType {
+  FN_AWARE,
+  FN_BLIND,
+  FN_NORMAL
+};
+
 struct Function {
+    FunctionType type;
     std::vector<uint8_t> opcode;
     std::vector<int> lines;
     std::vector<Value> constants;

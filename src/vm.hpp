@@ -54,7 +54,7 @@ class Machine {
             case FN_NORMAL:
                 call.scopes = std::vector<Scope>{scopes[0]};
                 call.fn_pool = fn_pool;
-                call.fn_scopes = fn_scopes;
+                call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes[0]};
                 break;
             default:
                 break;

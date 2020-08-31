@@ -38,8 +38,10 @@ static int getPrecedence(Type type) {
         case SLASH:
         case STAR: return 7;
 
+        case AS: return 8;
+
         //case DOT:
-        //case LEFT_PAREN: return 8;
+        //case LEFT_PAREN: return 9;
         
         default: return 0;
     }
@@ -320,6 +322,26 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_OR);
                     break;
                 }
+                case AS: {
+                    token++;
+                    vm.writeOp(TOKEN.line, OP_CONVERT);
+                    switch (TOKEN.type) {
+                        case NUM:
+                            vm.writeOp(TOKEN.line, 0);
+                            break;
+                        case STR:
+                            vm.writeOp(TOKEN.line, 1);
+                            break;
+                        case _BOOL:
+                            vm.writeOp(TOKEN.line, 2);
+                            break;
+                        case _VOID:
+                            vm.writeOp(TOKEN.line, 3);
+                            break;
+                        default: ERROR(" Expected either 'NUM', 'STR', 'BOOL', or 'VOID' as type specifier.");
+                    }
+                    break;
+                }
                 default: break;
             }
         }
@@ -345,8 +367,17 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token--;
             ERROR(" Expected an identifier.");
         }
+        std::string id = TOKEN.lexeme;
 
-        vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme)); // note: this won't show up in debug if the lexeme
+        token++;
+        Type expected = _EOF;
+        if (CHECK(COLON)) {
+            token++;
+            if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_VOID) && !CHECK(_BOOL)) ERROR(" Expected a type specifier ('NUM', 'STR', 'BOOL', 'VOID').");
+            expected = TOKEN.type;
+        } else token--;
+
+        vm.writeConstant(TOKEN.line, idLexeme(id)); // note: this won't show up in debug if the lexeme
                                                                     // is >= 2 because of TRIM()
         token++;
         if (CHECK(EQUAL)) {
@@ -354,6 +385,21 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             expression(1);
             token++;
         } else vm.writeConstant(TOKEN.line, nullValue());
+
+        switch (expected) {
+            case NUM:
+                vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
+                break;
+            case STR:
+                vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
+                break;
+            case _BOOL:
+                vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
+                break;
+            case _VOID:
+                vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
+                break;
+        }
 
         if (!CHECK(SEMICOLON)) ERROR(" Expected a semicolon.");
 

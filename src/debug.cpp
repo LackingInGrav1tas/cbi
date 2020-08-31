@@ -67,6 +67,10 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_DISASSEMBLE_CONSTANTS: COLOR("OP_DISASSEMBLE_CONSTANTS", DISPLAY_AQUA); break;
         case OP_DISASSEMBLE_SCOPES: COLOR("OP_DISASSEMBLE_SCOPES", DISPLAY_AQUA); break;
         case OP_DISASSEMBLE_STACK: COLOR("OP_DISASSEMBLE_STACK", DISPLAY_AQUA); break;
+        case OP_CONVERT:
+            op++;
+            COLOR("OP_CONVERT", DISPLAY_AQUA);
+            std::cout << " to " << (int)*op;
         default:
             std::cout << "bug in opcode, could not identify command.";
             break;

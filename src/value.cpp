@@ -42,15 +42,6 @@ Value nullValue() {
     return val;
 }
 
-Value funcValue(Function *opcode) {
-    Value val;
-
-    val.type = TYPE_FUN;
-    val.storage.fn = 1;
-
-    return val;
-}
-
 Value exitRT() {
     Value v;
     v.type = TYPE_RT_ERROR;

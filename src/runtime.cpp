@@ -36,7 +36,7 @@ Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
             COLOR("Run-time Error", DISPLAY_RED); \
-            std::cerr << " in line " << lines[op-opcode.begin()] << ": " << message; \
+            std::cerr << " in line " << lines[op-opcode.begin()]+1 << ": " << message; \
             std::cerr.flush(); \
             return exitRT(); \
         } while (false)
@@ -426,6 +426,67 @@ Value Machine::run() { // executes the program
                     found->second = stringValue(std::string("\"") + (char)getch() + "\"");
                     break;
                 }
+                break;
+            }
+            case OP_CONVERT: {
+                TOP();
+                op++;
+                switch ((int)OP) { // 0 -> num, 1 -> string, 2 -> bool, 3 -> void
+                    case 0: { // x to num
+                        if (top.type == TYPE_STRING) {
+                            try {
+                                value_pool.push(numberValue(std::stod(TRIM(top.string))));
+                            } catch (...) {
+                                ERROR("Cannot convert this string value to number.");
+                            }
+                        } else if (top.type == TYPE_DOUBLE) value_pool.push(top);
+                        else if (top.type == TYPE_BOOL) value_pool.push(numberValue(top.storage.boolean));
+                        else value_pool.push(numberValue(0));
+                        break;
+                    }
+                    case 1: { // x to string
+                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + std::to_string(top.storage.number) + "\""));
+                        else if (top.type == TYPE_STRING) value_pool.push(top);
+                        else if (top.type == TYPE_BOOL) {
+                            if (top.storage.boolean) value_pool.push(stringValue("true"));
+                            else value_pool.push(stringValue("false"));
+                        }
+                        else value_pool.push(stringValue("\"\""));
+                        break;
+                    }
+                    case 2: { // x to bool
+                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + std::to_string(top.storage.number) + "\""));
+                        else if (top.type == TYPE_BOOL) value_pool.push(top);
+                        else if (top.type == TYPE_STRING) {
+                            if (TRIM(top.string) == "\"\"" || TRIM(top.string) == "\"false\"" || TRIM(top.string) == "\"0\"")
+                                value_pool.push(boolValue(false));
+                            else value_pool.push(boolValue(true));
+                        }
+                        else value_pool.push(stringValue("\"\""));
+                        break;
+                    }
+                    case 3: { // x to null
+                        value_pool.push(nullValue());
+                        break;
+                    }
+                    default: ERROR("Expected a type specifier.");
+                }
+                break;
+            }
+            case OP_REQUIRE_BOOL: {
+                if (value_pool.top().type != TYPE_BOOL) ERROR("Expected a boolean value.");
+                break;
+            }
+            case OP_REQUIRE_NUM: {
+                if (value_pool.top().type != TYPE_DOUBLE) ERROR("Expected a num value.");
+                break;
+            }
+            case OP_REQUIRE_STR: {
+                if (value_pool.top().type != TYPE_STRING) ERROR("Expected a string value.");
+                break;
+            }
+            case OP_REQUIRE_VOID: {
+                if (value_pool.top().type != TYPE_NULL) ERROR("Expected a void value.");
                 break;
             }
 

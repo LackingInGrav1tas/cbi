@@ -62,6 +62,12 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "getc") tokens.push_back(Token(GETCH, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "aware") tokens.push_back(Token(AWARE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "blind") tokens.push_back(Token(BLIND, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "scope") tokens.push_back(Token(C_SCOPE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "NUM") tokens.push_back(Token(NUM, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "STR") tokens.push_back(Token(STR, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "VOID") tokens.push_back(Token(_VOID, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "BOOL") tokens.push_back(Token(_BOOL, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "as") tokens.push_back(Token(AS, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 
@@ -158,6 +164,11 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 case ';': {
                     PUSH_TOKEN(lexeme);
                     tokens.push_back(Token(SEMICOLON, ";", filename, line-lines.begin()));
+                    break;
+                }
+                case ':': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(COLON, ":", filename, line-lines.begin()));
                     break;
                 }
                 case '$': {

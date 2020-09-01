@@ -53,6 +53,7 @@ struct Function {
     std::vector<Value> constants;
     std::vector<Scope> scopes;
     std::vector<std::string> param_ids;
+    std::vector<std::string> param_types;
 };
 
 Value funcValue(Function *opcode);

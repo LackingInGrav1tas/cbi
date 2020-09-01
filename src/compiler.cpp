@@ -440,6 +440,11 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 if (CHECK(IDENTIFIER)) {
                     fn.param_ids.push_back(TOKEN.lexeme);
                     token++;
+                    if (!CHECK(COLON)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    token++;
+                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_BOOL) && !CHECK(_VOID) && !CHECK(ANY)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    fn.param_types.push_back(TOKEN.lexeme);
+                    token++;
                     if (CHECK(COMMA)) {
                         token++;
                         if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");

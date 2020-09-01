@@ -8,9 +8,6 @@
 #include <string>
 #include <vector>
 
-
-std::vector<std::string> getLines(const char *filename, bool &success);
-
 enum Type {
     STRING, NUMBER, TOKEN_TRUE, TOKEN_FALSE, IDENTIFIER,
 
@@ -28,10 +25,12 @@ enum Type {
     AND, OR, ELSE, FOR, WHILE, IF, TOKEN_NULL, FUN, PRINT, BREAK, C_SCOPE, NEW, RETURN,
     DIS_C, DIS_ST, DIS_SC, GETS, GETCH, AWARE, BLIND, AS,
 
-    NUM, STR, _VOID, _BOOL,
+    NUM, STR, _VOID, _BOOL, ANY,
 
     _EOF
 };
+
+std::vector<std::string> getLines(const char *filename, bool &success);
 
 struct Token {
     Type type;

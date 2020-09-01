@@ -11,8 +11,8 @@ Very much in development.
 <declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
-<set-variable> ::= "set" ["mut"] IDENTIFIER [ "=" <expression> ] ;
-<fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER [","])* ")" <code-block> ;
+<set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
+<fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") [","])* ")" <code-block> ;
 
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
@@ -101,7 +101,7 @@ output:
 ```
 ### Functions ###
 ```
-fn getnum(x) {
+fn getnum(x: NUM) { # type specifiers are necessary. ANY can be used as a template/generic
     return $x * 3.78;
 }
 

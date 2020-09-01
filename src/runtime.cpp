@@ -9,6 +9,7 @@
 #include "color.hpp"
 #include "vm.hpp"
 #include "types.hpp"
+#include "token.hpp"
 
 static bool valueEquals(Value lhs, Value rhs) {
     if (lhs.type != rhs.type) return false;
@@ -16,6 +17,23 @@ static bool valueEquals(Value lhs, Value rhs) {
     if (IS_STRING(lhs)) return lhs.string == rhs.string;
     if (IS_BOOL(lhs)) return lhs.storage.boolean == rhs.storage.boolean;
     return true; // this would be if both are null
+}
+
+static bool checkTypes(std::string type, Tag tag) {
+    if (type == "ANY") return true;
+    if (tag == TYPE_DOUBLE) {
+        if (type == "NUM") return true;
+        else return false;
+    } else if (tag == TYPE_BOOL) {
+        if (type == "BOOL") return true;
+        else return false;
+    } else if (tag == TYPE_STRING) {
+        if (type == "STR") return true;
+        else return false;
+    } else if (tag == TYPE_NULL) {
+        if (type == "VOID") return true;
+        else return false;
+    } else return true;
 }
 
 static bool valueToBool(Value value) {
@@ -356,6 +374,7 @@ Value Machine::run() { // executes the program
                     }
                     for (int p = fn.param_ids.size()-1; p >= 0; p--) { // setting params
                         call.scopes.back().variables[fn.param_ids[p]] = value_pool.top();
+                        if (!checkTypes(fn.param_types[p], value_pool.top().type)) ERROR("Param specifiers do not match. Expected " << fn.param_types[p] << ".");
                         value_pool.pop();
                         call.scopes.back().mutables.push_back(fn.param_ids[p]);
                     }

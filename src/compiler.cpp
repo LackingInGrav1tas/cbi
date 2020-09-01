@@ -10,7 +10,17 @@
 #include <iostream>
 #include <functional>
 
-static int getPrecedence(Type type) {
+struct CompilingEnvironment {
+    std::map<std::string, int> custom_infix_ops; // for getting precedence
+} environment;
+
+static int getInfixOp(std::string opname) {
+    auto found = environment.custom_infix_ops.find(opname);
+    if (found == environment.custom_infix_ops.end()) return -1;
+    return found->second;
+}
+
+static int getPrecedence(Type type, std::string lexeme = "") {
     switch (type) {
         case CONCAT_EQUALS:
         case STAR_EQUALS:
@@ -43,6 +53,8 @@ static int getPrecedence(Type type) {
         //case DOT:
         //case LEFT_PAREN: return 9;
         
+        case IDENTIFIER: return getInfixOp(lexeme);
+
         default: return 0;
     }
 }
@@ -175,7 +187,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 ERROR(" Expected an expression.");
             }
         }
-        while (p <= getPrecedence(NEXT.type)) {
+        while (p <= getPrecedence(NEXT.type, NEXT.lexeme)) {
             token++;
             switch (TOKEN.type) {
                 case MINUS: { // infix subtraction - 
@@ -340,6 +352,17 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                             break;
                         default: ERROR(" Expected either 'NUM', 'STR', 'BOOL', or 'VOID' as type specifier.");
                     }
+                    break;
+                }
+                case IDENTIFIER: {
+                    std::string id = TOKEN.lexeme;
+                    int prec = getInfixOp(TOKEN.lexeme);
+                    if (prec != -1) {
+                        token++;
+                        expression(prec+1);
+                        vm.writeConstant(TOKEN.line, idLexeme(id));
+                        vm.writeOp(TOKEN.line, OP_CALL);
+                    } else ERROR(" No operator by name " + id + ".");
                     break;
                 }
                 default: break;
@@ -572,6 +595,81 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             vm.opcode[size] = vm.opcode.size(); // skipping past the bytecode
 
             vm.writeOp(TOKEN.line, OP_END_SCOPE);
+        } else if (CHECK(INFIX)) {
+            Function fn;
+            fn.type = FN_BLIND;
+            
+            token++;
+
+            if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+            std::string id = TOKEN.lexeme;
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+
+            token++;
+            if (TOKEN.type != LEFT_PAREN) ERROR(" Expected a '('.");
+
+            token++;
+
+            while (true) {
+                if (CHECK(IDENTIFIER)) {
+                    fn.param_ids.push_back(TOKEN.lexeme);
+                    token++;
+                    if (!CHECK(COLON)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    token++;
+                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_BOOL) && !CHECK(_VOID) && !CHECK(ANY)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    fn.param_types.push_back(TOKEN.lexeme);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+                    }
+                } else if (CHECK(RIGHT_PAREN)) break;
+                else ERROR(" Expected valid parameters.");
+            }
+            if (fn.param_ids.size() != 2) ERROR(" Expected two params.");
+
+            if (!CHECK(RIGHT_PAREN)) ERROR(" Expected a ')'.");
+            token++;
+            if (!CHECK(PRECEDENCE)) ERROR(" Expected 'precedence'.");
+            token++;
+            if (!CHECK(NUMBER)) ERROR(" Expected a number literal.");
+            environment.custom_infix_ops[id] = std::stoi(TOKEN.lexeme);
+            
+            if (NEXT.type != LEFT_BRACKET) {
+                token++;
+                ERROR(" Expected a '{'.");
+            }
+
+            vm.writeOp(TOKEN.line, OP_DECL_FN);
+            vm.writeOp(TOKEN.line, vm.fn_pool.size());
+
+            int nests = 0;
+            std::vector<Token> function_body;
+            while (true) {
+                token++;
+
+                if (CHECK(FUN)) ERROR(" cbi does not support nested functions.");
+                function_body.push_back(TOKEN);
+                if (CHECK(LEFT_BRACKET))
+                    nests++;
+                else if (CHECK(RIGHT_BRACKET)) {
+                    if (nests == 1) break;
+                    nests--;
+                }
+            }
+
+            Machine body_as_M = compile(function_body, success);
+            if (!success) {
+                success = false;
+                std::cerr.setstate(std::ios_base::failbit);
+                panicking = true;
+                return;
+            }
+
+            fn.opcode = body_as_M.opcode;
+            fn.lines = body_as_M.lines;
+            fn.constants = body_as_M.constants;
+            vm.fn_pool.push_back(fn);
         } else if (CHECK(BREAK)) {
             vm.writeOp(TOKEN.line, OP_BREAK);
             token++;

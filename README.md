@@ -181,7 +181,7 @@ output:
 ```
 Prefix declaration (there must be one param):
 ```
-prefix println(rhs: STR) precedence 7 {
+prefix println(rhs: STR) precedence 1 {
     print $rhs || "\n";
 }
 

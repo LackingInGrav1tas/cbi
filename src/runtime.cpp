@@ -153,23 +153,7 @@ Value Machine::run() { // executes the program
                 }
                 break;
             }
-            case OP_JUMP_FALSE: { // goto
-                if (IS_BOOL(value_pool.top())) {
-                    if (value_pool.top().storage.boolean) {
-                        value_pool.pop();
-                        op++;
-                        break;
-                    }
-                } else if (value_pool.top().type != TYPE_NULL) {
-                    value_pool.pop();
-                    op++;
-                    break;
-                }
-                op++;
-                op = opcode.begin() + (int) OP-1;
-                value_pool.pop();
-                break;
-            }
+            case OP_JUMP_FALSE:
             case OP_JUMP_FALSE_IFv: { // goto
                 if (IS_BOOL(value_pool.top())) {
                     if (value_pool.top().storage.boolean) {
@@ -177,11 +161,13 @@ Value Machine::run() { // executes the program
                         op++;
                         break;
                     }
-                } else if (value_pool.top().type != TYPE_NULL) {
-                    value_pool.pop();
-                    op++;
-                    break;
-                }
+                } else if (IS_NUM(value_pool.top())) {
+                    if (value_pool.top().storage.number) {
+                        value_pool.pop();
+                        op++;
+                        break;
+                    }
+                } else ERROR("Expected a boolean expression. You can use 'as BOOL' to convert a value.");
                 op++;
                 op = opcode.begin() + (int) OP-1;
                 value_pool.pop();
@@ -474,14 +460,17 @@ Value Machine::run() { // executes the program
                         break;
                     }
                     case 2: { // x to bool
-                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + std::to_string(top.storage.number) + "\""));
+                        if (top.type == TYPE_DOUBLE) {
+                            if (top.storage.number == 0) value_pool.push(boolValue(false));
+                            else value_pool.push(boolValue(true));
+                        }
                         else if (top.type == TYPE_BOOL) value_pool.push(top);
                         else if (top.type == TYPE_STRING) {
-                            if (TRIM(top.string) == "\"\"" || TRIM(top.string) == "\"false\"" || TRIM(top.string) == "\"0\"")
+                            if (TRIM(top.string) == "" || TRIM(top.string) == "false" || TRIM(top.string) == "0")
                                 value_pool.push(boolValue(false));
                             else value_pool.push(boolValue(true));
                         }
-                        else value_pool.push(stringValue("\"\""));
+                        else value_pool.push(boolValue(false));
                         break;
                     }
                     case 3: { // x to null

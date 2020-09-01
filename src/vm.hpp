@@ -56,8 +56,12 @@ class Machine {
                 call.fn_pool = fn_pool;
                 call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes[0]};
                 break;
-            default:
+            case FN_BLIND:
+                call.scopes = fn.scopes;
+                call.fn_pool = std::vector<Function>();
+                call.fn_scopes = std::vector<std::map<std::string, Function>>();
                 break;
+            default: break;
         }
         return call;
     }

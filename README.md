@@ -147,6 +147,8 @@ std::getline(std::cin, input);
 ```
 The important difference is that ```getc``` has no buffer, whereas ```gets``` needs to find the enter key to return.
 ### Conversion ###
+The built-in type conversion uses ```as``` and type specifiers (```NUM```, ```STR```, ```BOOL```, ```VOID```, ```ANY```).
+
 as
 ```
 print 50 * "46.4" as NUM;
@@ -158,7 +160,8 @@ output:
 ```as```'s precedence is greater than ```+```/```-``` and ```*```/```/```.
 ### Custom Operators ###
 Custom operator declarations work very similar to function declarations, as they are mostly just retooled functions. The main difference between operators and functions, besides the obvious, is that the operator's precedence is needed during compile time. This means that their implementations are somewhat different.
-Infix declaration:
+
+Infix declaration (there must be two params because of how infix operators work):
 ```
 infix exp(lhs: NUM, rhs: NUM) precedence 6 {
     set mut i = 1;
@@ -176,7 +179,7 @@ output:
 ```
 125
 ```
-Prefix declaration:
+Prefix declaration (there must be one param):
 ```
 prefix println(rhs: STR) precedence 7 {
     print $rhs || "\n";

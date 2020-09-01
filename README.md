@@ -157,3 +157,35 @@ output:
 ```
 ```as```'s precedence is greater than ```+```/```-``` and ```*```/```/```.
 ### Custom Operators ###
+Custom operator declarations work very similar to function declarations, as they are mostly just retooled functions. The main difference between operators and functions, besides the obvious, is that the operator's precedence is needed during compile time. This means that their implementations are somewhat different.
+Infix declaration:
+```
+infix exp(lhs: NUM, rhs: NUM) precedence 6 {
+    set mut i = 1;
+    set base = $lhs;
+    while ($i < $rhs) {
+        lhs *= $base;
+        i += 1;
+    }
+    return $lhs;
+}
+
+print 5 exp 3;
+```
+output:
+```
+125
+```
+Prefix declaration:
+```
+prefix println(rhs: STR) precedence 7 {
+    print $rhs || "\n";
+}
+
+println "abc";
+```
+output
+```
+abc
+
+```

@@ -8,11 +8,13 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> ;
+<declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
 <fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") [","])* ")" <code-block> ;
+<infix-declaration> ::= "infix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") "," IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* infix operators must have two params *)
+<prefix-declaration> ::= "prefix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* prefix operators must have one param *)
 
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
@@ -154,3 +156,4 @@ output:
 2320
 ```
 ```as```'s precedence is greater than ```+```/```-``` and ```*```/```/```.
+### Custom Operators ###

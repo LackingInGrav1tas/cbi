@@ -12,11 +12,18 @@
 
 struct CompilingEnvironment {
     std::map<std::string, int> custom_infix_ops; // for getting precedence
+    std::map<std::string, int> custom_prefix_ops;
 } environment;
 
 static int getInfixOp(std::string opname) {
     auto found = environment.custom_infix_ops.find(opname);
     if (found == environment.custom_infix_ops.end()) return -1;
+    return found->second;
+}
+
+static int getPrefixOp(std::string opname) {
+    auto found = environment.custom_prefix_ops.find(opname);
+    if (found == environment.custom_prefix_ops.end()) return -1;
     return found->second;
 }
 
@@ -53,7 +60,11 @@ static int getPrecedence(Type type, std::string lexeme = "") {
         //case DOT:
         //case LEFT_PAREN: return 9;
         
-        case IDENTIFIER: return getInfixOp(lexeme);
+        case IDENTIFIER: {
+            int infix = getInfixOp(lexeme);
+            if (infix != -1) return infix;
+            return getPrefixOp(lexeme);
+        }
 
         default: return 0;
     }
@@ -153,6 +164,15 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 break;
             }
             case IDENTIFIER: {
+                std::string id = TOKEN.lexeme;
+                int prec = getPrefixOp(id);
+                if (prec != -1) {
+                    token++;
+                    expression(prec+1);
+                    vm.writeConstant(TOKEN.line, idLexeme(id));
+                    vm.writeOp(TOKEN.line, OP_CALL);
+                    break;
+                }
                 vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
                 if (NEXT.type != EQUAL && NEXT.type != PLUS_EQUALS && NEXT.type != MINUS_EQUALS
                 && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS)
@@ -634,6 +654,81 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             token++;
             if (!CHECK(NUMBER)) ERROR(" Expected a number literal.");
             environment.custom_infix_ops[id] = std::stoi(TOKEN.lexeme);
+            
+            if (NEXT.type != LEFT_BRACKET) {
+                token++;
+                ERROR(" Expected a '{'.");
+            }
+
+            vm.writeOp(TOKEN.line, OP_DECL_FN);
+            vm.writeOp(TOKEN.line, vm.fn_pool.size());
+
+            int nests = 0;
+            std::vector<Token> function_body;
+            while (true) {
+                token++;
+
+                if (CHECK(FUN)) ERROR(" cbi does not support nested functions.");
+                function_body.push_back(TOKEN);
+                if (CHECK(LEFT_BRACKET))
+                    nests++;
+                else if (CHECK(RIGHT_BRACKET)) {
+                    if (nests == 1) break;
+                    nests--;
+                }
+            }
+
+            Machine body_as_M = compile(function_body, success);
+            if (!success) {
+                success = false;
+                std::cerr.setstate(std::ios_base::failbit);
+                panicking = true;
+                return;
+            }
+
+            fn.opcode = body_as_M.opcode;
+            fn.lines = body_as_M.lines;
+            fn.constants = body_as_M.constants;
+            vm.fn_pool.push_back(fn);
+        } else if (CHECK(PREFIX)) {
+            Function fn;
+            fn.type = FN_BLIND;
+            
+            token++;
+
+            if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+            std::string id = TOKEN.lexeme;
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+
+            token++;
+            if (TOKEN.type != LEFT_PAREN) ERROR(" Expected a '('.");
+
+            token++;
+
+            while (true) {
+                if (CHECK(IDENTIFIER)) {
+                    fn.param_ids.push_back(TOKEN.lexeme);
+                    token++;
+                    if (!CHECK(COLON)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    token++;
+                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_BOOL) && !CHECK(_VOID) && !CHECK(ANY)) ERROR(" Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    fn.param_types.push_back(TOKEN.lexeme);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (!CHECK(IDENTIFIER)) ERROR(" Expected an identifier.");
+                    }
+                } else if (CHECK(RIGHT_PAREN)) break;
+                else ERROR(" Expected valid parameters.");
+            }
+            if (fn.param_ids.size() != 1) ERROR(" Expected one params.");
+
+            if (!CHECK(RIGHT_PAREN)) ERROR(" Expected a ')'.");
+            token++;
+            if (!CHECK(PRECEDENCE)) ERROR(" Expected 'precedence'.");
+            token++;
+            if (!CHECK(NUMBER)) ERROR(" Expected a number literal.");
+            environment.custom_prefix_ops[id] = std::stoi(TOKEN.lexeme);
             
             if (NEXT.type != LEFT_BRACKET) {
                 token++;

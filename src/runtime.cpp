@@ -367,6 +367,7 @@ Value Machine::run() { // executes the program
                     Value call_run = call.run();
                     if (call_run.type == TYPE_RT_ERROR) return exitRT();
                     else if (call_run.type != TYPE_OK) value_pool.push(call_run);
+                    else value_pool.push(nullValue());
                     switch (fn.type) {
                         case FN_AWARE:
                             scopes = call.scopes;

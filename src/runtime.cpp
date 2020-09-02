@@ -60,13 +60,14 @@ Value Machine::run() { // executes the program
         } while (false)
 
     #define GET_TOP() \
-        if (value_pool.size() < 2) { ERROR("Stack underflow."); } \
+        if (value_pool.size() < 2) ERROR("Stack underflow."); \
         Value rhs = value_pool.top(); \
         value_pool.pop(); \
         Value lhs = value_pool.top(); \
         value_pool.pop()
 
     #define TOP() \
+        if (value_pool.size() < 1) ERROR("Stack underflow."); \
         Value top = value_pool.top(); \
         value_pool.pop()
 
@@ -454,8 +455,8 @@ Value Machine::run() { // executes the program
                         if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + std::to_string(top.storage.number) + "\""));
                         else if (top.type == TYPE_STRING) value_pool.push(top);
                         else if (top.type == TYPE_BOOL) {
-                            if (top.storage.boolean) value_pool.push(stringValue("true"));
-                            else value_pool.push(stringValue("false"));
+                            if (top.storage.boolean) value_pool.push(stringValue("\"true\""));
+                            else value_pool.push(stringValue("\"false\""));
                         }
                         else value_pool.push(stringValue("\"\""));
                         break;

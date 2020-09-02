@@ -73,6 +73,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "prefix") tokens.push_back(Token(PREFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "postfix") tokens.push_back(Token(POSTFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "precedence") tokens.push_back(Token(PRECEDENCE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

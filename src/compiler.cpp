@@ -163,6 +163,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeConstant(TOKEN.line, boolValue(false));
                 break;
             }
+            case TOKEN_NULL: {
+                vm.writeConstant(TOKEN.line, nullValue());
+                break;
+            }
             case IDENTIFIER: {
                 std::string id = TOKEN.lexeme;
                 int prec = getPrefixOp(id);

@@ -47,14 +47,14 @@ struct Token {
         std::cerr << "\n";
         bool b = true;
         std::vector<std::string> lines = getLines(filename, b);
-        if (line == -1) {
-            std::cerr << "Error in non-existent file." << std::endl;
-        } else if (!b) {
-            std::cerr << "\n" << lines.size()+2 << "| _EOF\nCompile-time Error:" << message;
+        if (!b | line == -1) {
+            std::cerr << "\n" << lines.size()+2 << "| _EOF\n";
+            COLOR("Compile-time Error", DISPLAY_RED);
+            std::cerr << ": " << message;
         } else {
             std::cerr << "\n" << filename << ": ";
             COLOR("Compile-time Error", DISPLAY_RED);
-            std::cerr << ":" << message << " TOKEN: " << lexeme;
+            std::cerr << ": " << message << " TOKEN: " << lexeme;
             std::cerr << "\n" << line+1 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
                 if (it-lines.begin() == line) {

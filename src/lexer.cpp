@@ -52,7 +52,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "while") tokens.push_back(Token(WHILE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "break") tokens.push_back(Token(BREAK, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "scope") tokens.push_back(Token(C_SCOPE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "new") tokens.push_back(Token(NEW, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "return") tokens.push_back(Token(RETURN, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "disassemble_constants") tokens.push_back(Token(DIS_C, lexeme, filename, line-lines.begin())); \
@@ -62,7 +61,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "getc") tokens.push_back(Token(GETCH, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "aware") tokens.push_back(Token(AWARE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "blind") tokens.push_back(Token(BLIND, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "scope") tokens.push_back(Token(C_SCOPE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "struct") tokens.push_back(Token(STRUCT, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "NUM") tokens.push_back(Token(NUM, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "STR") tokens.push_back(Token(STR, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "VOID") tokens.push_back(Token(_VOID, lexeme, filename, line-lines.begin())); \
@@ -74,6 +73,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "postfix") tokens.push_back(Token(POSTFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "precedence") tokens.push_back(Token(PRECEDENCE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "at") tokens.push_back(Token(AT_KEYWORD, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

@@ -499,6 +499,14 @@ Value Machine::run() { // executes the program
                 if (value_pool.top().type != TYPE_NULL) ERROR("Expected a void value.");
                 break;
             }
+            case OP_AT: {
+                GET_TOP(); // rhs = position, lhs = subject
+                if (!IS_NUM(rhs)) ERROR("Expected a number.");
+                if (!IS_STRING(lhs)) ERROR("Expected a string value.");
+                if (TRIM(lhs.string).length() <= rhs.storage.number) ERROR("Index out of range.");
+                value_pool.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
+                break;
+            }
 
             case OP_DISASSEMBLE_CONSTANTS: {
                 disassembleConstants();

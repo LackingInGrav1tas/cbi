@@ -21,6 +21,11 @@ class Machine {
     std::vector<std::map<std::string, Function>> fn_scopes;
     std::vector<Function> fn_pool;
 
+    std::map<std::string, Struct> base_structs;
+    std::vector<std::map<std::string, Struct>> struct_scopes;
+    std::vector<Struct> struct_pool;
+    std::stack<Struct> struct_stack;
+
     // <helper>
     void writeOp(int line, uint8_t command) {
         opcode.push_back(command);

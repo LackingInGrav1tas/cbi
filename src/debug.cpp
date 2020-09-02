@@ -62,11 +62,15 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_END_SCOPE: COLOR("OP_END_SCOPE", DISPLAY_AQUA); break;
         case OP_CALL: COLOR("OP_CALL", DISPLAY_AQUA); break;
         case OP_EMPTY_STACK: COLOR("OP_EMPTY_STACK", DISPLAY_AQUA); break;
-        case OP_GET_FROM_C_SCOPE: COLOR("OP_GET_FROM_C_SCOPE", DISPLAY_AQUA); break;
         case OP_RETURN_TOP: COLOR("OP_RETURN_TOP", DISPLAY_AQUA); break;
         case OP_DISASSEMBLE_CONSTANTS: COLOR("OP_DISASSEMBLE_CONSTANTS", DISPLAY_AQUA); break;
         case OP_DISASSEMBLE_SCOPES: COLOR("OP_DISASSEMBLE_SCOPES", DISPLAY_AQUA); break;
         case OP_DISASSEMBLE_STACK: COLOR("OP_DISASSEMBLE_STACK", DISPLAY_AQUA); break;
+        case OP_AT: COLOR("OP_AT", DISPLAY_AQUA); break;
+        case OP_REQUIRE_BOOL: COLOR("OP_REQUIRE_BOOL", DISPLAY_AQUA); break;
+        case OP_REQUIRE_VOID: COLOR("OP_REQUIRE_VOID", DISPLAY_AQUA); break;
+        case OP_REQUIRE_NUM: COLOR("OP_REQUIRE_NUM", DISPLAY_AQUA); break;
+        case OP_REQUIRE_STR: COLOR("OP_REQUIRE_STR", DISPLAY_AQUA); break;
         case OP_CONVERT:
             op++;
             COLOR("OP_CONVERT", DISPLAY_AQUA);

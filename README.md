@@ -161,9 +161,9 @@ output:
 ### Custom Operators ###
 Custom operator declarations work very similar to function declarations, as they are mostly just retooled functions. The main difference between operators and functions, besides the obvious, is that the operator's precedence is needed during compile time. This means that their implementations are somewhat different.
 
-Infix declaration (there must be two params because of how infix operators work):
+custom infix operator (there must be two params because of how infix operators works):
 ```
-infix exp(lhs: NUM, rhs: NUM) precedence 6 {
+infix exp(lhs: NUM, rhs: NUM) precedence 5 {
     set mut i = 1;
     set base = $lhs;
     while ($i < $rhs) {
@@ -179,7 +179,7 @@ output:
 ```
 125
 ```
-Prefix declaration (there must be one param):
+custom prefix operator (there must be one param):
 ```
 prefix println(rhs: STR) precedence 1 {
     print $rhs || "\n";

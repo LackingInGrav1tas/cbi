@@ -13,6 +13,7 @@
 struct CompilingEnvironment {
     std::map<std::string, int> custom_infix_ops; // for getting precedence
     std::map<std::string, int> custom_prefix_ops;
+    std::vector<std::string> struct_names; // wip
 } environment;
 
 static int getInfixOp(std::string opname) {
@@ -55,7 +56,8 @@ static int getPrecedence(Type type, std::string lexeme = "") {
         case SLASH:
         case STAR: return 7;
 
-        case AS: return 8;
+        case AS:
+        case AT_KEYWORD: return 8;
 
         //case DOT:
         //case LEFT_PAREN: return 9;
@@ -104,7 +106,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         } while (false)\
 
     std::function<void(int)> expression = [&](int p)->void { // this notation used because c++ has no nested functions
-        switch (TOKEN.type) {
+        switch (TOKEN.type) { // prefix
             case LEFT_PAREN: { // group
                 token++;
                 expression(1);
@@ -128,23 +130,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 if (!CHECK(IDENTIFIER)) ERROR("Cannot retrieve non-identifier.");
                 token++;
-                if (!CHECK(DOT)) {
-                    vm.writeOp(TOKEN.line, OP_RETRIEVE);
-                    token--;
-                    vm.constants.push_back(idLexeme(TOKEN.lexeme));
-                    vm.writeOp(TOKEN.line, vm.constants.size()-1);
-                } else {
-                    vm.writeOp(TOKEN.line, OP_GET_FROM_C_SCOPE);
-                    
-                    vm.writeOp(TOKEN.line, vm.constants.size());
-                    vm.constants.push_back(stringValue(PREV.lexeme)); // prev.l == struct_name
-
-                    token++;
-
-                    if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
-                    vm.writeOp(TOKEN.line, vm.constants.size());
-                    vm.constants.push_back(stringValue(TOKEN.lexeme)); // TOKEN.l == member_name
-                }
+                vm.writeOp(TOKEN.line, OP_RETRIEVE);
+                token--;
+                vm.constants.push_back(idLexeme(TOKEN.lexeme));
+                vm.writeOp(TOKEN.line, vm.constants.size()-1);
                 break;
             }
             case NUMBER: { // number literal
@@ -211,7 +200,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 ERROR("Expected an expression.");
             }
         }
-        while (p <= getPrecedence(NEXT.type, NEXT.lexeme)) {
+        while (p <= getPrecedence(NEXT.type, NEXT.lexeme)) { // infix/postfix
             token++;
             switch (TOKEN.type) {
                 case MINUS: { // infix subtraction - 
@@ -376,6 +365,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                             break;
                         default: ERROR("Expected either 'NUM', 'STR', 'BOOL', or 'VOID' as type specifier.");
                     }
+                    break;
+                }
+                case AT_KEYWORD: {
+                    token++;
+                    expression(getPrecedence(AT_KEYWORD));
+                    vm.writeOp(TOKEN.line, OP_AT);
                     break;
                 }
                 case IDENTIFIER: {

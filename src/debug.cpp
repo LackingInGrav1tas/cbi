@@ -75,13 +75,6 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             op++;
             COLOR("OP_CONVERT", DISPLAY_AQUA);
             std::cout << " to " << (int)*op;
-        case OP_DECL_STRUCT: {
-            op++;
-            COLOR("OP_DECL_STRUCT", DISPLAY_AQUA);
-            std::cout << " with " << (int)*op;
-            break;
-        }
-        case OP_NEW_STRUCT: COLOR("OP_NEW_STRUCT", DISPLAY_AQUA); break;
         default:
             std::cout << "bug in opcode, could not identify command.";
             break;

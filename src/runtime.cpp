@@ -322,13 +322,11 @@ Value Machine::run() { // executes the program
             case OP_BEGIN_SCOPE: {
                 scopes.push_back(Scope());
                 fn_scopes.push_back(std::map<std::string, Function>());
-                struct_scopes.push_back(std::map<std::string, Struct>());
                 break;
             }
             case OP_END_SCOPE: {
                 scopes.pop_back();
                 fn_scopes.pop_back();
-                struct_scopes.pop_back();
                 break;
             }
             case OP_AND: {
@@ -509,42 +507,7 @@ Value Machine::run() { // executes the program
                 value_pool.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
                 break;
             }
-            case OP_DECL_STRUCT: {
-                if (!IS_ID(value_pool.top())) {
-                    ERROR("Expected an identifier.");
-                }
-                std::string id = value_pool.top().string;
-                value_pool.pop();
-                op++;
-                base_structs[id] = struct_pool[(int)OP];
-                break;
-            }
-            case OP_NEW_STRUCT: {
-                GET_TOP(); // lhs = struct name, rhs = struct obj name
-                auto found = base_structs.find(lhs.string);
-                if (found == base_structs.end()) ERROR("Cannot find base structure named " << lhs.string << ".");
-                struct_scopes.back()[rhs.string] = found->second;
-                break;
-            }
-            case OP_RETRIEVE_STRUCT: {
-                GET_TOP(); // lhs = obj name, rhs = var name
-                std::map<std::string, Struct>::iterator found;
-                for (int i = struct_scopes.size()-1; i >= 0; i--) {
-                    found = struct_scopes[i].find(lhs.string);
-                    if (found == struct_scopes[i].end()) {
-                        if (i == 0) {
-                            ERROR("Cannot access struct object " << lhs.string << ", which is out of scope.");
-                        }
-                        continue;
-                    }
-                    std::map<std::string, Value>::iterator vfound = found->second.scope.variables.find(rhs.string);
-                    if (vfound == found->second.scope.variables.end()) ERROR(lhs.string << " has no member named " << rhs.string << ".");
-                    value_pool.push(vfound->second);
-                    break;
-                }
-                break;
-            }
-
+            
             case OP_DISASSEMBLE_CONSTANTS: {
                 disassembleConstants();
                 break;

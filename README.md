@@ -117,7 +117,7 @@ Scope can be modified by using the ```aware``` or ```blind``` keywords after ```
 
 The way that parameters are handled can lead to strange errors, ex:
 ```
-fn getnum(x) {
+fn getnum(x: NUM) {
     return $x * 3.78;
 }
 

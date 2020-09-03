@@ -1,0 +1,15 @@
+prefix println(rhs: STR) precedence 1 {
+    print $rhs || "\n";
+}
+
+infix exp(lhs: NUM, rhs: NUM) precedence 5 {
+    set mut i = 1;
+    set base = $lhs;
+    while ($i < $rhs) {
+        lhs *= $base;
+        i += 1;
+    }
+    return $lhs;
+}
+
+println (5 exp 3) as STR;

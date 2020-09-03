@@ -1,0 +1,5 @@
+set mut input;
+gets input;
+print "You said (gets): " || $input || "\n";
+getc input;
+print "\nYou said (getc): " || $input;

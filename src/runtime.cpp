@@ -467,7 +467,7 @@ Value Machine::run() { // executes the program
                         break;
                     }
                     case 1: { // x to string
-                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + std::to_string(top.storage.number) + "\""));
+                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + shorten(std::to_string(top.storage.number)) + "\""));
                         else if (top.type == TYPE_STRING) value_pool.push(top);
                         else if (top.type == TYPE_BOOL) {
                             if (top.storage.boolean) value_pool.push(stringValue("\"true\""));

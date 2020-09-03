@@ -62,6 +62,8 @@ struct Struct {
     std::vector<Function> fn_pool;
 };
 
+std::string shorten(std::string str);
+
 Value numberValue(double num);
 
 Value stringValue(std::string str);

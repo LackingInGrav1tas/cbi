@@ -5,6 +5,7 @@
 #include "lexer.hpp"
 #include "color.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -126,12 +127,19 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeOp(TOKEN.line, OP_NOT);
                 break;
             }
-            case DOLLAR: { // prefix retrieve &<identifier>
+            case DOLLAR: { // prefix retrieve $IDENTIFIER
                 token++;
                 if (!CHECK(IDENTIFIER)) ERROR("Cannot retrieve non-identifier.");
                 token++;
+                if (CHECK(DOT)) {
+                    vm.writeConstant(TOKEN.line, idLexeme(PREV.lexeme));
+                    token++;
+                    if (!CHECK(IDENTIFIER)) ERROR("Cannot retrieve non-identifier.");
+                    vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+                    vm.writeOp(TOKEN.line, OP_RETRIEVE_STRUCT);
+                    break;
+                } else token--;
                 vm.writeOp(TOKEN.line, OP_RETRIEVE);
-                token--;
                 vm.constants.push_back(idLexeme(TOKEN.lexeme));
                 vm.writeOp(TOKEN.line, vm.constants.size()-1);
                 break;
@@ -484,7 +492,11 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     token++;
                     if (!CHECK(COLON)) ERROR("Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
                     token++;
-                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_BOOL) && !CHECK(_VOID) && !CHECK(ANY)) ERROR("Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
+                    if (CHECK(IDENTIFIER)) {
+                        if (std::find(environment.struct_names.begin(), environment.struct_names.end(), TOKEN.lexeme) == environment.struct_names.end())
+                            ERROR("Invalid type specifier.");
+                        else; // here
+                    } else if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_BOOL) && !CHECK(_VOID) && !CHECK(ANY)) ERROR("Expected a type specifier ('ANY', 'NUM', 'STR', 'BOOL', 'VOID').\nCorrect method == fn foo(param: ANY)");
                     fn.param_types.push_back(TOKEN.lexeme);
                     token++;
                     if (CHECK(COMMA)) {
@@ -528,6 +540,43 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             fn.lines = body_as_M.lines;
             fn.constants = body_as_M.constants;
             vm.fn_pool.push_back(fn);
+        } else if (CHECK(STRUCT)) {
+            Struct structure;
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            std::string id = TOKEN.lexeme;
+            vm.writeConstant(TOKEN.line, idLexeme(id));
+            vm.writeOp(TOKEN.line, OP_DECL_STRUCT);
+            vm.writeOp(TOKEN.line, vm.struct_pool.size());
+
+            token++;
+            if (TOKEN.type != LEFT_BRACKET) ERROR("Expected a '{'.");
+            while (true) {
+                token++;
+                if (CHECK(RIGHT_BRACKET)) break; 
+                else if (CHECK(IDENTIFIER)) {
+                    structure.scope.variables[TOKEN.lexeme] = stringValue("asdasdkhasdhasdasdasa");
+                    structure.scope.mutables.push_back(TOKEN.lexeme);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+                    } else if (!CHECK(RIGHT_BRACKET)) ERROR("Improper formatting.");
+                    token--;
+                }
+                else ERROR("Improper formatting.");
+            }
+            vm.struct_pool.push_back(structure);
+        } else if (CHECK(NEW)) {
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier."); // struct name
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier."); // struct obj name
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            token++;
+            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            vm.writeOp(TOKEN.line, OP_NEW_STRUCT);
         } else if (CHECK(PRINT)) { // printing
             token++;
             expression(1);

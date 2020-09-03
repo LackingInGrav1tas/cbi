@@ -8,11 +8,13 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
+<declaration> ::= <statement> | ( <set-variable> | <new-declaration> ";" ) | <fn-declaration> | <struct-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
 <fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") [","])* ")" <code-block> ;
+<new-declaration> ::= "new" IDENTIFIER IDENTIFIER ;
+<struct-declaration> ::= "struct" "{" (IDENTIFIER ",")* "}" ;
 <infix-declaration> ::= "infix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") "," IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* infix operators must have two params *)
 <prefix-declaration> ::= "prefix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* prefix operators must have one param *)
 

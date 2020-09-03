@@ -50,6 +50,16 @@ static bool valueToBool(Value value) {
     } else return false;
 }
 
+static bool conflicts(Machine vm, std::string lexeme) {
+    for (int i = 0; i < vm.scopes.size(); i++) // searching variables
+        if (vm.scopes[i].variables.find(lexeme) != vm.scopes[i].variables.end())
+            return true;
+    for (int i = 0; i < vm.fn_scopes.size(); i++) // searching variables
+        if (vm.fn_scopes[i].find(lexeme) != vm.fn_scopes[i].end())
+            return true;
+    return false;
+}
+
 Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
@@ -249,6 +259,8 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
+                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
+
                 value_pool.pop();
                 scopes.back().variables[id] = gl_value;
                 break;
@@ -259,6 +271,8 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
+                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
+
                 value_pool.pop();
                 scopes.back().variables[id] = top;
                 scopes.back().mutables.push_back(id);
@@ -269,6 +283,7 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
+                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
                 value_pool.pop();
                 op++;
                 fn_pool[(int)OP].scopes = scopes;

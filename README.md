@@ -30,8 +30,8 @@ Very much in development.
 <code-block> ::= "{" <code> "}" ;
 <operation> ::= <infix> | <prefix> ;
 
-<infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||" "=") | "push" | "and" | "or" | "at" | "index" | IDENTIFIER(*custom ops*) |  ) <expression> ;
-<prefix> ::=  ("!" | "-" | "$" | "@"  | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(*custom ops*)) <expression> ;
+<infix> ::= <expression> ("-" | "+" | "*" | "/" | ">" | "<" | "=" | ("!" | ">" | "<" | "||" | "=" | "+" |"-" | "*" |"/"  "=") | "push" | "and" | "or" | "at" | "index" | IDENTIFIER(* custom ops *) |  ) <expression> ;
+<prefix> ::=  ("!" | "-" | "$" | "@"  | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(* custom ops *)) <expression> ;
 
 <literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
 ```

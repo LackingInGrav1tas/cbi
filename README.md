@@ -8,11 +8,12 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
+<declaration> ::= <statement> | ( <set-variable> | <list-declaration> ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
 <fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") [","])* ")" <code-block> ;
+<list-declaration> ::= "list" IDENTIFIER ;
 <infix-declaration> ::= "infix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") "," IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* infix operators must have two params *)
 <prefix-declaration> ::= "prefix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* prefix operators must have one param *)
 
@@ -29,10 +30,8 @@ Very much in development.
 <code-block> ::= "{" <code> "}" ;
 <operation> ::= <infix> | <prefix> ;
 
-<infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||") "=" ) <expression> ;
-<prefix> ::= <get-var> | ("!" | "-" <expression>) ;
-
-<get-var> ::= "$" IDENTIFIER ; (* $var_name *)
+<infix> ::= <expression> ("-" | "+" | "*" | "/" | "||" | "==" | "!=" | ">" | ">=" | "<" | "<=" | "=" | ("+"|"-"|"*"|"/"|"||" "=") | "push" | "and" | "or" | "at" | "index" | IDENTIFIER(*custom ops*) |  ) <expression> ;
+<prefix> ::=  ("!" | "-" | "$" | "@"  | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(*custom ops*)) <expression> ;
 
 <literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
 ```
@@ -191,4 +190,42 @@ output
 ```
 abc
 
+```
+### Lists ###
+Lists are second class, just like functions. This means that they can't be returned or sent as parameters.
+List initialization:
+```
+list list_name;
+```
+pushing:
+```
+list_name push "This, for example.";
+```
+popping:
+```
+pop list_name;
+```
+
+
+### Utility ###
+sizeof (not like C's sizeof())
+```
+print "sizeof (on string): " || sizeof "this" || "\n" ;
+list list_example;
+list_example push 0;
+print "sizeof (on list): " || sizeof list_example;
+```
+```
+sizeof (on string): 4
+sizeof (on list): 1
+```
+
+ascii
+```
+print "NUM to STR: " || ascii 97 || "\n";
+print "STR to NUM: " || ascii "a";
+```
+```
+NUM to STR: a
+STR to NUM: 97
 ```

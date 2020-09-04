@@ -50,16 +50,6 @@ static bool valueToBool(Value value) {
     } else return false;
 }
 
-static bool conflicts(Machine vm, std::string lexeme) {
-    for (int i = 0; i < vm.scopes.size(); i++) // searching variables
-        if (vm.scopes[i].variables.find(lexeme) != vm.scopes[i].variables.end())
-            return true;
-    for (int i = 0; i < vm.fn_scopes.size(); i++) // searching variables
-        if (vm.fn_scopes[i].find(lexeme) != vm.fn_scopes[i].end())
-            return true;
-    return false;
-}
-
 Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
@@ -259,7 +249,6 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
-                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
 
                 value_pool.pop();
                 scopes.back().variables[id] = gl_value;
@@ -271,7 +260,6 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
-                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
 
                 value_pool.pop();
                 scopes.back().variables[id] = top;
@@ -283,7 +271,7 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_pool.top().string;
-                if (conflicts(*this, id)) ERROR("'" << id << "' already in use.");
+
                 value_pool.pop();
                 op++;
                 fn_pool[(int)OP].scopes = scopes;
@@ -336,12 +324,14 @@ Value Machine::run() { // executes the program
             }
             case OP_BEGIN_SCOPE: {
                 scopes.push_back(Scope());
+                scoped_lists.push_back(std::map<std::string, std::vector<Value>>());
                 fn_scopes.push_back(std::map<std::string, Function>());
                 break;
             }
             case OP_END_SCOPE: {
                 scopes.pop_back();
                 fn_scopes.pop_back();
+                scoped_lists.pop_back();
                 break;
             }
             case OP_AND: {
@@ -522,6 +512,157 @@ Value Machine::run() { // executes the program
                 value_pool.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
                 break;
             }
+            case OP_DECL_LIST: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+
+                scoped_lists.back()[top.string] = std::vector<Value>();
+                break;
+            }
+            case OP_PUSH_LIST: {
+                GET_TOP(); // lhs = id, rhs = value
+                if (!IS_ID(lhs)) ERROR("Expected an identifier.");
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(lhs.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << lhs.string << ".");
+                        }
+                        continue;
+                    }
+                    found->second.push_back(rhs);
+                    break;
+                }
+                break;
+            }
+            case OP_POP_LIST: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(top.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << top.string << ".");
+                        }
+                        continue;
+                    }
+                    if (found->second.size() < 1) ERROR("Cannot pop list with size 0.");
+                    found->second.pop_back();
+                    break;
+                }
+                break;
+            }
+            case OP_BACK_LIST: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(top.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << top.string << ".");
+                        }
+                        continue;
+                    }
+                    if (found->second.size() < 1) ERROR("Cannot get the back of an empty list.");
+                    value_pool.push(found->second.back());
+                    break;
+                }
+                break;
+            }
+            case OP_FRONT_LIST: {
+                TOP();
+                if (!IS_ID(top)) ERROR("Expected an identifier.");
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(top.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << top.string << ".");
+                        }
+                        continue;
+                    }
+                    if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
+                    value_pool.push(found->second.front());
+                    break;
+                }
+                break;
+            }
+            case OP_INDEX_LIST: {
+                GET_TOP();
+                if (!IS_ID(lhs)) ERROR("Expected an identifier.");
+                if (!IS_NUM(rhs)) ERROR("Expected a number, rhs = " << rhs.type );
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(lhs.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << lhs.string << ".");
+                        }
+                        continue;
+                    }
+                    if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
+                    value_pool.push(found->second[rhs.storage.number]);
+                    break;
+                }
+                break;
+            }
+            case OP_SIZEOF: {
+                TOP();
+                if (IS_ID(top)) { // it should be a list
+                    std::map<std::string, std::vector<Value>>::iterator found;
+                    for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                        found = scoped_lists[i].find(top.string);
+                        if (found == scoped_lists[i].end()) {
+                            if (i == 0) {
+                                ERROR("Cannot find list named " << top.string << ".");
+                            }
+                            continue;
+                        }
+                        value_pool.push(numberValue(found->second.size()));
+                        break;
+                    }
+                } else if (IS_STRING(top)) { // string
+                    value_pool.push(numberValue(top.string.size()-2));
+                } else ERROR("Expected either a string value or list.");
+                break;
+            }
+            case OP_DECL_LIST_INDEX: {
+                Value listname = value_pool.top();
+                value_pool.pop();
+                Value toassign = value_pool.top();
+                value_pool.pop();
+                Value index = value_pool.top();
+                value_pool.pop();
+                if (!IS_NUM(index)) ERROR("Expected a number.");
+                if (!IS_ID(listname)) ERROR("Expected an identifier.");
+                std::map<std::string, std::vector<Value>>::iterator found;
+                for (int i = scoped_lists.size()-1; i >= 0; i--) {
+                    found = scoped_lists[i].find(listname.string);
+                    if (found == scoped_lists[i].end()) {
+                        if (i == 0) {
+                            ERROR("Cannot find list named " << listname.string << ".");
+                        }
+                        continue;
+                    }
+                    if (found->second.size() <= index.storage.number) ERROR("Index out of range. sizeof list: " << found->second.size() << ", index: " << index.storage.number << ".");
+                    found->second[index.storage.number] = toassign;
+                    break;
+                }
+                break;
+            }
+            case OP_CONVERT_ASCII: {
+                TOP();
+                if (IS_NUM(top)) value_pool.push(stringValue(std::string("\"") + (char)(int)top.storage.number + "\""));
+                else if (IS_STRING(top)) {
+                    if (top.string.length() != 3) ERROR("Expected a string with sizeof 1, " << top.string.length() << "  " << top.string);
+                    value_pool.push(numberValue(top.string.at(1)));
+                }
+                else ERROR("Expected a string or number.");
+                break;
+            }
             
             case OP_DISASSEMBLE_CONSTANTS: {
                 disassembleConstants();
@@ -537,7 +678,7 @@ Value Machine::run() { // executes the program
             }
 
             default: {
-                ERROR("Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << ".");
+                ERROR("Could not identify opcode in line " << lines[op-opcode.begin()] << ", " << (int)OP << ", " << op-opcode.begin() << ".");
             }
         }
     }

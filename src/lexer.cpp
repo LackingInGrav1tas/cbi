@@ -73,7 +73,15 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "postfix") tokens.push_back(Token(POSTFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "precedence") tokens.push_back(Token(PRECEDENCE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "list") tokens.push_back(Token(LIST, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "push") tokens.push_back(Token(PUSH, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "pop") tokens.push_back(Token(POP, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "back") tokens.push_back(Token(BACK, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "front") tokens.push_back(Token(FRONT, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "index") tokens.push_back(Token(INDEX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "at") tokens.push_back(Token(AT_KEYWORD, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "sizeof") tokens.push_back(Token(SIZEOF, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "ascii") tokens.push_back(Token(ASCII, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

@@ -26,7 +26,7 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_CONCATENATE: COLOR("OP_CONCATENATE", DISPLAY_AQUA); break;
         case OP_JUMP_FALSE_IFv:
         case OP_JUMP_FALSE:
-            COLOR("OP_JUMP_FALSE)", DISPLAY_AQUA);
+            COLOR("OP_JUMP_FALSE", DISPLAY_AQUA);
             std::cout << " to " << (int) *(op+1);
             op++;
             break;
@@ -75,8 +75,19 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
             op++;
             COLOR("OP_CONVERT", DISPLAY_AQUA);
             std::cout << " to " << (int)*op;
+        case OP_DECL_LIST: COLOR("OP_DECL_LIST", DISPLAY_AQUA); break;
+        case OP_PUSH_LIST: COLOR("OP_PUSH_LIST", DISPLAY_AQUA); break;
+        case OP_POP_LIST: COLOR("OP_POP_LIST", DISPLAY_AQUA); break;
+        case OP_BACK_LIST: COLOR("OP_BACK_LIST", DISPLAY_AQUA); break;
+        case OP_FRONT_LIST: COLOR("OP_FRONT_LIST", DISPLAY_AQUA); break;
+        case OP_INDEX_LIST: COLOR("OP_INDEX_LIST", DISPLAY_AQUA); break;
+        case OP_SIZEOF: COLOR("OP_SIZEOF", DISPLAY_AQUA); break;
+        case OP_DECL_LIST_INDEX: COLOR("OP_DECL_LIST_INDEX", DISPLAY_AQUA); break;
+        case OP_CONVERT_ASCII: COLOR("OP_CONVERT_ASCII", DISPLAY_AQUA); break;
+        case OP_GETCH: COLOR("OP_GETCH", DISPLAY_AQUA); break;
+        case OP_GETS: COLOR("OP_GETS", DISPLAY_AQUA); break;
         default:
-            std::cout << "bug in opcode, could not identify command.";
+            COLOR("bug in opcode, could not identify command.", DISPLAY_RED);
             break;
     }
     std::cerr << "   ";

@@ -31,6 +31,7 @@ static int getPrefixOp(std::string opname) {
 
 static int getPrecedence(Type type, std::string lexeme = "") {
     switch (type) {
+        case PUSH:
         case CONCAT_EQUALS:
         case STAR_EQUALS:
         case SLASH_EQUALS:
@@ -41,7 +42,7 @@ static int getPrecedence(Type type, std::string lexeme = "") {
         case OR: return 2;
 
         case AND: return 3;
-
+        
         case EQUAL_EQUAL:
         case NOT_EQUAL: return 4;
 
@@ -58,6 +59,7 @@ static int getPrecedence(Type type, std::string lexeme = "") {
         case STAR: return 7;
 
         case AS:
+        case INDEX:
         case AT_KEYWORD: return 8;
 
         //case DOT:
@@ -89,6 +91,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             panicking = true; \
             return; \
         } while (false)
+
+    #define SEMICOLON() if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.")
+
+    #define IDEN() if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.")
 
     #define CHECK(t) (TOKEN.type == t)
 
@@ -167,13 +173,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 }
                 vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
                 if (NEXT.type != EQUAL && NEXT.type != PLUS_EQUALS && NEXT.type != MINUS_EQUALS
-                && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS)
-                    ERROR("Stray identifier. If you wanted to access the variables value, use $" + TOKEN.lexeme + ".");
+                && NEXT.type != SLASH_EQUALS && NEXT.type != STAR_EQUALS && NEXT.type != CONCAT_EQUALS &&
+                NEXT.type != PUSH && NEXT.type != INDEX && PREV.type != BACK && PREV.type != FRONT && PREV.type != SIZEOF)
+                    ERROR("Stray identifier. If you wanted to access the variable's value, use $" + TOKEN.lexeme + ".");
                 break;
             }
             case AT: { // change to prefix @ so params work
                 token++;
-                if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+                IDEN();
                 std::string id = TOKEN.lexeme;
                 token++;
                 if (!CHECK(LEFT_PAREN)) ERROR("Expected '('.");
@@ -192,6 +199,30 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
 
                 vm.writeConstant(TOKEN.line, idLexeme(id));
                 vm.writeOp(TOKEN.line, OP_CALL);
+                break;
+            }
+            case BACK: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_BACK_LIST);
+                break;
+            }
+            case FRONT: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_FRONT_LIST);
+                break;
+            }
+            case SIZEOF: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_SIZEOF);
+                break;
+            }
+            case ASCII: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_CONVERT_ASCII);
                 break;
             }
             case _EOF: break;
@@ -383,6 +414,18 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     } else ERROR("No operator by name " + id + ".");
                     break;
                 }
+                case PUSH: {
+                    token++;
+                    expression(getPrecedence(PUSH)+1);
+                    vm.writeOp(TOKEN.line, OP_PUSH_LIST);
+                    break;
+                }
+                case INDEX: {
+                    token++;
+                    expression(getPrecedence(INDEX)+1);
+                    vm.writeOp(TOKEN.line, OP_INDEX_LIST);
+                    break;
+                }
                 default: break;
             }
         }
@@ -391,70 +434,93 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
     auto expStatement = [&]() {
         expression(1);
         token++;
-        if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+        SEMICOLON();
         vm.writeOp(TOKEN.line, OP_EMPTY_STACK); 
-    };
-
-    auto setVariable = [&]() {
-        token++;
-        bool mut = true;
-        //checking mut
-        if (!CHECK(MUT))
-            mut = false;
-        else
-            token++;
-
-        if (!CHECK(IDENTIFIER)) {
-            token--;
-            ERROR("Expected an identifier.");
-        }
-        std::string id = TOKEN.lexeme;
-
-        token++;
-        Type expected = _EOF;
-        if (CHECK(COLON)) {
-            token++;
-            if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_VOID) && !CHECK(_BOOL)) ERROR("Expected a type specifier ('NUM', 'STR', 'BOOL', 'VOID').");
-            expected = TOKEN.type;
-        } else token--;
-
-        vm.writeConstant(TOKEN.line, idLexeme(id)); // note: this won't show up in debug if the lexeme
-                                                                    // is >= 2 because of TRIM()
-        token++;
-        bool found_equal = false;
-        if (CHECK(EQUAL)) {
-            found_equal = true;
-            token++;
-            expression(1);
-            token++;
-        } else vm.writeConstant(TOKEN.line, nullValue());
-
-        if (found_equal) {
-            switch (expected) {
-                case NUM:
-                    vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
-                    break;
-                case STR:
-                    vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
-                    break;
-                case _BOOL:
-                    vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
-                    break;
-                case _VOID:
-                    vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
-                    break;
-            }
-        }
-
-        if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
-
-        if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
-        else vm.writeOp(TOKEN.line, OP_VARIABLE);
     };
 
     std::function<void()> declaration = [&]()->void {
         if (CHECK(SET)) { // setting scoped variable
-            setVariable();
+            token++;
+            bool mut = true;
+            //checking mut
+            if (!CHECK(MUT))
+                mut = false;
+            else
+                token++;
+
+            if (!CHECK(IDENTIFIER)) {
+                token--;
+                ERROR("Expected an identifier.");
+            }
+            std::string id = TOKEN.lexeme;
+
+            token++;
+            if (CHECK(INDEX)) {
+                token++;
+                expression(2);
+                token++;
+                if (!CHECK(EQUAL)) ERROR("Expected '='.");
+                token++;
+                expression(1);
+                token++;
+                SEMICOLON();
+                vm.writeConstant(TOKEN.line, idLexeme(id));
+                vm.writeOp(TOKEN.line, OP_DECL_LIST_INDEX);
+            } else {
+                Type expected = _EOF;
+                if (CHECK(COLON)) {
+                    token++;
+                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_VOID) && !CHECK(_BOOL)) ERROR("Expected a type specifier ('NUM', 'STR', 'BOOL', 'VOID').");
+                    expected = TOKEN.type;
+                } else token--;
+
+                vm.writeConstant(TOKEN.line, idLexeme(id)); // note: this won't show up in debug if the lexeme
+                                                                            // is >= 2 because of TRIM()
+                token++;
+                bool found_equal = false;
+                if (CHECK(EQUAL)) {
+                    found_equal = true;
+                    token++;
+                    expression(1);
+                    token++;
+                } else vm.writeConstant(TOKEN.line, nullValue());
+
+                if (found_equal) {
+                    switch (expected) {
+                        case NUM:
+                            vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
+                            break;
+                        case STR:
+                            vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
+                            break;
+                        case _BOOL:
+                            vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
+                            break;
+                        case _VOID:
+                            vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
+                            break;
+                    }
+                }
+
+                SEMICOLON();
+
+                if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
+                else vm.writeOp(TOKEN.line, OP_VARIABLE);
+            }
+        } else if (CHECK(LIST)) {
+            token++;
+            IDEN();
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            vm.writeOp(TOKEN.line, OP_DECL_LIST);
+            token++;
+            SEMICOLON();
+        } else if (CHECK(POP)) {
+            token++;
+            IDEN();
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            vm.writeOp(TOKEN.line, OP_POP_LIST);
+            token++;
+            SEMICOLON();
         } else if (CHECK(FUN)) {
             Function fn;
             token++;
@@ -468,7 +534,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             } else {
                 fn.type = FN_NORMAL;
             }
-            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            IDEN();
             std::string id = TOKEN.lexeme;
             vm.writeConstant(TOKEN.line, idLexeme(id));
 
@@ -492,7 +558,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     token++;
                     if (CHECK(COMMA)) {
                         token++;
-                        if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+                        IDEN();
                     }
                 } else if (CHECK(RIGHT_PAREN)) break;
                 else ERROR("Expected valid parameters.");
@@ -536,14 +602,14 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             expression(1);
             token++;
 
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
 
             vm.writeOp(TOKEN.line, OP_PRINT_TOP);
         } else if (CHECK(RETURN)) {
             token++;
             expression(1);
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeOp(TOKEN.line, OP_RETURN_TOP);
         } else if (CHECK(IF)) { // if statement
             token++;
@@ -623,7 +689,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             
             token++;
 
-            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            IDEN();
             std::string id = TOKEN.lexeme;
             vm.writeConstant(TOKEN.line, idLexeme(id));
 
@@ -643,7 +709,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     token++;
                     if (CHECK(COMMA)) {
                         token++;
-                        if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+                        IDEN();
                     }
                 } else if (CHECK(RIGHT_PAREN)) break;
                 else ERROR("Expected valid parameters.");
@@ -698,7 +764,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
             
             token++;
 
-            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            IDEN();
             std::string id = TOKEN.lexeme;
             vm.writeConstant(TOKEN.line, idLexeme(id));
 
@@ -718,7 +784,7 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     token++;
                     if (CHECK(COMMA)) {
                         token++;
-                        if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+                        IDEN();
                     }
                 } else if (CHECK(RIGHT_PAREN)) break;
                 else ERROR("Expected valid parameters.");
@@ -770,33 +836,33 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
         } else if (CHECK(BREAK)) {
             vm.writeOp(TOKEN.line, OP_BREAK);
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
         } else if (CHECK(DIS_C)) {
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeOp(TOKEN.line, OP_DISASSEMBLE_CONSTANTS);
         } else if (CHECK(DIS_SC)) {
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeOp(TOKEN.line, OP_DISASSEMBLE_SCOPES);
         } else if (CHECK(DIS_ST)) {
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeOp(TOKEN.line, OP_DISASSEMBLE_STACK);
         } else if (CHECK(GETS)) {
             token++;
-            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            IDEN();
             std::string id = TOKEN.lexeme;
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeConstant(TOKEN.line, idLexeme(id));
             vm.writeOp(TOKEN.line, OP_GETS);
         } else if (CHECK(GETCH)) {
             token++;
-            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            IDEN();
             std::string id = TOKEN.lexeme;
             token++;
-            if (!CHECK(SEMICOLON)) ERROR("Expected a semicolon.");
+            SEMICOLON();
             vm.writeConstant(TOKEN.line, idLexeme(id));
             vm.writeOp(TOKEN.line, OP_GETCH);
         } else if (CHECK(LEFT_BRACKET)) { // block

@@ -377,11 +377,9 @@ Value Machine::run() { // executes the program
                     switch (fn.type) {
                         case FN_AWARE:
                             scopes = call.scopes;
-                            scoped_lists = call.scoped_lists;
                             break;
                         case FN_NORMAL:
                             scopes[0] = call.scopes[0];
-                            scoped_lists[0] = call.scoped_lists[0];
                             break;
                     }
                     break;

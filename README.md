@@ -8,7 +8,7 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> | <list-declaration> ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
+<declaration> ::= <statement> | ( <set-variable> | <list-declaration> | (("sleep"|"console"|"throw") <expression>) ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
@@ -31,7 +31,7 @@ Very much in development.
 <operation> ::= <infix> | <prefix> ;
 
 <infix> ::= <expression> ("-" | "+" | "*" | "/" | ">" | "<" | "=" | ("!" | ">" | "<" | "||" | "=" | "+" |"-" | "*" |"/"  "=") | "push" | "and" | "or" | "at" | "index" | IDENTIFIER(* custom ops *) |  ) <expression> ;
-<prefix> ::=  ("!" | "-" | "$" | "@"  | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(* custom ops *)) <expression> ;
+<prefix> ::=  ("!" | "-" | "$" | "@"  | "rand" | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(* custom ops *)) <expression> ;
 
 <literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
 ```
@@ -208,7 +208,7 @@ pop list_name;
 
 
 ### Utility ###
-sizeof (not like C's sizeof())
+sizeof (not like C's sizeof()):
 ```
 print "sizeof (on string): " || sizeof "this" || "\n" ;
 list list_example;
@@ -220,7 +220,7 @@ sizeof (on string): 4
 sizeof (on list): 1
 ```
 
-ascii
+ascii:
 ```
 print "NUM to STR: " || ascii 97 || "\n";
 print "STR to NUM: " || ascii "a";
@@ -228,4 +228,77 @@ print "STR to NUM: " || ascii "a";
 ```
 NUM to STR: a
 STR to NUM: 97
+```
+console:
+Using C++'s ```system```, it sends a command to the console.
+```
+console "mkdir new_folder"; # creates folder
+console 'echo "blah, blah, blah" > file.txt'; # writes to file
+```
+rand:
+When called during runtime, it seeds the PRNG (using ```time(NULL)```) and returns a number in between 0 and it's param.
+```
+print rand 50;
+```
+```
+<a number between 0 and 49>
+```
+sleep:
+Waits for it's param.
+```
+println "Wait for two seconds..."; # println is in the STL
+sleep 2000;
+print "Done.";
+```
+```
+Wait for two seconds...
+Done.
+```
+throw:
+uses the ```ERROR()``` definition from runtime.cpp on ```getPrintable(top)```, then exits with errorcode 1;
+```
+throw "Get me outta here!";
+```
+```
+Run-time Error in line 1: Get me outta here!
+```
+
+## The Standard Library ##
+### Constants ###
+EXIT_SUCCESS: ```set EXIT_SUCCESS = 0;```
+EXIT_FAILURE: ```set EXIT_FAILURE = 1;```
+### Functions ###
+assert:
+```
+fn assert(expr: BOOL) {
+    if (!$expr) throw "assertion failed.";
+}
+```
+input:
+```
+fn input(text: ANY) {
+    print $text;
+    set mut s;
+    gets s;
+    return $s;
+}
+```
+### Operators ###
+println:
+```
+prefix println(txt: ANY) precedence 1 {
+    print $txt || "\n";
+}
+```
+exp:
+```
+infix exp(lhs: NUM, rhs: NUM) precedence 5 {
+    set mut i = 1;
+    set base = $lhs;
+    while ($i < $rhs) {
+        lhs *= $base;
+        i += 1;
+    }
+    return $lhs;
+}
 ```

@@ -24,6 +24,7 @@ enum Type {
     // keywords
     AND, OR, ELSE, FOR, WHILE, IF, FUN, PRINT, BREAK, STRUCT, NEW, RETURN, AT_KEYWORD,
     DIS_C, DIS_ST, DIS_SC, GETS, GETCH, AWARE, BLIND, AS, INFIX, PREFIX, POSTFIX, PRECEDENCE,
+    THROW, CONSOLE, SLEEP, RAND,
 
     SIZEOF, ASCII,
 
@@ -59,9 +60,9 @@ struct Token {
             std::cerr << "\n" << filename << ": ";
             COLOR("Compile-time Error", DISPLAY_RED);
             std::cerr << ": " << message << " TOKEN: " << lexeme;
-            std::cerr << "\n" << line+1 << "| ";
+            std::cerr << "\n" << line-5 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
-                if (it-lines.begin() == line) {
+                if (it-lines.begin() == line-6) {
                     std::cerr << *it;
                     break;
                 }

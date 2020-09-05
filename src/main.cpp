@@ -32,6 +32,12 @@ int main(int argc, char **argv) {
                 std::cout << "Reading file... ";
             }
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
+            lines.insert(lines.begin(), "prefix println(txt: ANY) precedence 1 { print $txt || \"\\n\"; }{");
+            lines.insert(lines.begin(), "infix exp(lhs: NUM, rhs: NUM) precedence 5 { set mut i = 1; set base = $lhs; while ($i < $rhs) { lhs *= $base; i += 1; } return $lhs; }");
+            lines.insert(lines.begin(), "fn input(text: ANY) { print $text; set mut s; gets s; return $s; }");
+            lines.insert(lines.begin(), "fn assert(exp: BOOL) { if (!$exp) throw \"assertion failed.\"; }");
+            lines.insert(lines.begin(), "set EXIT_FAILURE = 1; set EXIT_SUCCESS = 0;");
+            lines.push_back("}");
             if (!success) {
                 std::cerr << "\nCould not access file" << std::endl;
                 return EXIT_FAILURE;
@@ -48,6 +54,12 @@ int main(int argc, char **argv) {
                 COLOR("\n\nFatal error(s) during scanning.\n", DISPLAY_RED);
                 return EXIT_FAILURE;
             }
+            /*for (int b = 0; b < tokens.size(); b++) {
+                std::cout << tokens[b].lexeme << " ";
+                if (tokens[b].type == SEMICOLON) std::cout << std::endl;
+                if (tokens[b].type == RIGHT_BRACKET) std::cout << std::endl;
+                if (tokens[b].type == LEFT_BRACKET) std::cout << std::endl;
+            }*/
 
             if (debugmode) {
                 int pt = PASSED_TIME();

@@ -5,6 +5,7 @@
 #include <cstring>
 #include <algorithm>
 #include <conio.h>
+#include <time.h>
 
 #include "color.hpp"
 #include "vm.hpp"
@@ -54,7 +55,7 @@ Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
             COLOR("Run-time Error", DISPLAY_RED); \
-            std::cerr << " in line " << lines[op-opcode.begin()]+1 << ": " << message; \
+            std::cerr << " in line " << lines[op-opcode.begin()] << ": " << message; \
             std::cerr.flush(); \
             return exitRT(); \
         } while (false)
@@ -380,6 +381,7 @@ Value Machine::run() { // executes the program
                             break;
                         case FN_NORMAL:
                             scopes[0] = call.scopes[0];
+                            scopes[1] = call.scopes[1];
                             break;
                     }
                     break;
@@ -393,6 +395,10 @@ Value Machine::run() { // executes the program
             case OP_RETURN_TOP: {
                 TOP();
                 return top;
+            }
+            case OP_THROW: {
+                TOP();
+                ERROR(getPrintable(top));
             }
             case OP_GETS: {
                 TOP();
@@ -661,6 +667,25 @@ Value Machine::run() { // executes the program
                     value_pool.push(numberValue(top.string.at(1)));
                 }
                 else ERROR("Expected a string or number.");
+                break;
+            }
+            case OP_CONSOLE: {
+                TOP();
+                if (!IS_STRING(top)) ERROR("Expected a string");
+                system(TRIM(top.string).c_str());
+                break;
+            }
+            case OP_SLEEP: {
+                TOP();
+                if (!IS_NUM(top)) ERROR("Expected a number.");
+                Sleep(top.storage.number);
+                break;
+            }
+            case OP_RAND: {
+                TOP();
+                if (!IS_NUM(top)) ERROR("Expected a number.");
+                srand(time(NULL));
+                value_pool.push(numberValue(rand() % (int)top.storage.number));
                 break;
             }
             

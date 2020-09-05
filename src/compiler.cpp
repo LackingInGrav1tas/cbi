@@ -225,6 +225,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeOp(TOKEN.line, OP_CONVERT_ASCII);
                 break;
             }
+            case RAND: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_RAND);
+                break;
+            }
             case _EOF: break;
             default: {
                 ERROR("Expected an expression.");
@@ -507,6 +513,24 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
                 else vm.writeOp(TOKEN.line, OP_VARIABLE);
             }
+        } else if (CHECK(THROW)) {
+            token++;
+            expression(1);
+            vm.writeOp(TOKEN.line, OP_THROW);
+            token++;
+            SEMICOLON();
+        } else if (CHECK(SLEEP)) {
+            token++;
+            expression(1);
+            vm.writeOp(TOKEN.line, OP_SLEEP);
+            token++;
+            SEMICOLON();
+        } else if (CHECK(CONSOLE)) {
+            token++;
+            expression(1);
+            vm.writeOp(TOKEN.line, OP_CONSOLE);
+            token++;
+            SEMICOLON();
         } else if (CHECK(LIST)) {
             token++;
             IDEN();

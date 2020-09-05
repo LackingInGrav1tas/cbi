@@ -86,6 +86,8 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_CONVERT_ASCII: COLOR("OP_CONVERT_ASCII", DISPLAY_AQUA); break;
         case OP_GETCH: COLOR("OP_GETCH", DISPLAY_AQUA); break;
         case OP_GETS: COLOR("OP_GETS", DISPLAY_AQUA); break;
+        case OP_THROW: COLOR("OP_THROW", DISPLAY_AQUA); break;
+        case OP_CONSOLE: COLOR("OP_CONSOLE", DISPLAY_AQUA); break;
         default:
             COLOR("bug in opcode, could not identify command.", DISPLAY_RED);
             break;

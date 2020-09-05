@@ -82,6 +82,10 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "at") tokens.push_back(Token(AT_KEYWORD, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "sizeof") tokens.push_back(Token(SIZEOF, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "ascii") tokens.push_back(Token(ASCII, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "throw") tokens.push_back(Token(THROW, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "console") tokens.push_back(Token(CONSOLE, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "sleep") tokens.push_back(Token(SLEEP, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "rand") tokens.push_back(Token(RAND, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 
@@ -187,7 +191,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 }
                 case '$': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(DOLLAR, ";", filename, line-lines.begin()));
+                    tokens.push_back(Token(DOLLAR, "$", filename, line-lines.begin()));
                     break;
                 }
                 case '@': {

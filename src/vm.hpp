@@ -55,14 +55,14 @@ class Machine {
                 call.fn_scopes = fn_scopes;
                 break;
             case FN_NORMAL:
+                call.scopes = std::vector<Scope>{scopes[0], scopes[1]};
+                call.fn_pool = fn_pool;
+                call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes[0], fn_scopes[1]};
+                break;
+            case FN_BLIND:
                 call.scopes = std::vector<Scope>{scopes[0]};
                 call.fn_pool = fn_pool;
                 call.fn_scopes = std::vector<std::map<std::string, Function>>{fn_scopes[0]};
-                break;
-            case FN_BLIND:
-                call.scopes = fn.scopes;
-                call.fn_pool = std::vector<Function>();
-                call.fn_scopes = std::vector<std::map<std::string, Function>>();
                 break;
             default: break;
         }

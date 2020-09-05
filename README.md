@@ -230,12 +230,14 @@ NUM to STR: a
 STR to NUM: 97
 ```
 console:
+
 Using C++'s ```system```, it sends a command to the console.
 ```
 console "mkdir new_folder"; # creates folder
 console 'echo "blah, blah, blah" > file.txt'; # writes to file
 ```
 rand:
+
 When called during runtime, it seeds the PRNG (using ```time(NULL)```) and returns a number in between 0 and it's param.
 ```
 print rand 50;
@@ -244,6 +246,7 @@ print rand 50;
 <a number between 0 and 49>
 ```
 sleep:
+
 Waits for it's param.
 ```
 println "Wait for two seconds..."; # println is in the STL
@@ -255,6 +258,7 @@ Wait for two seconds...
 Done.
 ```
 throw:
+
 uses the ```ERROR()``` definition from runtime.cpp on ```getPrintable(top)```, then exits with errorcode 1;
 ```
 throw "Get me outta here!";
@@ -264,8 +268,8 @@ Run-time Error in line 1: Get me outta here!
 ```
 
 ## The Standard Library ##
-### Constants ###
 The way I implemented the STL is inefficient because I don't want to write the opcode by hand.
+### Constants ###
 ```EXIT_SUCCESS```: ```set EXIT_SUCCESS = 0;```
 ```EXIT_FAILURE```: ```set EXIT_FAILURE = 1;```
 

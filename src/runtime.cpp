@@ -55,7 +55,7 @@ Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
             COLOR("Run-time Error", DISPLAY_RED); \
-            std::cerr << " in line " << lines[op-opcode.begin()] << ": " << message; \
+            std::cerr << " in line " << lines[op-opcode.begin()]-9 << ": " << message; \
             std::cerr.flush(); \
             return exitRT(); \
         } while (false)
@@ -316,7 +316,7 @@ Value Machine::run() { // executes the program
                     }
 
                     if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
-                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
                     }
                     found->second = top;
                     break;
@@ -415,7 +415,7 @@ Value Machine::run() { // executes the program
                     }
 
                     if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
-                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
                     }
                     std::string input;
                     std::getline(std::cin, input);
@@ -439,7 +439,7 @@ Value Machine::run() { // executes the program
                     }
 
                     if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
-                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax:\nset mut <name>;");
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
                     }
                     found->second = stringValue(std::string("\"") + (char)getch() + "\"");
                     break;

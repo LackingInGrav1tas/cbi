@@ -265,16 +265,58 @@ Run-time Error in line 1: Get me outta here!
 
 ## The Standard Library ##
 ### Constants ###
-EXIT_SUCCESS: ```set EXIT_SUCCESS = 0;```
-EXIT_FAILURE: ```set EXIT_FAILURE = 1;```
+The way I implemented the STL is inefficient because I don't want to write the opcode by hand.
+```EXIT_SUCCESS```: ```set EXIT_SUCCESS = 0;```
+```EXIT_FAILURE```: ```set EXIT_FAILURE = 1;```
+
+```OS_WIN```:
+```C++
+#ifdef _WIN32
+    lines.insert(lines.begin(), "set OS_WIN = true;");
+#else
+    lines.insert(lines.begin(), "set OS_WIN = false;");
+#endif
+```
+```OS_UNIX```:
+```C++
+#if defined(unix) || defined(__unix__) || defined(__unix)
+    lines.insert(lines.begin(), "set OS_UNIX = true;");
+#else
+    lines.insert(lines.begin(), "set OS_UNIX = false;");
+#endif
+```
+```OS_MAC```:
+```C++
+#ifdef __APPLE__
+    lines.insert(lines.begin(), "set OS_MAC = true;");
+#else
+    lines.insert(lines.begin(), "set OS_MAC = false;");
+#endif
+```
+```OS_FBSD```:
+```C++
+#ifdef __Free_BSD__
+    lines.insert(lines.begin(), "set OS_FBSD = true;");
+#else
+    lines.insert(lines.begin(), "set OS_FBSD = false;");
+#endif
+```
+```OS_ANDR```:
+```C++
+#ifdef __ANDROID__
+    lines.insert(lines.begin(), "set OS_ANDR = true;");
+#else
+    lines.insert(lines.begin(), "set OS_ANDR = false;");
+#endif
+```
 ### Functions ###
-assert:
+```assert```:
 ```
 fn assert(expr: BOOL) {
     if (!$expr) throw "assertion failed.";
 }
 ```
-input:
+```input```:
 ```
 fn input(text: ANY) {
     print $text;
@@ -284,13 +326,13 @@ fn input(text: ANY) {
 }
 ```
 ### Operators ###
-println:
+```println```:
 ```
 prefix println(txt: ANY) precedence 1 {
     print $txt || "\n";
 }
 ```
-exp:
+```exp```:
 ```
 infix exp(lhs: NUM, rhs: NUM) precedence 5 {
     set mut i = 1;

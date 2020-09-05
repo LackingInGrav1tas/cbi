@@ -60,9 +60,9 @@ struct Token {
             std::cerr << "\n" << filename << ": ";
             COLOR("Compile-time Error", DISPLAY_RED);
             std::cerr << ": " << message << " TOKEN: " << lexeme;
-            std::cerr << "\n" << line-5 << "| ";
+            std::cerr << "\n" << line-9 << "| ";
             for (auto it = lines.begin(); it < lines.end(); it++) {
-                if (it-lines.begin() == line-6) {
+                if (it-lines.begin() == line-10) {
                     std::cerr << *it;
                     break;
                 }

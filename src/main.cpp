@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
                 vm.disassembleOpcode();
                 vm.disassembleConstants();
             }
+            vm.build();
 
             if (debugmode) {
                 COLOR("\n== runtime ==\n", DISPLAY_GREEN);

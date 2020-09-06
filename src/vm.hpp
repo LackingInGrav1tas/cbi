@@ -15,7 +15,7 @@ class Machine {
     std::vector<Value> constants;
     std::vector<int> lines;
 
-    std::stack<Value> value_pool;
+    std::stack<Value> value_stack;
     std::vector<Scope> scopes;
 
     // seperated functions from variables because its much easier to not have functions be included as values
@@ -42,6 +42,9 @@ class Machine {
 
     //in runtime
     Value run();
+
+    //in build
+    void build();
 
     Machine from(Function fn) {
         Machine call;

@@ -61,39 +61,39 @@ Value Machine::run() { // executes the program
         } while (false)
 
     #define GET_TOP() \
-        if (value_pool.size() < 2) ERROR("Stack underflow."); \
-        Value rhs = value_pool.top(); \
-        value_pool.pop(); \
-        Value lhs = value_pool.top(); \
-        value_pool.pop()
+        if (value_stack.size() < 2) ERROR("Stack underflow."); \
+        Value rhs = value_stack.top(); \
+        value_stack.pop(); \
+        Value lhs = value_stack.top(); \
+        value_stack.pop()
 
     #define TOP() \
-        if (value_pool.size() < 1) ERROR("Stack underflow."); \
-        Value top = value_pool.top(); \
-        value_pool.pop()
+        if (value_stack.size() < 1) ERROR("Stack underflow."); \
+        Value top = value_stack.top(); \
+        value_stack.pop()
 
     for (auto op = opcode.begin(); op < opcode.end(); op++) {
         #define OP (*op)
         switch (OP) {
             case OP_PRINT_TOP: { // prints top of stack
-                std::cout << getPrintable(value_pool.top());
-                value_pool.pop();
+                std::cout << getPrintable(value_stack.top());
+                value_stack.pop();
                 break;
             }
             case OP_CONSTANT: { // adds constant
                 op++;
-                value_pool.push(constants[(int)OP]);
+                value_stack.push(constants[(int)OP]);
                 break;
             }
             case OP_CONCATENATE: { // pops the top 2 strings off the value stack, then pushes a concatenated string
                 GET_TOP();
-                value_pool.push(stringValue('"' + getPrintable(lhs) + getPrintable(rhs) + '"'));
+                value_stack.push(stringValue('"' + getPrintable(lhs) + getPrintable(rhs) + '"'));
                 break;
             }
             case OP_ADD: { // pops the top 2 numbers off the value stack, then pushes the sum
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(numberValue(lhs.storage.number + rhs.storage.number));
+                    value_stack.push(numberValue(lhs.storage.number + rhs.storage.number));
                 else {
                     ERROR("Could not add non-number value.");
                 }
@@ -102,7 +102,7 @@ Value Machine::run() { // executes the program
             case OP_SUB: { // pops the top 2 numbers off the value stack, then pushes the difference
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(numberValue(lhs.storage.number - rhs.storage.number));
+                    value_stack.push(numberValue(lhs.storage.number - rhs.storage.number));
                 else {
                     ERROR("Could not subtract non-number value.");
                 }
@@ -111,7 +111,7 @@ Value Machine::run() { // executes the program
             case OP_MUL: { // pops the top 2 numbers off the value stack, then pushes the product
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(numberValue(lhs.storage.number * rhs.storage.number));
+                    value_stack.push(numberValue(lhs.storage.number * rhs.storage.number));
                 else {
                     ERROR("Could not multiply non-number value.");
                 }
@@ -120,7 +120,7 @@ Value Machine::run() { // executes the program
             case OP_DIV: { // pops the top 2 numbers off the value stack, then pushes the quotient
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(numberValue(lhs.storage.number / rhs.storage.number));
+                    value_stack.push(numberValue(lhs.storage.number / rhs.storage.number));
                 else {
                     ERROR("Run-time Error: Could not divide non-number value.");
                 }
@@ -129,7 +129,7 @@ Value Machine::run() { // executes the program
             case OP_NEGATE: { // -top
                 TOP();
                 if (IS_NUM(top))
-                    value_pool.push(numberValue(-top.storage.number));
+                    value_stack.push(numberValue(-top.storage.number));
                 else {
                     ERROR("Could not negate non-number value.");
                 }
@@ -138,18 +138,18 @@ Value Machine::run() { // executes the program
             case OP_NOT: { // !top
                 TOP();
                 if (IS_BOOL(top)) {
-                    value_pool.push(boolValue(!top.storage.boolean));
+                    value_stack.push(boolValue(!top.storage.boolean));
                 } else if (top.type == TYPE_NULL) {
-                    value_pool.push(boolValue(true));
+                    value_stack.push(boolValue(true));
                 } else if (IS_STRING(top)) {
                     if (top.string == R"("")") {
-                        value_pool.push(boolValue(true));
+                        value_stack.push(boolValue(true));
                     } else {
-                        value_pool.push(boolValue(false));
+                        value_stack.push(boolValue(false));
                     }
                 } else if (IS_NUM(top)) {
-                    if (top.storage.number == 0) value_pool.push(boolValue(true));
-                    else value_pool.push(boolValue(false));
+                    if (top.storage.number == 0) value_stack.push(boolValue(true));
+                    else value_stack.push(boolValue(false));
                 } else {
                     ERROR("Cannot negate unreferenced variable.");
                 }
@@ -157,22 +157,22 @@ Value Machine::run() { // executes the program
             }
             case OP_JUMP_FALSE:
             case OP_JUMP_FALSE_IFv: { // goto
-                if (IS_BOOL(value_pool.top())) {
-                    if (value_pool.top().storage.boolean) {
-                        value_pool.pop();
+                if (IS_BOOL(value_stack.top())) {
+                    if (value_stack.top().storage.boolean) {
+                        value_stack.pop();
                         op++;
                         break;
                     }
-                } else if (IS_NUM(value_pool.top())) {
-                    if (value_pool.top().storage.number) {
-                        value_pool.pop();
+                } else if (IS_NUM(value_stack.top())) {
+                    if (value_stack.top().storage.number) {
+                        value_stack.pop();
                         op++;
                         break;
                     }
                 } else ERROR("Expected a boolean expression. You can use 'as BOOL' to convert a value.");
                 op++;
                 op = opcode.begin() + (int) OP-1;
-                value_pool.pop();
+                value_stack.pop();
                 break;
             }
             case OP_JUMP: { // goto
@@ -195,18 +195,18 @@ Value Machine::run() { // executes the program
             case OP_BEGIN: break; // because of jump quirk
             case OP_EQUALITY: { // ==
                 GET_TOP();
-                value_pool.push(boolValue(valueEquals(lhs, rhs)));
+                value_stack.push(boolValue(valueEquals(lhs, rhs)));
                 break;
             }
             case OP_NOT_EQ: { // !=
                 GET_TOP();
-                value_pool.push(boolValue(!valueEquals(lhs, rhs)));
+                value_stack.push(boolValue(!valueEquals(lhs, rhs)));
                 break;
             }
             case OP_LESS: { // <
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(boolValue(lhs.storage.number < rhs.storage.number));
+                    value_stack.push(boolValue(lhs.storage.number < rhs.storage.number));
                 else {
                     ERROR("Could not solve with non-number value.");
                 }
@@ -215,7 +215,7 @@ Value Machine::run() { // executes the program
             case OP_GREATER: { // >
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(boolValue(lhs.storage.number > rhs.storage.number));
+                    value_stack.push(boolValue(lhs.storage.number > rhs.storage.number));
                 else {
                     ERROR("Could not solve with non-number value.");
                 }
@@ -224,7 +224,7 @@ Value Machine::run() { // executes the program
             case OP_LESS_EQ: { // <=
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(boolValue(lhs.storage.number <= rhs.storage.number));
+                    value_stack.push(boolValue(lhs.storage.number <= rhs.storage.number));
                 else {
                     ERROR("Could not solve with non-number value.");
                 }
@@ -233,47 +233,47 @@ Value Machine::run() { // executes the program
             case OP_GREATER_EQ: { // >=
                 GET_TOP();
                 if (IS_NUM(rhs) && IS_NUM(lhs))
-                    value_pool.push(boolValue(lhs.storage.number >= rhs.storage.number));
+                    value_stack.push(boolValue(lhs.storage.number >= rhs.storage.number));
                 else {
                     ERROR("Could not solve with non-number value.");
                 }
                 break;
             }
             case OP_POP_TOP: {
-                if (value_pool.size() > 0) value_pool.pop(); // the if statement is for function calls as exp stmts
+                if (value_stack.size() > 0) value_stack.pop(); // the if statement is for function calls as exp stmts
                 break;
             }
             case OP_VARIABLE: {
-                Value gl_value = value_pool.top();
-                value_pool.pop();
-                if (!IS_ID(value_pool.top())) {
+                Value gl_value = value_stack.top();
+                value_stack.pop();
+                if (!IS_ID(value_stack.top())) {
                     ERROR("Expected an identifier.");
                 }
-                std::string id = value_pool.top().string;
+                std::string id = value_stack.top().string;
 
-                value_pool.pop();
+                value_stack.pop();
                 scopes.back().variables[id] = gl_value;
                 break;
             }
             case OP_VARIABLE_MUT: {
                 TOP();
-                if (!IS_ID(value_pool.top())) {
+                if (!IS_ID(value_stack.top())) {
                     ERROR("Expected an identifier.");
                 }
-                std::string id = value_pool.top().string;
+                std::string id = value_stack.top().string;
 
-                value_pool.pop();
+                value_stack.pop();
                 scopes.back().variables[id] = top;
                 scopes.back().mutables.push_back(id);
                 break;
             }
             case OP_DECL_FN: { // format: identifier constant, decl, size
-                if (!IS_ID(value_pool.top())) {
+                if (!IS_ID(value_stack.top())) {
                     ERROR("Expected an identifier.");
                 }
-                std::string id = value_pool.top().string;
+                std::string id = value_stack.top().string;
 
-                value_pool.pop();
+                value_stack.pop();
                 op++;
                 fn_pool[(int)OP].scopes = scopes;
                 fn_scopes.back()[id] = fn_pool[(int)OP];
@@ -291,7 +291,7 @@ Value Machine::run() { // executes the program
                         }
                         continue;
                     }
-                    value_pool.push(found->second);
+                    value_stack.push(found->second);
                     break;
                 }
                 break;
@@ -300,17 +300,17 @@ Value Machine::run() { // executes the program
             case OP_SET_VARIABLE: {
                 TOP();
                 
-                if (!IS_ID(value_pool.top())) {
+                if (!IS_ID(value_stack.top())) {
                     ERROR("Expected an identifier.");
                 }
 
                 std::map<std::string, Value>::iterator found;
                 for (int i = scopes.size()-1; i >= 0; i--) {
-                    std::string a = value_pool.top().string;
+                    std::string a = value_stack.top().string;
                     found = scopes[i].variables.find(a);
                     if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot access variable out of scope, " << value_pool.top().string << ".");
+                            ERROR("Cannot access variable out of scope, " << value_stack.top().string << ".");
                         }
                         continue;
                     }
@@ -337,20 +337,20 @@ Value Machine::run() { // executes the program
             }
             case OP_AND: {
                 GET_TOP();
-                value_pool.push(boolValue(valueToBool(lhs) && valueToBool(rhs)));
+                value_stack.push(boolValue(valueToBool(lhs) && valueToBool(rhs)));
                 break;
             }
             case OP_OR: {
                 GET_TOP();
-                value_pool.push(boolValue(valueToBool(lhs) || valueToBool(rhs)));
+                value_stack.push(boolValue(valueToBool(lhs) || valueToBool(rhs)));
                 break;
             }
             case OP_CALL: {
-                if (!IS_ID(value_pool.top())) {
+                if (!IS_ID(value_stack.top())) {
                     ERROR("Expected an identifier.");
                 }
-                std::string id = value_pool.top().string;
-                value_pool.pop();
+                std::string id = value_stack.top().string;
+                value_stack.pop();
                 std::map<std::string, Function>::iterator found;
                 for (int i = fn_scopes.size()-1; i >= 0; i--) {
                     found = fn_scopes[i].find(id);
@@ -362,19 +362,19 @@ Value Machine::run() { // executes the program
                     }
                     Function fn = found->second;
                     Machine call = Machine::from(fn); // setting opcode/constant pool/etc.
-                    if (value_pool.size() < fn.param_ids.size()) { // checking params
-                        ERROR("Expected more parameters during call of function " << id << ". Received: " << value_pool.size() << ", Expected: " << fn.param_ids.size());
+                    if (value_stack.size() < fn.param_ids.size()) { // checking params
+                        ERROR("Expected more parameters during call of function " << id << ". Received: " << value_stack.size() << ", Expected: " << fn.param_ids.size());
                     }
                     for (int p = fn.param_ids.size()-1; p >= 0; p--) { // setting params
-                        call.scopes.back().variables[fn.param_ids[p]] = value_pool.top();
-                        if (!checkTypes(fn.param_types[p], value_pool.top().type)) ERROR("Param specifiers do not match. Expected " << fn.param_types[p] << ".");
-                        value_pool.pop();
+                        call.scopes.back().variables[fn.param_ids[p]] = value_stack.top();
+                        if (!checkTypes(fn.param_types[p], value_stack.top().type)) ERROR("Param specifiers do not match. Expected " << fn.param_types[p] << ".");
+                        value_stack.pop();
                         call.scopes.back().mutables.push_back(fn.param_ids[p]);
                     }
                     Value call_run = call.run();
                     if (call_run.type == TYPE_RT_ERROR) return exitRT();
-                    else if (call_run.type != TYPE_OK) value_pool.push(call_run);
-                    else value_pool.push(nullValue());
+                    else if (call_run.type != TYPE_OK) value_stack.push(call_run);
+                    else value_stack.push(nullValue());
                     switch (fn.type) {
                         case FN_AWARE:
                             scopes = call.scopes;
@@ -389,7 +389,7 @@ Value Machine::run() { // executes the program
                 break;
             }
             case OP_EMPTY_STACK: {
-                value_pool.empty();
+                value_stack.empty();
                 break;
             }
             case OP_RETURN_TOP: {
@@ -453,41 +453,41 @@ Value Machine::run() { // executes the program
                     case 0: { // x to num
                         if (top.type == TYPE_STRING) {
                             try {
-                                value_pool.push(numberValue(std::stod(TRIM(top.string))));
+                                value_stack.push(numberValue(std::stod(TRIM(top.string))));
                             } catch (...) {
                                 ERROR("Cannot convert this string value to number.");
                             }
-                        } else if (top.type == TYPE_DOUBLE) value_pool.push(top);
-                        else if (top.type == TYPE_BOOL) value_pool.push(numberValue(top.storage.boolean));
-                        else value_pool.push(numberValue(0));
+                        } else if (top.type == TYPE_DOUBLE) value_stack.push(top);
+                        else if (top.type == TYPE_BOOL) value_stack.push(numberValue(top.storage.boolean));
+                        else value_stack.push(numberValue(0));
                         break;
                     }
                     case 1: { // x to string
-                        if (top.type == TYPE_DOUBLE) value_pool.push(stringValue("\"" + shorten(std::to_string(top.storage.number)) + "\""));
-                        else if (top.type == TYPE_STRING) value_pool.push(top);
+                        if (top.type == TYPE_DOUBLE) value_stack.push(stringValue("\"" + shorten(std::to_string(top.storage.number)) + "\""));
+                        else if (top.type == TYPE_STRING) value_stack.push(top);
                         else if (top.type == TYPE_BOOL) {
-                            if (top.storage.boolean) value_pool.push(stringValue("\"true\""));
-                            else value_pool.push(stringValue("\"false\""));
+                            if (top.storage.boolean) value_stack.push(stringValue("\"true\""));
+                            else value_stack.push(stringValue("\"false\""));
                         }
-                        else value_pool.push(stringValue("\"\""));
+                        else value_stack.push(stringValue("\"\""));
                         break;
                     }
                     case 2: { // x to bool
                         if (top.type == TYPE_DOUBLE) {
-                            if (top.storage.number == 0) value_pool.push(boolValue(false));
-                            else value_pool.push(boolValue(true));
+                            if (top.storage.number == 0) value_stack.push(boolValue(false));
+                            else value_stack.push(boolValue(true));
                         }
-                        else if (top.type == TYPE_BOOL) value_pool.push(top);
+                        else if (top.type == TYPE_BOOL) value_stack.push(top);
                         else if (top.type == TYPE_STRING) {
                             if (TRIM(top.string) == "" || TRIM(top.string) == "false" || TRIM(top.string) == "0")
-                                value_pool.push(boolValue(false));
-                            else value_pool.push(boolValue(true));
+                                value_stack.push(boolValue(false));
+                            else value_stack.push(boolValue(true));
                         }
-                        else value_pool.push(boolValue(false));
+                        else value_stack.push(boolValue(false));
                         break;
                     }
                     case 3: { // x to null
-                        value_pool.push(nullValue());
+                        value_stack.push(nullValue());
                         break;
                     }
                     default: ERROR("Expected a type specifier.");
@@ -495,19 +495,19 @@ Value Machine::run() { // executes the program
                 break;
             }
             case OP_REQUIRE_BOOL: {
-                if (value_pool.top().type != TYPE_BOOL) ERROR("Expected a boolean value.");
+                if (value_stack.top().type != TYPE_BOOL) ERROR("Expected a boolean value.");
                 break;
             }
             case OP_REQUIRE_NUM: {
-                if (value_pool.top().type != TYPE_DOUBLE) ERROR("Expected a num value.");
+                if (value_stack.top().type != TYPE_DOUBLE) ERROR("Expected a num value.");
                 break;
             }
             case OP_REQUIRE_STR: {
-                if (value_pool.top().type != TYPE_STRING) ERROR("Expected a string value.");
+                if (value_stack.top().type != TYPE_STRING) ERROR("Expected a string value.");
                 break;
             }
             case OP_REQUIRE_VOID: {
-                if (value_pool.top().type != TYPE_NULL) ERROR("Expected a void value.");
+                if (value_stack.top().type != TYPE_NULL) ERROR("Expected a void value.");
                 break;
             }
             case OP_AT: {
@@ -515,7 +515,7 @@ Value Machine::run() { // executes the program
                 if (!IS_NUM(rhs)) ERROR("Expected a number.");
                 if (!IS_STRING(lhs)) ERROR("Expected a string value.");
                 if (TRIM(lhs.string).length() <= rhs.storage.number) ERROR("Index out of range.");
-                value_pool.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
+                value_stack.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
                 break;
             }
             case OP_DECL_LIST: {
@@ -573,7 +573,7 @@ Value Machine::run() { // executes the program
                         continue;
                     }
                     if (found->second.size() < 1) ERROR("Cannot get the back of an empty list.");
-                    value_pool.push(found->second.back());
+                    value_stack.push(found->second.back());
                     break;
                 }
                 break;
@@ -591,7 +591,7 @@ Value Machine::run() { // executes the program
                         continue;
                     }
                     if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
-                    value_pool.push(found->second.front());
+                    value_stack.push(found->second.front());
                     break;
                 }
                 break;
@@ -610,7 +610,7 @@ Value Machine::run() { // executes the program
                         continue;
                     }
                     if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
-                    value_pool.push(found->second[rhs.storage.number]);
+                    value_stack.push(found->second[rhs.storage.number]);
                     break;
                 }
                 break;
@@ -627,21 +627,21 @@ Value Machine::run() { // executes the program
                             }
                             continue;
                         }
-                        value_pool.push(numberValue(found->second.size()));
+                        value_stack.push(numberValue(found->second.size()));
                         break;
                     }
                 } else if (IS_STRING(top)) { // string
-                    value_pool.push(numberValue(top.string.size()-2));
+                    value_stack.push(numberValue(top.string.size()-2));
                 } else ERROR("Expected either a string value or list.");
                 break;
             }
             case OP_DECL_LIST_INDEX: {
-                Value listname = value_pool.top();
-                value_pool.pop();
-                Value toassign = value_pool.top();
-                value_pool.pop();
-                Value index = value_pool.top();
-                value_pool.pop();
+                Value listname = value_stack.top();
+                value_stack.pop();
+                Value toassign = value_stack.top();
+                value_stack.pop();
+                Value index = value_stack.top();
+                value_stack.pop();
                 if (!IS_NUM(index)) ERROR("Expected a number.");
                 if (!IS_ID(listname)) ERROR("Expected an identifier.");
                 std::map<std::string, std::vector<Value>>::iterator found;
@@ -661,10 +661,10 @@ Value Machine::run() { // executes the program
             }
             case OP_CONVERT_ASCII: {
                 TOP();
-                if (IS_NUM(top)) value_pool.push(stringValue(std::string("\"") + (char)(int)top.storage.number + "\""));
+                if (IS_NUM(top)) value_stack.push(stringValue(std::string("\"") + (char)(int)top.storage.number + "\""));
                 else if (IS_STRING(top)) {
                     if (top.string.length() != 3) ERROR("Expected a string with sizeof 1, " << top.string.length() << "  " << top.string);
-                    value_pool.push(numberValue(top.string.at(1)));
+                    value_stack.push(numberValue(top.string.at(1)));
                 }
                 else ERROR("Expected a string or number.");
                 break;
@@ -685,7 +685,7 @@ Value Machine::run() { // executes the program
                 TOP();
                 if (!IS_NUM(top)) ERROR("Expected a number.");
                 srand(time(NULL));
-                value_pool.push(numberValue(rand() % (int)top.storage.number));
+                value_stack.push(numberValue(rand() % (int)top.storage.number));
                 break;
             }
             

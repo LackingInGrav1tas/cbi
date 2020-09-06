@@ -111,7 +111,7 @@ void Machine::disassembleConstants() {
 
 void Machine::disassembleStack() {
     COLOR("\n== stack ==\n", DISPLAY_YELLOW);
-    std::stack<Value> copy = value_pool;
+    std::stack<Value> copy = value_stack;
     for (int count = copy.size()-1; !copy.empty(); count--) {
         std::cout << count << ": " << getPrintable(copy.top()) << std::endl;
         copy.pop();

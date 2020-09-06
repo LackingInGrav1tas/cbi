@@ -43,9 +43,6 @@ class Machine {
     //in runtime
     Value run();
 
-    //in build
-    void build();
-
     Machine from(Function fn) {
         Machine call;
         call.opcode = fn.opcode;

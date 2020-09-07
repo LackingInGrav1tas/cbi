@@ -11,12 +11,13 @@ Very much in development.
 <declaration> ::= <statement> | ( <set-variable> | <list-declaration> | (("sleep"|"console"|"throw") <expression>) ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
-<set-variable> ::= "set" ["mut"] IDENTIFIER [":" "ANY"|"STR"|"NUM"|"BOOL"|"VOID"] [ "=" <expression> ] ;
-<fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") [","])* ")" <code-block> ;
-<list-declaration> ::= "list" IDENTIFIER ;
-<infix-declaration> ::= "infix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") "," IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* infix operators must have two params *)
-<prefix-declaration> ::= "prefix" IDENTIFIER "(" IDENTIFIER ":" ("ANY"|"STR"|"NUM"|"BOOL"|"VOID") ")" "precedence" NUMBER <code-block> ; (* prefix operators must have one param *)
+<set-variable> ::= "set" ["mut"] IDENTIFIER [":" <type-specifier>] [ "=" <expression> ] ;
+<fn-declaration> ::= "fn" ["aware"|"blind"] IDENTIFIER "(" (IDENTIFIER ":" <type-specifier> [","])* ")" <code-block> ;
+<infix-declaration> ::= "infix" IDENTIFIER "(" IDENTIFIER ":" <type-specifier> "," IDENTIFIER ":" <type-specifier> ")" "precedence" NUMBER <code-block> ; (* infix operators must have two params *)
+<prefix-declaration> ::= "prefix" IDENTIFIER "(" IDENTIFIER ":" <type-specifier> ")" "precedence" NUMBER <code-block> ; (* prefix operators must have one param *)
 
+
+<type-specifier> ::= "ANY"|"STR"|"NUM"|"BOOL"|"LIST"|"VOID" ;
 <print-statement> ::= "print" <expression> ;
 <if-statement> ::= "if" <group> <flexible-block> [ "else" <flexible-block> ] ;
 <while-statement> ::= "while" <group> <flexible-block> ;
@@ -146,7 +147,7 @@ std::getline(std::cin, input);
 ```
 The important difference is that ```getc``` has no buffer, whereas ```gets``` needs to find the enter key to return.
 ### Conversion ###
-The built-in type conversion uses ```as``` and type specifiers (```NUM```, ```STR```, ```BOOL```, ```VOID```, ```ANY```).
+The built-in type conversion uses ```as``` and type specifiers (```NUM```, ```STR```, ```BOOL```,, ```LIST```(has no conversions), ```VOID```, ```ANY```).
 
 as
 ```
@@ -192,20 +193,31 @@ abc
 
 ```
 ### Lists ###
-Lists are second class, just like functions. This means that they can't be returned or sent as parameters.
+Lists are semi-first class (lists can't contain lists).
 List initialization:
 ```
-list list_name;
+set mut list_obj: LIST = list; # 'list' works like 'null', it returns a blank object.
 ```
 pushing:
 ```
-list_name push "This, for example.";
+list_obj push "This, for example.";
 ```
 popping:
 ```
-pop list_name;
+pop list_obj;
 ```
-
+back:
+```
+print back $list_obj;
+```
+front:
+```
+print front $list_obj;
+```
+both output
+```
+This, for example.
+```
 
 ### Utility ###
 sizeof (not like C's sizeof()):

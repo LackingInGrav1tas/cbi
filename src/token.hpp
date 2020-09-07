@@ -15,7 +15,7 @@ enum Type {
 
     // single length operators
     EQUAL, LESS, GREATER, NOT, PLUS, MINUS, STAR, SLASH, DOT, LEFT_PAREN, RIGHT_PAREN,
-    LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON, COLON, DOLLAR, COMMA, AT,
+    LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON, COLON, DOLLAR, COMMA, AT, LEFT_BRACE, RIGHT_BRACE,
  
     // multiple length operators
     EQUAL_EQUAL, NOT_EQUAL, LESS_EQUAL, GREATER_EQUAL, CONCATENATE, PLUS_EQUALS,
@@ -28,9 +28,9 @@ enum Type {
 
     SIZEOF, ASCII,
 
-    LIST, PUSH, POP, BACK, FRONT, INDEX,
+    LIST, PUSH, POP, BACK, FRONT,
 
-    NUM, STR, _VOID, _BOOL, ANY, // type specifiers
+    NUM, STR, _VOID, _BOOL, _LIST, ANY, // type specifiers
 
     _EOF
 };

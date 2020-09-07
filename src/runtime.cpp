@@ -24,16 +24,19 @@ static bool checkTypes(std::string type, Tag tag) {
     if (type == "ANY") return true;
     if (tag == TYPE_DOUBLE) {
         if (type == "NUM") return true;
-        else return false;
+        return false;
     } else if (tag == TYPE_BOOL) {
         if (type == "BOOL") return true;
-        else return false;
+        return false;
     } else if (tag == TYPE_STRING) {
         if (type == "STR") return true;
-        else return false;
+        return false;
     } else if (tag == TYPE_NULL) {
         if (type == "VOID") return true;
-        else return false;
+        return false;
+    } else if (tag == TYPE_LIST) {
+        if (type == "LIST") return true;
+        return false;
     } else return true;
 }
 
@@ -325,14 +328,12 @@ Value Machine::run() { // executes the program
             }
             case OP_BEGIN_SCOPE: {
                 scopes.push_back(Scope());
-                scoped_lists.push_back(std::map<std::string, std::vector<Value>>());
                 fn_scopes.push_back(std::map<std::string, Function>());
                 break;
             }
             case OP_END_SCOPE: {
                 scopes.pop_back();
                 fn_scopes.pop_back();
-                scoped_lists.pop_back();
                 break;
             }
             case OP_AND: {
@@ -449,7 +450,7 @@ Value Machine::run() { // executes the program
             case OP_CONVERT: {
                 TOP();
                 op++;
-                switch ((int)OP) { // 0 -> num, 1 -> string, 2 -> bool, 3 -> void
+                switch ((int)OP) { // 0 -> num, 1 -> string, 2 -> bool, 3 -> void, 4 -> list
                     case 0: { // x to num
                         if (top.type == TYPE_STRING) {
                             try {
@@ -459,6 +460,7 @@ Value Machine::run() { // executes the program
                             }
                         } else if (top.type == TYPE_DOUBLE) value_stack.push(top);
                         else if (top.type == TYPE_BOOL) value_stack.push(numberValue(top.storage.boolean));
+                        else if (top.type == TYPE_LIST) value_stack.push(numberValue(top.list.size()));
                         else value_stack.push(numberValue(0));
                         break;
                     }
@@ -469,6 +471,7 @@ Value Machine::run() { // executes the program
                             if (top.storage.boolean) value_stack.push(stringValue("\"true\""));
                             else value_stack.push(stringValue("\"false\""));
                         }
+                        else if (top.type == TYPE_LIST) value_stack.push(stringValue("\"" + getPrintable(top) + "\""));
                         else value_stack.push(stringValue("\"\""));
                         break;
                     }
@@ -488,6 +491,15 @@ Value Machine::run() { // executes the program
                     }
                     case 3: { // x to null
                         value_stack.push(nullValue());
+                        break;
+                    }
+                    case 4: { // x to list
+                        if (top.type == TYPE_LIST) value_stack.push(top);
+                        else {
+                            Value list = listValue();
+                            list.list.push_back(ListValue::from(top));
+                            value_stack.push(list);
+                        }
                         break;
                     }
                     default: ERROR("Expected a type specifier.");
@@ -510,6 +522,10 @@ Value Machine::run() { // executes the program
                 if (value_stack.top().type != TYPE_NULL) ERROR("Expected a void value.");
                 break;
             }
+            case OP_REQUIRE_LIST: {
+                if (value_stack.top().type != TYPE_LIST) ERROR("Expected a list value.");
+                break;
+            }
             case OP_AT: {
                 GET_TOP(); // rhs = position, lhs = subject
                 if (!IS_NUM(rhs)) ERROR("Expected a number.");
@@ -518,26 +534,25 @@ Value Machine::run() { // executes the program
                 value_stack.push(stringValue(std::string("\"") + TRIM(lhs.string).at(rhs.storage.number) + "\""));
                 break;
             }
-            case OP_DECL_LIST: {
-                TOP();
-                if (!IS_ID(top)) ERROR("Expected an identifier.");
-
-                scoped_lists.back()[top.string] = std::vector<Value>();
-                break;
-            }
             case OP_PUSH_LIST: {
                 GET_TOP(); // lhs = id, rhs = value
                 if (!IS_ID(lhs)) ERROR("Expected an identifier.");
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(lhs.string);
-                    if (found == scoped_lists[i].end()) {
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(lhs.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << lhs.string << ".");
+                            ERROR("Cannot access variable out of scope, " << lhs.string << ".");
                         }
                         continue;
                     }
-                    found->second.push_back(rhs);
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    if (rhs.type == TYPE_LIST) ERROR("Cannot have nested lists.");
+                    found->second.list.push_back(ListValue::from(rhs));
                     break;
                 }
                 break;
@@ -545,17 +560,21 @@ Value Machine::run() { // executes the program
             case OP_POP_LIST: {
                 TOP();
                 if (!IS_ID(top)) ERROR("Expected an identifier.");
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(top.string);
-                    if (found == scoped_lists[i].end()) {
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(top.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << top.string << ".");
+                            ERROR("Cannot access variable out of scope, " << top.string << ".");
                         }
                         continue;
                     }
-                    if (found->second.size() < 1) ERROR("Cannot pop list with size 0.");
-                    found->second.pop_back();
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    found->second.list.pop_back();
                     break;
                 }
                 break;
@@ -563,17 +582,21 @@ Value Machine::run() { // executes the program
             case OP_BACK_LIST: {
                 TOP();
                 if (!IS_ID(top)) ERROR("Expected an identifier.");
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(top.string);
-                    if (found == scoped_lists[i].end()) {
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(top.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << top.string << ".");
+                            ERROR("Cannot access variable out of scope, " << top.string << ".");
                         }
                         continue;
                     }
-                    if (found->second.size() < 1) ERROR("Cannot get the back of an empty list.");
-                    value_stack.push(found->second.back());
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    value_stack.push(Value::from(found->second.list.back()));
                     break;
                 }
                 break;
@@ -581,17 +604,21 @@ Value Machine::run() { // executes the program
             case OP_FRONT_LIST: {
                 TOP();
                 if (!IS_ID(top)) ERROR("Expected an identifier.");
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(top.string);
-                    if (found == scoped_lists[i].end()) {
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(top.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << top.string << ".");
+                            ERROR("Cannot access variable out of scope, " << top.string << ".");
                         }
                         continue;
                     }
-                    if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
-                    value_stack.push(found->second.front());
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    value_stack.push(Value::from(found->second.list.front()));
                     break;
                 }
                 break;
@@ -600,36 +627,32 @@ Value Machine::run() { // executes the program
                 GET_TOP();
                 if (!IS_ID(lhs)) ERROR("Expected an identifier.");
                 if (!IS_NUM(rhs)) ERROR("Expected a number, rhs = " << rhs.type );
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(lhs.string);
-                    if (found == scoped_lists[i].end()) {
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(lhs.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << lhs.string << ".");
+                            ERROR("Cannot access variable out of scope, " << lhs.string << ".");
                         }
                         continue;
                     }
-                    if (found->second.size() < 1) ERROR("Cannot get the front of an empty list.");
-                    value_stack.push(found->second[rhs.storage.number]);
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    if (rhs.storage.number < 0 || rhs.storage.number >= found->second.list.size()) {
+                        ERROR("Index out of range.");
+                    }
+                    value_stack.push(Value::from(found->second.list[rhs.storage.number]));
                     break;
                 }
                 break;
             }
             case OP_SIZEOF: {
                 TOP();
-                if (IS_ID(top)) { // it should be a list
-                    std::map<std::string, std::vector<Value>>::iterator found;
-                    for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                        found = scoped_lists[i].find(top.string);
-                        if (found == scoped_lists[i].end()) {
-                            if (i == 0) {
-                                ERROR("Cannot find list named " << top.string << ".");
-                            }
-                            continue;
-                        }
-                        value_stack.push(numberValue(found->second.size()));
-                        break;
-                    }
+                if (top.type == TYPE_LIST) { // it should be a list
+                    value_stack.push(numberValue(top.list.size()));
                 } else if (IS_STRING(top)) { // string
                     value_stack.push(numberValue(top.string.size()-2));
                 } else ERROR("Expected either a string value or list.");
@@ -644,17 +667,25 @@ Value Machine::run() { // executes the program
                 value_stack.pop();
                 if (!IS_NUM(index)) ERROR("Expected a number.");
                 if (!IS_ID(listname)) ERROR("Expected an identifier.");
-                std::map<std::string, std::vector<Value>>::iterator found;
-                for (int i = scoped_lists.size()-1; i >= 0; i--) {
-                    found = scoped_lists[i].find(listname.string);
-                    if (found == scoped_lists[i].end()) {
+                if (toassign.type == TYPE_LIST) ERROR("Lists cannot contain lists.");
+                std::map<std::string, Value>::iterator found;
+                for (int i = scopes.size()-1; i >= 0; i--) {
+                    found = scopes[i].variables.find(listname.string);
+                    if (found == scopes[i].variables.end()) {
                         if (i == 0) {
-                            ERROR("Cannot find list named " << listname.string << ".");
+                            ERROR("Cannot access variable out of scope, " << listname.string << ".");
                         }
                         continue;
                     }
-                    if (found->second.size() <= index.storage.number) ERROR("Index out of range. sizeof list: " << found->second.size() << ", index: " << index.storage.number << ".");
-                    found->second[index.storage.number] = toassign;
+
+                    if (std::find(scopes[i].mutables.begin(), scopes[i].mutables.end(), found->first) == scopes[i].mutables.end()) { // if it's immutable
+                        ERROR("Cannot mutate immutable value " << found->first << ". Use syntax: set mut <name>;");
+                    }
+                    if (found->second.type != TYPE_LIST) ERROR("Expected a list variable.");
+                    if (index.storage.number < 0 || index.storage.number >= found->second.list.size()) {
+                        ERROR("Index out of range.");
+                    }
+                    found->second.list[index.storage.number] = ListValue::from(toassign);
                     break;
                 }
                 break;

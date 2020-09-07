@@ -62,7 +62,7 @@ std::string shorten(std::string str) {
     return str;
 }
 
-std::string getPrintable(Value value) {
+std::string getPrintable(ListValue value) {
     switch (value.type) {
         case TYPE_DOUBLE:    return shorten(std::to_string(value.storage.number));
         case TYPE_BOOL:      return std::to_string(value.storage.boolean);
@@ -71,4 +71,47 @@ std::string getPrintable(Value value) {
         case TYPE_ID_LEXEME: return value.string;
         default:             return "error";
     }
+}
+
+std::string getPrintable(Value value) {
+    switch (value.type) {
+        case TYPE_DOUBLE:    return shorten(std::to_string(value.storage.number));
+        case TYPE_BOOL:      return std::to_string(value.storage.boolean);
+        case TYPE_STRING:    return TRIM(value.string);
+        case TYPE_NULL:      return "";
+        case TYPE_ID_LEXEME: return value.string;
+        case TYPE_LIST: {
+            std::string po = "list(";
+            if (value.list.size() > 0)
+                po += getPrintable(value.list[0]);
+            for (int i = 1; i < value.list.size(); i++)
+                po += " ," + getPrintable(value.list[i]);
+            return po + ")";
+        }
+        default:             return "error";
+    }
+}
+
+Value Value::from(ListValue lv) {
+    Value value;
+    value.type = lv.type;
+    value.string = lv.string;
+    value.storage.boolean = lv.storage.boolean;
+    value.storage.number = lv.storage.number;
+    return value;
+}
+
+ListValue ListValue::from(Value v) {
+    ListValue lv;
+    lv.type = v.type;
+    lv.string = v.string;
+    lv.storage.number = v.storage.number;
+    lv.storage.boolean = v.storage.boolean;
+    return lv;
+}
+
+Value listValue() {
+    Value value;
+    value.type = TYPE_LIST;
+    return value;
 }

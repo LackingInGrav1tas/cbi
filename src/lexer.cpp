@@ -49,10 +49,10 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "fn") tokens.push_back(Token(FUN, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "if") tokens.push_back(Token(IF, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "else") tokens.push_back(Token(ELSE, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin())); \
+                    /*else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin()));*/ \
                     else if (lexeme == "while") tokens.push_back(Token(WHILE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "break") tokens.push_back(Token(BREAK, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "new") tokens.push_back(Token(NEW, lexeme, filename, line-lines.begin())); \
+                    /*else if (lexeme == "new") tokens.push_back(Token(NEW, lexeme, filename, line-lines.begin())); */\
                     else if (lexeme == "return") tokens.push_back(Token(RETURN, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "disassemble_constants") tokens.push_back(Token(DIS_C, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "disassemble_stack") tokens.push_back(Token(DIS_ST, lexeme, filename, line-lines.begin())); \
@@ -61,11 +61,12 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "getc") tokens.push_back(Token(GETCH, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "aware") tokens.push_back(Token(AWARE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "blind") tokens.push_back(Token(BLIND, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "struct") tokens.push_back(Token(STRUCT, lexeme, filename, line-lines.begin())); \
+                    /*else if (lexeme == "struct") tokens.push_back(Token(STRUCT, lexeme, filename, line-lines.begin()));*/ \
                     else if (lexeme == "NUM") tokens.push_back(Token(NUM, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "STR") tokens.push_back(Token(STR, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "VOID") tokens.push_back(Token(_VOID, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "BOOL") tokens.push_back(Token(_BOOL, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "LIST") tokens.push_back(Token(_LIST, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "ANY") tokens.push_back(Token(ANY, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "as") tokens.push_back(Token(AS, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "infix") tokens.push_back(Token(INFIX, lexeme, filename, line-lines.begin())); \
@@ -78,7 +79,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "pop") tokens.push_back(Token(POP, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "back") tokens.push_back(Token(BACK, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "front") tokens.push_back(Token(FRONT, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "index") tokens.push_back(Token(INDEX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "at") tokens.push_back(Token(AT_KEYWORD, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "sizeof") tokens.push_back(Token(SIZEOF, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "ascii") tokens.push_back(Token(ASCII, lexeme, filename, line-lines.begin())); \
@@ -216,10 +216,20 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                 }
                 case '{': {
                     PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(LEFT_BRACKET, "{", filename, line-lines.begin()));
+                    tokens.push_back(Token(LEFT_BRACE, "{", filename, line-lines.begin()));
                     break;
                 }
                 case '}': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(RIGHT_BRACE, "}", filename, line-lines.begin()));
+                    break;
+                }
+                case '[': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(LEFT_BRACKET, "{", filename, line-lines.begin()));
+                    break;
+                }
+                case ']': {
                     PUSH_TOKEN(lexeme);
                     tokens.push_back(Token(RIGHT_BRACKET, "}", filename, line-lines.begin()));
                     break;

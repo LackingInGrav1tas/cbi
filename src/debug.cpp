@@ -71,6 +71,7 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_REQUIRE_VOID: COLOR("OP_REQUIRE_VOID", DISPLAY_AQUA); break;
         case OP_REQUIRE_NUM: COLOR("OP_REQUIRE_NUM", DISPLAY_AQUA); break;
         case OP_REQUIRE_STR: COLOR("OP_REQUIRE_STR", DISPLAY_AQUA); break;
+        case OP_REQUIRE_LIST: COLOR("OP_REQUIRE_LIST", DISPLAY_AQUA); break;
         case OP_CONVERT:
             op++;
             COLOR("OP_CONVERT", DISPLAY_AQUA);

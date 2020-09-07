@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
             /*for (int b = 0; b < tokens.size(); b++) {
                 std::cout << tokens[b].lexeme << " ";
                 if (tokens[b].type == SEMICOLON) std::cout << std::endl;
-                if (tokens[b].type == RIGHT_BRACKET) std::cout << std::endl;
-                if (tokens[b].type == LEFT_BRACKET) std::cout << std::endl;
+                if (tokens[b].type == RIGHT_BRACE) std::cout << std::endl;
+                if (tokens[b].type == LEFT_BRACE) std::cout << std::endl;
             }*/
 
             if (debugmode) {

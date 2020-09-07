@@ -476,11 +476,35 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 token++;
                 if (!CHECK(RIGHT_BRACKET)) ERROR("Expected a ']'");
                 token++;
+                Type expected_type = _EOF;
+                if (CHECK(COLON)) {
+                    token++;
+                    if (!CHECK(NUM) && !CHECK(STR) && !CHECK(_VOID) && !CHECK(_BOOL) && !CHECK(_LIST)) ERROR("Expected a type specifier ('NUM', 'STR', 'BOOL', 'LIST', 'VOID').");
+                    expected_type = TOKEN.type;
+                    token++;
+                }
                 if (!CHECK(EQUAL)) ERROR("Expected '='.");
                 token++;
                 expression(1);
                 token++;
                 SEMICOLON();
+                switch (expected_type) {
+                    case NUM:
+                        vm.writeOp(TOKEN.line, OP_REQUIRE_NUM);
+                        break;
+                    case STR:
+                        vm.writeOp(TOKEN.line, OP_REQUIRE_STR);
+                        break;
+                    case _BOOL:
+                        vm.writeOp(TOKEN.line, OP_REQUIRE_BOOL);
+                        break;
+                    case _VOID:
+                        vm.writeOp(TOKEN.line, OP_REQUIRE_VOID);
+                        break;
+                    case _LIST:
+                        vm.writeOp(TOKEN.line, OP_REQUIRE_LIST);
+                        break;
+                }
                 vm.writeConstant(TOKEN.line, idLexeme(id));
                 vm.writeOp(TOKEN.line, OP_DECL_LIST_INDEX);
             } else {

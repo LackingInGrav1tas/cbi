@@ -50,30 +50,21 @@ enum Tag {
     TYPE_OK, TYPE_RT_ERROR, TYPE_DOUBLE, TYPE_BOOL, TYPE_NULL, TYPE_STRING, TYPE_ID_LEXEME, TYPE_LIST
 };
 
-struct Value;
-
-struct ListValue {
-    Tag type;
-    std::string string;
-    union {
-        double number;
-        bool boolean;
-    } storage;
-    static ListValue from(Value v);
-};
-
 struct Value {
     Tag type;
     std::string string;
-    std::vector<ListValue> list;
+    std::vector<Value *> list;
     union {
         double number;
         bool boolean;
     } storage;
-    static Value from(ListValue lv);
 };
 
-Value listValue();
+template <typename T>
+void delete_list(std::vector<T*> &list) {
+    for (auto it = list.begin(); it < list.end(); it++)
+        delete *it;
+}
 
 struct Scope {
     std::map<std::string, Value> variables;
@@ -114,6 +105,10 @@ Value boolValue(bool boolean);
 
 Value nullValue();
 
+Value listValue();
+
+Value listValue(Value v);
+
 Value exitRT();
 
 Value exitOK();
@@ -127,6 +122,10 @@ std::string getPrintable(Value value);
 #define IS_STRING(value) ((value).type == TYPE_STRING)
 
 #define IS_ID(value) ((value).type == TYPE_ID_LEXEME)
+
+#define IS_LIST(value) ((value).type == TYPE_LIST)
+
+#define IS_NULL(value) ((value).type == TYPE_NULL)
 
 #define TRIM(string) string.substr(1, string.length()-2)
 

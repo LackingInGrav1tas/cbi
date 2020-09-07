@@ -193,7 +193,7 @@ abc
 
 ```
 ### Lists ###
-Lists are semi-first class (lists can't contain lists).
+Lists are first class objects.
 List initialization:
 ```
 set mut list_obj: LIST = list; # 'list' works like 'null', it returns a blank object.
@@ -217,6 +217,28 @@ print front $list_obj;
 both output
 ```
 This, for example.
+```
+
+Example program:
+```
+set mut L = list;
+L push "front";
+L push 35;
+L push null;
+set L[2] = "back"; #type specifiers do work
+println $L[2];
+println back $L;
+println front $L;
+println $L as STR;
+
+print "abcd" as LIST;
+```
+```
+back
+back
+front
+list(front, 35, back)
+list(abcd)
 ```
 
 ### Utility ###

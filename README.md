@@ -8,7 +8,7 @@ Very much in development.
 ```EBNF
 <code> ::= <declaration>* ;
 
-<declaration> ::= <statement> | ( <set-variable> | <list-declaration> | (("sleep"|"console"|"throw") <expression>) ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
+<declaration> ::= <statement> | ( <set-variable> | (("sleep"|"console"|"throw") <expression>) ";" ) | <fn-declaration> | <infix-declaration> | <prefix-declaration> ;
 
 <statement> ::= (<expression> | <print-statement> | ("break" | "disassemble_constants" | "disassemble_stack" | "disassemble_scopes" | ("gets"|"getc" IDENTIFIER) ";")) | <if-statement> | <while-statement> | <code-block> ;
 <set-variable> ::= "set" ["mut"] IDENTIFIER [":" <type-specifier>] [ "=" <expression> ] ;
@@ -34,7 +34,7 @@ Very much in development.
 <infix> ::= <expression> ("-" | "+" | "*" | "/" | ">" | "<" | "=" | ("!" | ">" | "<" | "||" | "=" | "+" |"-" | "*" |"/"  "=") | "push" | "and" | "or" | "at" | "index" | IDENTIFIER(* custom ops *) |  ) <expression> ;
 <prefix> ::=  ("!" | "-" | "$" | "@"  | "rand" | "pop" | "ascii" |"sizeof" | "front" | "back" | IDENTIFIER(* custom ops *)) <expression> ;
 
-<literal> ::= STRING | NUMBER | "true" | "false" | "null" ;
+<literal> ::= STRING | NUMBER | "true" | "false" | "null" | "list" ;
 ```
 
 ## Code Snippets ##
@@ -245,9 +245,9 @@ list(abcd)
 sizeof (not like C's sizeof()):
 ```
 print "sizeof (on string): " || sizeof "this" || "\n" ;
-list list_example;
+set mut list_example = list;
 list_example push 0;
-print "sizeof (on list): " || sizeof list_example;
+print "sizeof (on list): " || sizeof $list_example;
 ```
 ```
 sizeof (on string): 4

@@ -86,6 +86,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "console") tokens.push_back(Token(CONSOLE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "sleep") tokens.push_back(Token(SLEEP, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "rand") tokens.push_back(Token(RAND, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "floor") tokens.push_back(Token(FLOOR, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

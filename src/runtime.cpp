@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <conio.h>
 #include <time.h>
+#include <math.h>
 
 #include "color.hpp"
 #include "vm.hpp"
@@ -679,6 +680,12 @@ Value Machine::run() { // executes the program
                 if (!IS_NUM(top)) ERROR("Expected a number.");
                 srand(time(NULL));
                 value_stack.push(numberValue(rand() % (int)top.storage.number));
+                break;
+            }
+            case OP_FLOOR: {
+                TOP();
+                if (!IS_NUM(top)) ERROR("Expected a number.");
+                value_stack.push(numberValue(floor(top.storage.number)));
                 break;
             }
             

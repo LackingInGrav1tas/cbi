@@ -1,0 +1,18 @@
+println "Guess a (lowercase) letter in the alphabet";
+
+set correct = ascii ((rand 26) + 97);
+
+set mut guesses = 0;
+set mut getch: STR;
+
+while (true) {
+    getc getch;
+    guesses += 1;
+
+        if ($getch == $correct) {
+        print "Good job, you guessed " || $getch || "! It took you " || $guesses || " tries.";
+        return 0;
+    } else if ($getch == "*") throw "* found. Exiting...";
+
+    println $getch || " is wrong...";
+}

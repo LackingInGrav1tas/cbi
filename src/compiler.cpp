@@ -235,6 +235,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeOp(TOKEN.line, OP_RAND);
                 break;
             }
+            case FLOOR: {
+                token++;
+                expression(8);
+                vm.writeOp(TOKEN.line, OP_FLOOR);
+                break;
+            }
             case _EOF: break;
             default: {
                 ERROR("Expected an expression.");

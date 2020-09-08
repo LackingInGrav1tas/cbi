@@ -162,7 +162,24 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 break;
             }
             case LIST: {
-                vm.writeConstant(TOKEN.line, listValue());
+                if (NEXT.type == LEFT_PAREN) {
+                    token += 2;
+                    int arity = -1; // -1 because of )
+                    while (true) {
+                        arity++;
+                        if (CHECK(RIGHT_PAREN)) break;
+                        expression(1);
+                        token++;
+                        if (CHECK(COMMA)) {
+                            token++;
+                            if (CHECK(RIGHT_PAREN)) ERROR("Expected an expression.");
+                        }
+                    }
+                    if (!CHECK(RIGHT_PAREN)) ERROR("Expected ')'.");
+                    vm.writeConstant(TOKEN.line, numberValue(arity));
+                    vm.writeOp(TOKEN.line, OP_LIST_FN);
+                } else
+                    vm.writeConstant(TOKEN.line, listValue());
                 break;
             }
             case IDENTIFIER: {

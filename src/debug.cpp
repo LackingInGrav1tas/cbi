@@ -10,89 +10,92 @@
 
 void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> constants, std::vector<int> lines, int position) {
     printf("\n| byte %04d lines %04d | ", position, lines[position]);
+    #define DBCOL(str) COLOR(str, DISPLAY_AQUA)
     switch (*op) {
         case OP_CONSTANT:
             op++;
-            COLOR("OP_CONSTANT", DISPLAY_AQUA);
+            DBCOL("OP_CONSTANT");
             std::cout << "  position: " << (int) *op << "  value: " << getPrintable(constants[*op]);
             break;
-        case OP_PRINT_TOP: COLOR("OP_PRINT_TOP", DISPLAY_AQUA); break;
-        case OP_NEGATE: COLOR("OP_NEGATE", DISPLAY_AQUA); break;
-        case OP_NOT: COLOR("OP_NOT", DISPLAY_AQUA); break;
-        case OP_ADD: COLOR("OP_ADD", DISPLAY_AQUA); break;
-        case OP_SUB: COLOR("OP_SUB", DISPLAY_AQUA); break;
-        case OP_MUL: COLOR("OP_MUL", DISPLAY_AQUA); break;
-        case OP_DIV: COLOR("OP_DIV", DISPLAY_AQUA); break;
-        case OP_CONCATENATE: COLOR("OP_CONCATENATE", DISPLAY_AQUA); break;
+        case OP_PRINT_TOP: DBCOL("OP_PRINT_TOP"); break;
+        case OP_NEGATE: DBCOL("OP_NEGATE"); break;
+        case OP_NOT: DBCOL("OP_NOT"); break;
+        case OP_ADD: DBCOL("OP_ADD"); break;
+        case OP_SUB: DBCOL("OP_SUB"); break;
+        case OP_MUL: DBCOL("OP_MUL"); break;
+        case OP_DIV: DBCOL("OP_DIV"); break;
+        case OP_CONCATENATE: DBCOL("OP_CONCATENATE"); break;
         case OP_JUMP_FALSE_IFv:
         case OP_JUMP_FALSE:
-            COLOR("OP_JUMP_FALSE", DISPLAY_AQUA);
+            DBCOL("OP_JUMP_FALSE");
             std::cout << " to " << (int) *(op+1);
             op++;
             break;
-        case OP_BREAK: COLOR("OP_BREAK", DISPLAY_AQUA); break;
+        case OP_BREAK: DBCOL("OP_BREAK"); break;
         case OP_JUMP:
-            COLOR("OP_JUMP", DISPLAY_AQUA);
+            DBCOL("OP_JUMP");
             std::cout << " to " << (int) *(op+1);
             op++;
             break;
-        case OP_EQUALITY: COLOR("OP_EQUALITY", DISPLAY_AQUA); break;
-        case OP_LESS: COLOR("OP_LESS", DISPLAY_AQUA); break;
-        case OP_GREATER: COLOR("OP_GREATER", DISPLAY_AQUA); break;
-        case OP_LESS_EQ: COLOR("OP_LESS_EQ", DISPLAY_AQUA); break;
-        case OP_GREATER_EQ: COLOR("OP_GREATER_EQ", DISPLAY_AQUA); break;
-        case OP_NOT_EQ: COLOR("OP_NOT_EQ", DISPLAY_AQUA); break;
-        case OP_POP_TOP: COLOR("OP_POP_TOP", DISPLAY_AQUA); break;
+        case OP_EQUALITY: DBCOL("OP_EQUALITY"); break;
+        case OP_LESS: DBCOL("OP_LESS"); break;
+        case OP_GREATER: DBCOL("OP_GREATER"); break;
+        case OP_LESS_EQ: DBCOL("OP_LESS_EQ"); break;
+        case OP_GREATER_EQ: DBCOL("OP_GREATER_EQ"); break;
+        case OP_NOT_EQ: DBCOL("OP_NOT_EQ"); break;
+        case OP_POP_TOP: DBCOL("OP_POP_TOP"); break;
         case OP_DECL_FN: {
             op++;
-            COLOR("OP_DECL_FN", DISPLAY_AQUA);
+            DBCOL("OP_DECL_FN");
             std::cout << " with " << (int)*op;
             break;
         }
-        case OP_VARIABLE: COLOR("OP_VARIABLE", DISPLAY_AQUA); break;
-        case OP_VARIABLE_MUT: COLOR("OP_VARIABLE_MUT", DISPLAY_AQUA); break;
+        case OP_VARIABLE: DBCOL("OP_VARIABLE"); break;
+        case OP_VARIABLE_MUT: DBCOL("OP_VARIABLE_MUT"); break;
         case OP_RETRIEVE:
             op++;
-            COLOR("OP_RETRIEVE", DISPLAY_AQUA);
+            DBCOL("OP_RETRIEVE");
             std::cout << "  position: " << (int) *op << "  lexeme: " << constants[*op].string;
             break;
-        case OP_SET_VARIABLE: COLOR("OP_SET_VARIABLE", DISPLAY_AQUA); break;
-        case OP_IMUT: COLOR("OP_IMUT", DISPLAY_AQUA); break;
-        case OP_BEGIN_SCOPE: COLOR("OP_BEGIN_SCOPE", DISPLAY_AQUA); break;
-        case OP_END_SCOPE: COLOR("OP_END_SCOPE", DISPLAY_AQUA); break;
-        case OP_CALL: COLOR("OP_CALL", DISPLAY_AQUA); break;
-        case OP_EMPTY_STACK: COLOR("OP_EMPTY_STACK", DISPLAY_AQUA); break;
-        case OP_RETURN_TOP: COLOR("OP_RETURN_TOP", DISPLAY_AQUA); break;
-        case OP_DISASSEMBLE_CONSTANTS: COLOR("OP_DISASSEMBLE_CONSTANTS", DISPLAY_AQUA); break;
-        case OP_DISASSEMBLE_SCOPES: COLOR("OP_DISASSEMBLE_SCOPES", DISPLAY_AQUA); break;
-        case OP_DISASSEMBLE_STACK: COLOR("OP_DISASSEMBLE_STACK", DISPLAY_AQUA); break;
-        case OP_AT: COLOR("OP_AT", DISPLAY_AQUA); break;
-        case OP_REQUIRE_BOOL: COLOR("OP_REQUIRE_BOOL", DISPLAY_AQUA); break;
-        case OP_REQUIRE_VOID: COLOR("OP_REQUIRE_VOID", DISPLAY_AQUA); break;
-        case OP_REQUIRE_NUM: COLOR("OP_REQUIRE_NUM", DISPLAY_AQUA); break;
-        case OP_REQUIRE_STR: COLOR("OP_REQUIRE_STR", DISPLAY_AQUA); break;
-        case OP_REQUIRE_LIST: COLOR("OP_REQUIRE_LIST", DISPLAY_AQUA); break;
+        case OP_SET_VARIABLE: DBCOL("OP_SET_VARIABLE"); break;
+        case OP_IMUT: DBCOL("OP_IMUT"); break;
+        case OP_BEGIN_SCOPE: DBCOL("OP_BEGIN_SCOPE"); break;
+        case OP_END_SCOPE: DBCOL("OP_END_SCOPE"); break;
+        case OP_CALL: DBCOL("OP_CALL"); break;
+        case OP_EMPTY_STACK: DBCOL("OP_EMPTY_STACK"); break;
+        case OP_RETURN_TOP: DBCOL("OP_RETURN_TOP"); break;
+        case OP_DISASSEMBLE_CONSTANTS: DBCOL("OP_DISASSEMBLE_CONSTANTS"); break;
+        case OP_DISASSEMBLE_SCOPES: DBCOL("OP_DISASSEMBLE_SCOPES"); break;
+        case OP_DISASSEMBLE_STACK: DBCOL("OP_DISASSEMBLE_STACK"); break;
+        case OP_AT: DBCOL("OP_AT"); break;
+        case OP_REQUIRE_BOOL: DBCOL("OP_REQUIRE_BOOL"); break;
+        case OP_REQUIRE_VOID: DBCOL("OP_REQUIRE_VOID"); break;
+        case OP_REQUIRE_NUM: DBCOL("OP_REQUIRE_NUM"); break;
+        case OP_REQUIRE_STR: DBCOL("OP_REQUIRE_STR"); break;
+        case OP_REQUIRE_LIST: DBCOL("OP_REQUIRE_LIST"); break;
         case OP_CONVERT:
             op++;
-            COLOR("OP_CONVERT", DISPLAY_AQUA);
+            DBCOL("OP_CONVERT");
             std::cout << " to " << (int)*op;
-        case OP_DECL_LIST: COLOR("OP_DECL_LIST", DISPLAY_AQUA); break;
-        case OP_PUSH_LIST: COLOR("OP_PUSH_LIST", DISPLAY_AQUA); break;
-        case OP_POP_LIST: COLOR("OP_POP_LIST", DISPLAY_AQUA); break;
-        case OP_BACK_LIST: COLOR("OP_BACK_LIST", DISPLAY_AQUA); break;
-        case OP_FRONT_LIST: COLOR("OP_FRONT_LIST", DISPLAY_AQUA); break;
-        case OP_INDEX_LIST: COLOR("OP_INDEX_LIST", DISPLAY_AQUA); break;
-        case OP_SIZEOF: COLOR("OP_SIZEOF", DISPLAY_AQUA); break;
-        case OP_DECL_LIST_INDEX: COLOR("OP_DECL_LIST_INDEX", DISPLAY_AQUA); break;
-        case OP_CONVERT_ASCII: COLOR("OP_CONVERT_ASCII", DISPLAY_AQUA); break;
-        case OP_GETCH: COLOR("OP_GETCH", DISPLAY_AQUA); break;
-        case OP_GETS: COLOR("OP_GETS", DISPLAY_AQUA); break;
-        case OP_THROW: COLOR("OP_THROW", DISPLAY_AQUA); break;
-        case OP_CONSOLE: COLOR("OP_CONSOLE", DISPLAY_AQUA); break;
+        case OP_DECL_LIST: DBCOL("OP_DECL_LIST"); break;
+        case OP_PUSH_LIST: DBCOL("OP_PUSH_LIST"); break;
+        case OP_POP_LIST: DBCOL("OP_POP_LIST"); break;
+        case OP_BACK_LIST: DBCOL("OP_BACK_LIST"); break;
+        case OP_FRONT_LIST: DBCOL("OP_FRONT_LIST"); break;
+        case OP_INDEX_LIST: DBCOL("OP_INDEX_LIST"); break;
+        case OP_SIZEOF: DBCOL("OP_SIZEOF"); break;
+        case OP_DECL_LIST_INDEX: DBCOL("OP_DECL_LIST_INDEX"); break;
+        case OP_CONVERT_ASCII: DBCOL("OP_CONVERT_ASCII"); break;
+        case OP_GETCH: DBCOL("OP_GETCH"); break;
+        case OP_GETS: DBCOL("OP_GETS"); break;
+        case OP_THROW: DBCOL("OP_THROW"); break;
+        case OP_CONSOLE: DBCOL("OP_CONSOLE"); break;
+        case OP_LIST_FN: DBCOL("OP_LIST_FN"); break;
         default:
             COLOR("bug in opcode, could not identify command.", DISPLAY_RED);
             break;
     }
+    #undef DBCOL
     std::cerr << "   ";
 }
 

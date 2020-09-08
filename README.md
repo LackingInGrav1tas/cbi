@@ -198,6 +198,7 @@ Lists are first class objects.
 List initialization:
 ```
 set mut list_obj: LIST = list; # 'list' works like 'null', it returns a blank object.
+set list_obj = list(1, 2, 3); # 'list' can also do this
 ```
 pushing:
 ```

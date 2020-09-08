@@ -688,6 +688,23 @@ Value Machine::run() { // executes the program
                 value_stack.push(numberValue(floor(top.storage.number)));
                 break;
             }
+            case OP_LIST_FN: {
+                TOP();
+                if (!IS_NUM(top)) ERROR("Expected a number.");
+
+                Value list = listValue();
+
+                if (top.storage.number > value_stack.size()) ERROR("Stack underflow.");
+                for (int i = 0; i < top.storage.number; i++) {
+                    Value *item = new Value;
+                    *item = value_stack.top();
+                    value_stack.pop();
+                    list.list.insert(list.list.begin(), item);
+                }
+
+                value_stack.push(list);
+                break;
+            }
             
             case OP_DISASSEMBLE_CONSTANTS: {
                 disassembleConstants();

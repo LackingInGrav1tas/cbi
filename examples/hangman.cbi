@@ -1,0 +1,84 @@
+fn cls() {
+    if ($OS_UNIX or $OS_FBSD or $OS_ANDR or $OS_MAC) console "clear";
+    else if ($OS_WIN) console "cls";
+}
+
+fn hangman_graphic(num: NUM) {
+    if ($num == 7)      return " ________\n|        |\n|        0\n|       /|\\n|       / \\n|\nGAME OVER";
+    else if ($num == 6) return " ________\n|        |\n|        0\n|       /|\\n|       /\n|";
+    else if ($num == 5) return " ________\n|        |\n|        0\n|       /|\\n|\n|";
+    else if ($num == 4) return " ________\n|        |\n|        0\n|       /|\n|\n|";
+    else if ($num == 3) return " ________\n|        |\n|        0\n|        |\n|\n|";
+    else if ($num == 2) return " ________\n|        |\n|        0\n|\n|\n|";
+    else if ($num == 1) return " ________\n|        |\n|\n|\n|\n|";
+    else if ($num == 0) return " ________\n|\n|\n|\n|\n|";
+}
+
+fn printlist(l: LIST) {
+    set mut i = 0;
+    while ($i < sizeof $l) {
+        print $l[$i] || " ";
+        i += 1;
+    }
+}
+
+fn aware in() {
+    set mut i = 0;
+    while ($i < sizeof $word_list) {
+        if ($word_list[$i] == $guess) {
+            set word_list[$i] = null;
+            set print_list[$i] = $guess;
+            return true;
+        }
+        i += 1;
+    }
+    return false;
+}
+
+fn done(l: LIST) {
+    set mut i = 0;
+    while ($i < sizeof $l) {
+        if ($l[$i] != null) return false;
+        i += 1;
+    }
+    return true;
+}
+
+set mut word;
+print "Enter a phrase/word to guess: ";
+gets word;
+@cls();
+set mut word_list = list;
+set mut print_list = list;
+set mut i = 0;
+while ($i < sizeof $word) {
+    word_list push $word at $i;
+    print_list push "_";
+    i += 1;
+}
+
+set mut wrong_guesses = 0;
+set mut guessed = list;
+set mut guess: STR;
+while (true) {
+    println @hangman_graphic($wrong_guesses);
+    if ($wrong_guesses == 7) return 0;
+    
+    @printlist($print_list);
+
+    if (@done($word_list)) {
+        print "\nYou win!";
+        return 0;
+    }
+
+    print "\nguessed: ";
+    @printlist($guessed);
+
+    print "\nWhat do you guess? ";
+    getc guess;
+    guessed push $guess;
+
+    if (!@in()) wrong_guesses += 1;
+
+    @cls();
+}

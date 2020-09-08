@@ -1,7 +1,8 @@
 # cbi #
 
 Your average bytecode interpreter. C++ IR/VM instead of C because at the moment I don't want to write up all the garbage collection or use non-growable arrays. Might change in the future.
-Very much in development.
+
+Notice: Weird stuff happens when ifs are used inside of while blocks. ```aware``` functions can be used to as a replacement to ifs, as they create seperate machines.
 
 
 ## Grammar EBNF ##
@@ -301,6 +302,14 @@ throw "Get me outta here!";
 Run-time Error in line 1: Get me outta here!
 ```
 
+floor:
+```
+print floor 45.9;
+```
+```
+45
+```
+
 ## The Standard Library ##
 The way I implemented the STL is inefficient because I don't want to write the opcode by hand.
 ### Constants ###
@@ -380,5 +389,11 @@ infix exp(lhs: NUM, rhs: NUM) precedence 5 {
         i += 1;
     }
     return $lhs;
+}
+```
+```mod```:
+```
+infix mod(lhs: NUM, rhs: NUM) precedence 5 {
+    return $lhs - $rhs*floor($lhs/$rhs);
 }
 ```

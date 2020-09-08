@@ -4,14 +4,14 @@ fn cls() {
 }
 
 fn hangman_graphic(num: NUM) {
-    if ($num == 7)      return " ________\n|        |\n|        0\n|       /|\\n|       / \\n|\nGAME OVER";
-    else if ($num == 6) return " ________\n|        |\n|        0\n|       /|\\n|       /\n|";
-    else if ($num == 5) return " ________\n|        |\n|        0\n|       /|\\n|\n|";
-    else if ($num == 4) return " ________\n|        |\n|        0\n|       /|\n|\n|";
-    else if ($num == 3) return " ________\n|        |\n|        0\n|        |\n|\n|";
-    else if ($num == 2) return " ________\n|        |\n|        0\n|\n|\n|";
-    else if ($num == 1) return " ________\n|        |\n|\n|\n|\n|";
-    else if ($num == 0) return " ________\n|\n|\n|\n|\n|";
+    if ($num == 7)       return " ________\n|        |\n|        0\n|       /|\\n|       / \\n|\nGAME OVER";
+    else if ($num == 6)  return " ________\n|        |\n|        0\n|       /|\\n|       /\n|";
+    else if ($num == 5)  return " ________\n|        |\n|        0\n|       /|\\n|\n|";
+    else if ($num == 4)  return " ________\n|        |\n|        0\n|       /|\n|\n|";
+    else if ($num == 3)  return " ________\n|        |\n|        0\n|        |\n|\n|";
+    else if ($num == 2)  return " ________\n|        |\n|        0\n|\n|\n|";
+    else if ($num == 1)  return " ________\n|        |\n|\n|\n|\n|";
+    else if ($num == 0)  return " ________\n|\n|\n|\n|\n|";
 }
 
 fn printlist(l: LIST) {
@@ -24,15 +24,16 @@ fn printlist(l: LIST) {
 
 fn aware in() {
     set mut i = 0;
+    set mut found = false;
     while ($i < sizeof $word_list) {
         if ($word_list[$i] == $guess) {
             set word_list[$i] = null;
             set print_list[$i] = $guess;
-            return true;
+            found = true;
         }
         i += 1;
     }
-    return false;
+    return $found;
 }
 
 fn done(l: LIST) {
@@ -50,10 +51,21 @@ gets word;
 @cls();
 set mut word_list = list;
 set mut print_list = list;
+
+fn to(a: STR) {
+    if ($a == " ") return " ";
+    else return "_";
+}
+
+fn aware fault() {
+    if ($word at $i != " ") word_list push $word at $i;
+    else word_list push null;
+}
+
 set mut i = 0;
 while ($i < sizeof $word) {
-    word_list push $word at $i;
-    print_list push "_";
+    @fault();
+    print_list push @to($word at $i);
     i += 1;
 }
 

@@ -61,6 +61,11 @@ Value Machine::run() { // executes the program
             COLOR("Run-time Error", DISPLAY_RED); \
             std::cerr << " in line " << lines[op-opcode.begin()]-9 << ": " << message; \
             std::cerr.flush(); \
+            while (!scopes.empty()) { \
+                for (auto it = scopes.back().variables.begin(); it != scopes.back().variables.end(); it++) \
+                    delete_list(it->second.list); \
+                scopes.pop_back(); \
+            } \
             return exitRT(); \
         } while (false)
 

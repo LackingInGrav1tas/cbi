@@ -62,8 +62,10 @@ struct Value {
 
 template <typename T>
 void delete_list(std::vector<T*> &list) {
-    for (auto it = list.begin(); it < list.end(); it++)
-        delete *it;
+    while (!list.empty()) {
+        delete list.back();
+        list.pop_back();
+    }
 }
 
 struct Scope {

@@ -92,7 +92,7 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_CONSOLE: DBCOL("OP_CONSOLE"); break;
         case OP_LIST_FN: DBCOL("OP_LIST_FN"); break;
         default:
-            COLOR("bug in opcode, could not identify command.", DISPLAY_RED);
+            COLOR("bug in opcode, could not identify command: " + (int)*op, DISPLAY_RED);
             break;
     }
     #undef DBCOL

@@ -74,7 +74,10 @@ set mut guessed = list;
 set mut guess: STR;
 while (true) {
     println @hangman_graphic($wrong_guesses);
-    if ($wrong_guesses == 7) return 0;
+    if ($wrong_guesses == 7) {
+        print $word;
+        return 0;
+    }
     
     @printlist($print_list);
 

@@ -2,8 +2,7 @@
 
 Your average bytecode interpreter. C++ IR/VM instead of C because at the moment I don't want to write up all the garbage collection or use non-growable arrays. Might change in the future.
 
-Notice: Weird stuff happens when ifs are used inside of while blocks. ```aware``` functions can be used to as a replacement to ifs, as they create seperate machines.
-
+Notice: Lists sometimes do weird stuff. Dunno why.
 
 ## Grammar EBNF ##
 ```EBNF
@@ -148,7 +147,7 @@ std::getline(std::cin, input);
 ```
 The important difference is that ```getc``` has no buffer, whereas ```gets``` needs to find the enter key to return.
 ### Conversion ###
-The built-in type conversion uses ```as``` and type specifiers (```NUM```, ```STR```, ```BOOL```,, ```LIST```(has no conversions), ```VOID```, ```ANY```).
+The built-in type conversion uses ```as``` and type specifiers (```NUM```, ```STR```, ```BOOL```, ```LIST```, ```VOID```, ```ANY```).
 
 as
 ```
@@ -194,6 +193,9 @@ abc
 
 ```
 ### Lists ###
+
+BEWARE: Lists show some weird / program breaking behavior
+
 Lists are first class objects.
 List initialization:
 ```

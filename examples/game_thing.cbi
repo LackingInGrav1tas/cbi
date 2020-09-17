@@ -1,0 +1,67 @@
+fn aware printarr() {
+    set mut total = $message || "\n ________________________________ \n|";
+    set mut o = 0;
+    while ($o < 16) {
+        set mut i = 0;
+        while ($i < 32) {
+            if ($o == $y and $i == $x) total ||= "@";
+            else if ($o == $goaly and $i == $goalx) total ||= "0";
+            else total ||= " ";
+            i += 1;
+        }
+        if ($o != 15) total ||= "|\n|";
+        else {
+            total ||= "|\n" || ascii (192);
+            set mut _ = 0;
+            while ($_ < 32) {
+                total ||= ascii 196;
+                _ += 1;
+            }
+            total ||= ascii (217) || "\n";
+        }
+        o += 1;
+    }
+    print $total;
+}
+
+fn game_instance() {
+    set mut x = 0;
+    set mut y = 0;
+    set goalx = rand(32);
+    set goaly = rand(16);
+    
+    set mut message = "press h for help.";
+
+    while (true) {
+        #print the "array"
+        @printarr();
+        println "x: " || $x || "  y: " || $y || "  score: " || $score;
+
+        set mut c;
+        getc c;
+        
+        console "cls";
+        
+        if ($c == "w") y = ($y - 1) mod 16;
+        else if ($c == "s") y = ($y + 1) mod 16;
+        else if ($c == "a") x = ($x - 1) mod 32;
+        else if ($c == "d") x = ($x + 1) mod 32;
+
+        else if ($c == "e") throw "game over";
+
+        else if ($c == "h") {
+            println "w: up\na: left\ns: down\nd: right\ne: exit";
+            console "pause && cls";
+        }
+
+        else message = "Unknown command '" || $c || "'";
+
+        if ($x == $goalx and $y == $goaly) {
+            score += 1;
+            return true;
+        }
+    }
+}
+
+set mut score = 0;
+while (true) @game_instance();

@@ -1,5 +1,7 @@
+set num = @input("to what number would you like to count? ") as NUM;
+
 set mut i: NUM = 0;
-while ($i < 100) {
+while ($i < $num) {
     i += 1;
 
     if ($i mod 15 == 0)      print "FizzBuzz";

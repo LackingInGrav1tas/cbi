@@ -1,0 +1,16 @@
+set rows = (@input("how many rows? ") as NUM + 1) * 2;
+set mut r = 0;
+while ($r < $rows) {
+    set mut p = 0;
+    while ($p < ($rows-$r)/2) {
+        p += 1;
+        print " ";
+    }
+    set mut i = 0;
+    while ($i < $r-1) {
+        print "*";
+        i += 1;
+    }
+    r += 2;
+    println "";
+}

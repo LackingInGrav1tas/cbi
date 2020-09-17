@@ -1,0 +1,11 @@
+set h = @input("height of triangle: ") as NUM;
+set mut ch = 0;
+while ($ch < $h) {
+    ch += 1;
+    set mut i = 0;
+    while ($i < $ch) {
+        i += 1;
+        print "*";
+    }
+    print "\n";
+}

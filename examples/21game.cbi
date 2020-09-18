@@ -18,7 +18,7 @@ fn best_move() {
 }
 
 while (true) { #game loop
-    println "total: " || $total;
+    println "\ntotal: " || $total;
     set player_choice = @input("1, 2, or 3: ") as NUM;
     @assert($player_choice == 1 or $player_choice == 2 or $player_choice == 3); # lazy
     total += $player_choice;

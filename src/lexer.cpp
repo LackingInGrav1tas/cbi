@@ -123,6 +123,11 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                                 lexeme.push_back('\n');
                                 continue;
                             }
+                            if (lexeme.back() == '\\' && c == 'r') {
+                                lexeme.pop_back();
+                                lexeme.push_back('\r');
+                                continue;
+                            }
                         }
                         lexeme += c;
                     }

@@ -1,0 +1,23 @@
+set mut percent = 0;
+set BAR_SIZE = 80;
+
+while ($percent < 1) {
+    print " [";
+    set mut _i = 0;
+    while ($_i < $BAR_SIZE) {
+        if ($_i <= $BAR_SIZE*$percent) print ascii 178;
+        else print " ";
+        _i += 1;
+    }
+    print "] " || $percent*100 || "%\r";
+    sleep 250;
+    percent += 0.034;
+}
+
+print " [";
+set mut _i = 0;
+while ($_i < 101) {
+    print ascii 178;
+    _i += 1;
+}
+print "] 100%";

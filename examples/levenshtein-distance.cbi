@@ -1,0 +1,21 @@
+set string_one = @input("Enter a string: ");
+set string_two = @input("Enter a string to compare against ^: ");
+
+set mut lev_distance = 0;
+
+set mut smallest;
+if (sizeof $string_one > sizeof $string_two) {
+    smallest = sizeof $string_two;
+    lev_distance += sizeof $string_one - $smallest;
+} else {
+    smallest = sizeof $string_one;
+    lev_distance += sizeof $string_two - $smallest;
+}
+
+set mut i = 0;
+while ($i < $smallest) {
+    if ($string_one at $i != $string_two at $i) lev_distance += 1;
+    i += 1;
+}
+
+print "The Levenshtein distance is " || $lev_distance;

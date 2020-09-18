@@ -1,0 +1,28 @@
+fn getch() {
+    set mut c;
+    getc c;
+    return $c;
+}
+
+println "Rock beats scissors, scissors beats paper, paper beats rock. (to enter an answer type [rps])";
+
+while (true) {
+    sleep 400;
+    println "\nRock...";
+    sleep 400;
+    println "Paper...";
+    sleep 400;
+    println "Scissors!\n";
+
+    set mut guess = "";
+    while ($guess != "r" and $guess != "p" and $guess != "s" and $guess != "e")
+        guess = @getch();
+
+    if      ($guess == "r")  println "The Computer guesses: Paper\nYou lose!";
+    else if ($guess == "p")  println "The Computer guesses: Scissors\nYou lose!";
+    else if ($guess == "s")  println "The Computer guesses: Rock\nYou lose!";
+    else if ($guess == "e")  {
+        print "exiting...";
+        return 0;
+    }
+}

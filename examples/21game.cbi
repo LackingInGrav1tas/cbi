@@ -1,0 +1,42 @@
+set mut total = 0;
+
+fn best_move() {
+    set mut move = 1;
+    set mut i = 1;
+    while ($i <= 3) {
+        if (($total + $i - 1) mod 4 == 0)
+            move = $i;
+        i += 1;
+    }
+    i = 1;
+    while ($i <= 3) {
+        if (($total + $i) == 21)
+            move = $i;
+        i += 1;
+    }
+    return $move;
+}
+
+while (true) { #game loop
+    println "total: " || $total;
+    set player_choice = @input("1, 2, or 3: ") as NUM;
+    @assert($player_choice == 1 or $player_choice == 2 or $player_choice == 3); # lazy
+    total += $player_choice;
+    if ($total == 21) {
+        print "\nPlayer wins.";
+        return 0;
+    } else if ($total > 21) {
+        print "dumb move.";
+        return 0;
+    }
+    set cpu_ch = @best_move();
+    println "Computer: " || $cpu_ch;
+    total += $cpu_ch;
+    if ($total == 21) {
+        print "\nComputer wins.";
+        return 0;
+    } else if ($total > 21) {
+        print "dumb move.";
+        return 0;
+    }
+}

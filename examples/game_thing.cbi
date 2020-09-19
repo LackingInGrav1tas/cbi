@@ -42,10 +42,10 @@ fn game_instance() {
         
         console "cls";
         
-        if ($c == "w") y = ($y - 1) mod 16;
-        else if ($c == "s") y = ($y + 1) mod 16;
-        else if ($c == "a") x = ($x - 1) mod 32;
-        else if ($c == "d") x = ($x + 1) mod 32;
+        if ($c == "w") y = ($y - 1) % 16;
+        else if ($c == "s") y = ($y + 1) % 16;
+        else if ($c == "a") x = ($x - 1) % 32;
+        else if ($c == "d") x = ($x + 1) % 32;
 
         else if ($c == "e") throw "game over";
 

@@ -1,0 +1,14 @@
+set plaintext = @input("c(p, k) = p+k\nenter plaintext: ");
+set key = @input("enter key: ") as NUM;
+
+set mut i = 0;
+set mut sCiphertext = "";
+set mut asciiCiphertext = "";
+set mut encrypted;
+while ($i < sizeof $plaintext) {
+    encrypted = ((ascii $plaintext at $i) + $key) % 129;
+    sCiphertext ||= ascii $encrypted;
+    asciiCiphertext ||= $encrypted as STR || " ";
+    i += 1;
+}
+print "ciphertext (characters): " || $sCiphertext || "\nciphertext (ascii value): " || $asciiCiphertext;

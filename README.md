@@ -394,9 +394,3 @@ infix exp(lhs: NUM, rhs: NUM) precedence 5 {
     return $lhs;
 }
 ```
-```mod```:
-```
-infix mod(lhs: NUM, rhs: NUM) precedence 5 {
-    return $lhs - $rhs*floor($lhs/$rhs);
-}
-```

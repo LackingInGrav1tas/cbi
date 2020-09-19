@@ -14,7 +14,7 @@ enum Type {
     SET, MUT, // for variables
 
     // single length operators
-    EQUAL, LESS, GREATER, NOT, PLUS, MINUS, STAR, SLASH, DOT, LEFT_PAREN, RIGHT_PAREN,
+    EQUAL, LESS, GREATER, NOT, PLUS, MINUS, STAR, SLASH, DOT, PERCENT, LEFT_PAREN, RIGHT_PAREN,
     LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON, COLON, DOLLAR, COMMA, AT, LEFT_BRACE, RIGHT_BRACE,
  
     // multiple length operators

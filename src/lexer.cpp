@@ -185,6 +185,11 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     break;
                 }
                 // necessarily one character operators
+                case '%': {
+                    PUSH_TOKEN(lexeme);
+                    tokens.push_back(Token(PERCENT, "%", filename, line-lines.begin()));
+                    break;
+                }
                 case ';': {
                     PUSH_TOKEN(lexeme);
                     tokens.push_back(Token(SEMICOLON, ";", filename, line-lines.begin()));

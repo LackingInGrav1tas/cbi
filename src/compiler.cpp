@@ -54,6 +54,7 @@ static int getPrecedence(Type type, std::string lexeme = "") {
         case MINUS:
         case PLUS: return 6;
 
+        case PERCENT:
         case SLASH:
         case STAR: return 7;
 
@@ -288,6 +289,12 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     token++;
                     expression(getPrecedence(SLASH)+1);
                     vm.writeOp(TOKEN.line, OP_DIV);
+                    break;
+                }
+                case PERCENT: { // /
+                    token++;
+                    expression(getPrecedence(PERCENT)+1);
+                    vm.writeOp(TOKEN.line, OP_MODULO);
                     break;
                 }
                 case CONCATENATE: { // ||

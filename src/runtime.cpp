@@ -135,6 +135,15 @@ Value Machine::run() { // executes the program
                 }
                 break;
             }
+            case OP_MODULO: { // pops the top 2 numbers off the value stack, then pushes the quotient
+                GET_TOP();
+                if (IS_NUM(rhs) && IS_NUM(lhs))
+                    value_stack.push(numberValue((int)lhs.storage.number % (int)rhs.storage.number));
+                else {
+                    ERROR("Run-time Error: Could not mod non-number value.");
+                }
+                break;
+            }
             case OP_NEGATE: { // -top
                 TOP();
                 if (IS_NUM(top))

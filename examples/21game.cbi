@@ -4,7 +4,7 @@ fn best_move() {
     set mut move = 1;
     set mut i = 1;
     while ($i <= 3) {
-        if (($total + $i - 1) mod 4 == 0)
+        if (($total + $i - 1) % 4 == 0)
             move = $i;
         i += 1;
     }

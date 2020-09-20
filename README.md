@@ -312,6 +312,33 @@ print floor 45.9;
 ```
 45
 ```
+### Namespaces ###
+
+creating a namespace
+```
+namespace ns {
+    set variable = "var"; # can also be created by set ns::variable
+    fn foo() { # can also work with fn ns::foo()
+        println "in foo";
+    }
+}
+```
+
+interacting with a namespace
+```
+println $ns::variable;
+@ns::foo();
+
+use ns;
+println $variable;
+@foo();
+```
+```
+var
+in foo
+var
+in foo
+```
 
 ## The Standard Library ##
 The way I implemented the STL is inefficient because I don't want to write the opcode by hand.

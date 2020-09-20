@@ -3,12 +3,12 @@ set key = @input("enter key: ") as NUM;
 
 set mut i = 0;
 set mut sCiphertext = "";
-set mut asciiCiphertext = "";
+set mut asciiCiphertext = list;
 set mut encrypted;
 while ($i < sizeof $plaintext) {
-    encrypted = ((ascii $plaintext at $i) + $key) % 129;
+    encrypted = ((ascii $plaintext at $i) + $key) % 128;
     sCiphertext ||= ascii $encrypted;
-    asciiCiphertext ||= $encrypted as STR || " ";
+    asciiCiphertext push $encrypted;
     i += 1;
 }
-print "ciphertext (characters): " || $sCiphertext || "\nciphertext (ascii value): " || $asciiCiphertext;
+print "\nciphertext (characters)-> " || $sCiphertext || "\nciphertext (ascii value) -> " || $asciiCiphertext;

@@ -1,0 +1,11 @@
+fn fib(n: NUM) {
+    set mut i = 0;
+    set mut sequence = list(0, 1);
+    while ($i <= $n-2) {
+        sequence push $sequence[sizeof $sequence - 1] + $sequence[sizeof $sequence - 2];
+        i += 1;
+    }
+    return $sequence;
+}
+
+print @fib(@input("Enter the sequence length: ") as NUM);

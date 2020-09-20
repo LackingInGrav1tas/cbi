@@ -1,3 +1,5 @@
+use std;
+
 set mut percent = 0;
 set BAR_SIZE = 80;
 

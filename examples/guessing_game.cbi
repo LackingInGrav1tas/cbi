@@ -1,3 +1,5 @@
+use std;
+
 println "Guess a (lowercase) letter in the alphabet";
 
 set correct = ascii ((rand 26) + 97);

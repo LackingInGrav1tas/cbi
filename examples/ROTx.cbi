@@ -1,3 +1,5 @@
+use std;
+
 set plaintext = @input("c(p, k) = p+k\nenter plaintext: ");
 set key = @input("enter key: ") as NUM;
 

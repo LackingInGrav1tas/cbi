@@ -1,3 +1,5 @@
+use std;
+
 fn cls() {
     if ($OS_UNIX or $OS_FBSD or $OS_ANDR or $OS_MAC) console "clear";
     else if ($OS_WIN) console "cls";

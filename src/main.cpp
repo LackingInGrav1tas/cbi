@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
                 std::cout << "Reading file... ";
             }
             std::vector<std::string> lines = getLines(argv[1], success); // getting the contents of the file
-            lines.insert(lines.begin(), "prefix println(txt: ANY) precedence 1 { print $txt || \"\\n\"; }{");
+            lines.insert(lines.begin(), "prefix println(txt: ANY) precedence 1 { print $txt || \"\\n\"; } } {");
             lines.insert(lines.begin(), "infix exp(lhs: NUM, rhs: NUM) precedence 5 { set mut i = 1; set base = $lhs; while ($i < $rhs) { lhs *= $base; i += 1; } return $lhs; }");
             lines.insert(lines.begin(), "fn input(text: ANY) { print $text; set mut s; gets s; return $s; }");
             lines.insert(lines.begin(), "fn assert(expr: BOOL) { if (!$expr) throw \"assertion failed.\"; }");
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 #ifdef __ANDROID__
             lines.insert(lines.begin(), "set OS_ANDR = true;");
 #else
-            lines.insert(lines.begin(), "set OS_ANDR = false;");
+            lines.insert(lines.begin(), "namespace std { set OS_ANDR = false;");
 #endif
             lines.push_back("}");
             if (!success) {

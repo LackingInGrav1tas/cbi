@@ -1,3 +1,5 @@
+use std;
+
 set string_one = @input("Enter a string: ");
 set string_two = @input("Enter a string to compare against ^: ");
 

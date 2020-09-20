@@ -1,3 +1,5 @@
+use std;
+
 fn fib(n: NUM) {
     set mut i = 0;
     set mut sequence = list(0, 1);

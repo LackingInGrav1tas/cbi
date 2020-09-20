@@ -1,3 +1,5 @@
+use std;
+
 set rows = (@input("how many rows? ") as NUM + 1) * 2;
 set mut r = 0;
 while ($r < $rows) {

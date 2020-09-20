@@ -1,3 +1,5 @@
+use std;
+
 fn aware printarr() {
     set mut total = $message || "\n ________________________________ \n|";
     set mut o = 0;

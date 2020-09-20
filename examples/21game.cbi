@@ -1,3 +1,5 @@
+use std;
+
 set mut total = 0;
 
 fn best_move() {

@@ -1,3 +1,5 @@
+use std;
+
 set h = @input("height of triangle: ") as NUM;
 set mut ch = 0;
 while ($ch < $h) {

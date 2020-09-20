@@ -1,3 +1,5 @@
+use std;
+
 fn getch() {
     set mut c;
     getc c;

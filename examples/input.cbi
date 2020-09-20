@@ -1,3 +1,5 @@
+use std;
+
 set mut input;
 gets input;
 print "You said (gets): " || $input || "\n";

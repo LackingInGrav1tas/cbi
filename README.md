@@ -341,7 +341,9 @@ in foo
 ```
 
 ## The Standard Library ##
-The way I implemented the STL is inefficient because I don't want to write the opcode by hand.
+The way I implemented the STL is inefficient because I don't want to write the opcode by hand. 
+ALL THINGS IN THE STANDARD LIBRARY EXIST BEHIND THE ```std``` NAMESPACE
+
 ### Constants ###
 ```EXIT_SUCCESS```: ```set EXIT_SUCCESS = 0;```
 ```EXIT_FAILURE```: ```set EXIT_FAILURE = 1;```

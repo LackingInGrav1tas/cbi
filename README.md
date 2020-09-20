@@ -159,6 +159,9 @@ output:
 ```
 ```as```'s precedence is greater than ```+```/```-``` and ```*```/```/```.
 ### Custom Operators ###
+
+NOTE: Because of how custom operators work, they cant be called from namespaces by ```namespace::op``` because of bad foresight. Might be fixed soon. Just do ```use namespace``` and it works fine.
+
 Custom operator declarations work very similar to function declarations, as they are mostly just retooled functions. The main difference between operators and functions, besides the obvious, is that the operator's precedence is needed during compile time. This means that their implementations are somewhat different.
 
 custom infix operator (there must be two params because of how infix operators works):

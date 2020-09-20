@@ -55,6 +55,11 @@ static bool valueToBool(Value value) {
     } else return false;
 }
 
+#define ADD_NAMESPACES(id) \
+    do { for (int i = namespaces.size()-1; i >= 0; i--) { \
+        id = namespaces[i] + "::" + id; \
+    } } while (0)
+
 Value Machine::run() { // executes the program
     #define ERROR(message) \
         do { \
@@ -268,6 +273,7 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_stack.top().string;
+                ADD_NAMESPACES(id);
 
                 value_stack.pop();
                 scopes.back().variables[id] = gl_value;
@@ -290,6 +296,7 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_stack.top().string;
+                ADD_NAMESPACES(id);
 
                 value_stack.pop();
                 op++;
@@ -299,18 +306,31 @@ Value Machine::run() { // executes the program
             }
             case OP_RETRIEVE: {
                 op++;
-
+                bool b = false;
                 std::map<std::string, Value>::iterator found;
-                for (int i = scopes.size()-1; i >= 0; i--) {
-                    found = scopes[i].variables.find(constants[(int)OP].string);
-                    if (found == scopes[i].variables.end()) {
-                        if (i == 0) {
-                            ERROR("Cannot access variable out of scope, " << constants[(int)OP].string << ".");
-                        }
+                for (int o = scopes.size()-1; o >= 0; o--) {
+                    found = scopes[o].variables.find(constants[(int)OP].string);
+                    if (found == scopes[o].variables.end())
                         continue;
-                    }
                     value_stack.push(found->second);
+                    b = true;
                     break;
+                }
+                if (!b) {
+                    bool in_scope = false;
+                    for (int i = using_namespaces.size()-1; i >= 0; i--) {
+                        for (int ns = 0; ns < using_namespaces[i].size(); ns++) {
+                            for (int o = scopes.size()-1; o >= 0; o--) {
+                                found = scopes[o].variables.find(using_namespaces[i][ns] + "::" + constants[(int)OP].string);
+                                if (found == scopes[o].variables.end())
+                                    continue;
+                                value_stack.push(found->second);
+                                in_scope = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!in_scope) ERROR("Cannot access variable out of scope, " << constants[(int)OP].string << ".");
                 }
                 break;
             }
@@ -344,6 +364,7 @@ Value Machine::run() { // executes the program
             case OP_BEGIN_SCOPE: {
                 scopes.push_back(Scope());
                 fn_scopes.push_back(std::map<std::string, Function>());
+                using_namespaces.push_back(std::vector<std::string>());
                 break;
             }
             case OP_END_SCOPE: {
@@ -351,6 +372,7 @@ Value Machine::run() { // executes the program
                     delete_list(it->second.list);
                 scopes.pop_back();
                 fn_scopes.pop_back();
+                using_namespaces.pop_back();
                 break;
             }
             case OP_AND: {
@@ -370,39 +392,56 @@ Value Machine::run() { // executes the program
                 std::string id = value_stack.top().string;
                 value_stack.pop();
                 std::map<std::string, Function>::iterator found;
+                Function fn;
+                bool fnd = false;
                 for (int i = fn_scopes.size()-1; i >= 0; i--) {
                     found = fn_scopes[i].find(id);
                     if (found == fn_scopes[i].end()) {
-                        if (i == 0) {
-                            ERROR("Cannot call function out of scope, " << id << ".");
-                        }
                         continue;
                     }
-                    Function fn = found->second;
-                    Machine call = Machine::from(fn); // setting opcode/constant pool/etc.
-                    if (value_stack.size() < fn.param_ids.size()) { // checking params
-                        ERROR("Expected more parameters during call of function " << id << ". Received: " << value_stack.size() << ", Expected: " << fn.param_ids.size());
-                    }
-                    for (int p = fn.param_ids.size()-1; p >= 0; p--) { // setting params
-                        call.scopes.back().variables[fn.param_ids[p]] = value_stack.top();
-                        if (!checkTypes(fn.param_types[p], value_stack.top().type)) ERROR("Param specifiers do not match. Expected " << fn.param_types[p] << ".");
-                        value_stack.pop();
-                        call.scopes.back().mutables.push_back(fn.param_ids[p]);
-                    }
-                    Value call_run = call.run();
-                    if (call_run.type == TYPE_RT_ERROR) return exitRT();
-                    else if (call_run.type != TYPE_OK) value_stack.push(call_run);
-                    else value_stack.push(nullValue());
-                    switch (fn.type) {
-                        case FN_AWARE:
-                            scopes = call.scopes;
-                            break;
-                        case FN_NORMAL:
-                            scopes[0] = call.scopes[0];
-                            scopes[1] = call.scopes[1];
-                            break;
-                    }
+                    fn = found->second;
+                    fnd = true;
                     break;
+                }
+                if (!fnd) {
+                    bool in_scope = false;
+                    for (int i = using_namespaces.size()-1; i >= 0; i--) {
+                        for (int ns = 0; ns < using_namespaces[i].size(); ns++) {
+                            for (int o = fn_scopes.size()-1; o >= 0; o--) {
+                                found = fn_scopes[o].find(using_namespaces[i][ns] + "::" + id);
+                                if (found == fn_scopes[o].end()) {
+                                    continue;
+                                }
+                                fn = found->second;
+                                in_scope = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!in_scope) ERROR("Cannot access variable out of scope, " << id << ".");
+                }
+                Machine call = Machine::from(fn); // setting opcode/constant pool/etc.
+                if (value_stack.size() < fn.param_ids.size()) { // checking params
+                    ERROR("Expected more parameters during call of function " << id << ". Received: " << value_stack.size() << ", Expected: " << fn.param_ids.size());
+                }
+                for (int p = fn.param_ids.size()-1; p >= 0; p--) { // setting params
+                    call.scopes.back().variables[fn.param_ids[p]] = value_stack.top();
+                    if (!checkTypes(fn.param_types[p], value_stack.top().type)) ERROR("Param specifiers do not match. Expected " << fn.param_types[p] << ".");
+                    value_stack.pop();
+                    call.scopes.back().mutables.push_back(fn.param_ids[p]);
+                }
+                Value call_run = call.run();
+                if (call_run.type == TYPE_RT_ERROR) return exitRT();
+                else if (call_run.type != TYPE_OK) value_stack.push(call_run);
+                else value_stack.push(nullValue());
+                switch (fn.type) {
+                    case FN_AWARE:
+                        scopes = call.scopes;
+                        break;
+                    case FN_NORMAL:
+                        scopes[0] = call.scopes[0];
+                        scopes[1] = call.scopes[1];
+                        break;
                 }
                 break;
             }
@@ -717,6 +756,20 @@ Value Machine::run() { // executes the program
                 }
 
                 value_stack.push(list);
+                break;
+            }
+            case OP_BEGIN_NAMESPACE: {
+                TOP();
+                namespaces.push_back(top.string);
+                break;
+            }
+            case OP_END_NAMESPACE: {
+                namespaces.pop_back();
+                break;
+            }
+            case OP_USE_NAMESPACE: {
+                TOP();
+                using_namespaces.back().push_back(top.string);
                 break;
             }
             

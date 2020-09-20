@@ -581,6 +581,21 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 if (mut) vm.writeOp(TOKEN.line, OP_VARIABLE_MUT);
                 else vm.writeOp(TOKEN.line, OP_VARIABLE);
             }
+        } else if (CHECK(NAMESPACE)) {
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            vm.writeOp(TOKEN.line, OP_BEGIN_NAMESPACE);
+            token++;
+            HANDLE_BLOCK();
+            vm.writeOp(TOKEN.line, OP_END_NAMESPACE);
+        } else if (CHECK(USE)) {
+            token++;
+            if (!CHECK(IDENTIFIER)) ERROR("Expected an identifier.");
+            vm.writeConstant(TOKEN.line, idLexeme(TOKEN.lexeme));
+            vm.writeOp(TOKEN.line, OP_USE_NAMESPACE);
+            token++;
+            SEMICOLON();
         } else if (CHECK(THROW)) {
             token++;
             expression(1);

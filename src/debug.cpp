@@ -91,6 +91,9 @@ void disassembleOp(std::vector<uint8_t>::iterator &op, std::vector<Value> consta
         case OP_THROW: DBCOL("OP_THROW"); break;
         case OP_CONSOLE: DBCOL("OP_CONSOLE"); break;
         case OP_LIST_FN: DBCOL("OP_LIST_FN"); break;
+        case OP_BEGIN_NAMESPACE: DBCOL("OP_BEGIN_NAMESPACE"); break;
+        case OP_END_NAMESPACE: DBCOL("OP_END_NAMESPACE"); break;
+        case OP_USE_NAMESPACE: DBCOL("OP_USE_NAMESPACE"); break;
         default:
             COLOR("bug in opcode, could not identify command: " + (int)*op, DISPLAY_RED);
             break;

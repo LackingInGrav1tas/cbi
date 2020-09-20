@@ -22,6 +22,9 @@ class Machine {
     std::vector<std::map<std::string, Function>> fn_scopes;
     std::vector<Function> fn_pool;
 
+    std::vector<std::string> namespaces;
+    std::vector<std::vector<std::string>> using_namespaces;
+
     // <helper>
     void writeOp(int line, uint8_t command) {
         opcode.push_back(command);

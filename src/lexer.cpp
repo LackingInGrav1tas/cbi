@@ -52,7 +52,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     /*else if (lexeme == "for") tokens.push_back(Token(FOR, lexeme, filename, line-lines.begin()));*/ \
                     else if (lexeme == "while") tokens.push_back(Token(WHILE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "break") tokens.push_back(Token(BREAK, lexeme, filename, line-lines.begin())); \
-                    /*else if (lexeme == "new") tokens.push_back(Token(NEW, lexeme, filename, line-lines.begin())); */\
+                    else if (lexeme == "use") tokens.push_back(Token(USE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "return") tokens.push_back(Token(RETURN, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "disassemble_constants") tokens.push_back(Token(DIS_C, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "disassemble_stack") tokens.push_back(Token(DIS_ST, lexeme, filename, line-lines.begin())); \
@@ -61,7 +61,7 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "getc") tokens.push_back(Token(GETCH, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "aware") tokens.push_back(Token(AWARE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "blind") tokens.push_back(Token(BLIND, lexeme, filename, line-lines.begin())); \
-                    /*else if (lexeme == "struct") tokens.push_back(Token(STRUCT, lexeme, filename, line-lines.begin()));*/ \
+                    else if (lexeme == "namespace") tokens.push_back(Token(NAMESPACE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "NUM") tokens.push_back(Token(NUM, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "STR") tokens.push_back(Token(STR, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "VOID") tokens.push_back(Token(_VOID, lexeme, filename, line-lines.begin())); \
@@ -196,8 +196,13 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     break;
                 }
                 case ':': {
-                    PUSH_TOKEN(lexeme);
-                    tokens.push_back(Token(COLON, ":", filename, line-lines.begin()));
+                    if (*(character+1) == ':') {
+                        character++;
+                        lexeme += "::";
+                    } else {
+                        PUSH_TOKEN(lexeme);
+                        tokens.push_back(Token(COLON, ":", filename, line-lines.begin()));
+                    }
                     break;
                 }
                 case '$': {

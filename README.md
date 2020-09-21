@@ -2,7 +2,7 @@
 
 Your average bytecode interpreter. C++ IR/VM instead of C because at the moment I don't want to write up all the garbage collection or use non-growable arrays. Might change in the future.
 
-Notice: Lists sometimes do weird stuff. Dunno why.
+NOTE: Lists sometimes do weird stuff. Dunno why.
 
 ## Grammar EBNF ##
 ```EBNF
@@ -197,7 +197,7 @@ abc
 ```
 ### Lists ###
 
-BEWARE: Lists show some weird / program breaking behavior
+NOTE: Lists show some weird / program breaking behavior
 
 Lists are first class objects.
 List initialization:

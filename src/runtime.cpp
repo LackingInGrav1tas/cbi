@@ -285,6 +285,7 @@ Value Machine::run() { // executes the program
                     ERROR("Expected an identifier.");
                 }
                 std::string id = value_stack.top().string;
+                ADD_NAMESPACES(id);
 
                 value_stack.pop();
                 scopes.back().variables[id] = top;

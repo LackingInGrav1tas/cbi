@@ -2,7 +2,117 @@
 
 Your average bytecode interpreter. C++ IR/VM instead of C because at the moment I don't want to write up all the garbage collection or use non-growable arrays. Might change in the future.
 
-NOTE: Lists sometimes do weird stuff. Dunno why.
+NOTE: Lists sometimes do weird stuff. Dunno why. There are also other things that go weird. CBI is an exercise, and shouldn't be used for anything important.
+
+## Working CBI ##
+
+It's recommended to add cbi\bin to your environment variables.
+
+CBI is called through the command line:
+```CMD
+d:\...\cbi\examples> ccbi helloworld.cbi
+Hello, World!
+```
+### Command Line Flags ###
+-h -help
+```CMD
+d:\...\cbi\examples> ccbi -h
+Documentation: https://github.com/LackingInGrav1tas/cbi
+```
+
+-b -build
+```CMD
+d:\...\cbi\examples> ccbi helloworld.cbi -b
+Hello, World!
+d:\...\cbi\examples> dir
+...
+build.bat
+...
+```
+
+-d -debug
+```CMD
+d:\...\cbi\examples> ccbi helloworld.cbi -d
+Reading file... 733 microseconds
+Lexing file... 293 microseconds
+Compiling opcode... 286 microseconds
+Disassembling opcode...
+== opcode ==
+| byte 0000 lines -001 | OP_BEGIN_SCOPE
+| byte 0001 lines 0000 | OP_CONSTANT  position: 0  value: std
+| byte 0003 lines 0000 | OP_BEGIN_NAMESPACE
+| byte 0004 lines 0000 | OP_CONSTANT  position: 1  value: OS_ANDR
+| byte 0006 lines 0000 | OP_CONSTANT  position: 2  value: 0
+| byte 0008 lines 0000 | OP_VARIABLE
+| byte 0009 lines 0001 | OP_CONSTANT  position: 3  value: OS_FBSD
+| byte 0011 lines 0001 | OP_CONSTANT  position: 4  value: 0
+| byte 0013 lines 0001 | OP_VARIABLE
+| byte 0014 lines 0002 | OP_CONSTANT  position: 5  value: OS_MAC
+| byte 0016 lines 0002 | OP_CONSTANT  position: 6  value: 0
+| byte 0018 lines 0002 | OP_VARIABLE
+| byte 0019 lines 0003 | OP_CONSTANT  position: 7  value: OS_UNIX
+| byte 0021 lines 0003 | OP_CONSTANT  position: 8  value: 0
+| byte 0023 lines 0003 | OP_VARIABLE
+| byte 0024 lines 0004 | OP_CONSTANT  position: 9  value: OS_WIN
+| byte 0026 lines 0004 | OP_CONSTANT  position: 10  value: 1
+| byte 0028 lines 0004 | OP_VARIABLE
+| byte 0029 lines 0005 | OP_CONSTANT  position: 11  value: EXIT_FAILURE
+| byte 0031 lines 0005 | OP_CONSTANT  position: 12  value: 1
+| byte 0033 lines 0005 | OP_VARIABLE
+| byte 0034 lines 0005 | OP_CONSTANT  position: 13  value: EXIT_SUCCESS
+| byte 0036 lines 0005 | OP_CONSTANT  position: 14  value: 0
+| byte 0038 lines 0005 | OP_VARIABLE
+| byte 0039 lines 0006 | OP_CONSTANT  position: 15  value: assert
+| byte 0041 lines 0006 | OP_DECL_FN with 0
+| byte 0043 lines 0007 | OP_CONSTANT  position: 16  value: input
+| byte 0045 lines 0007 | OP_DECL_FN with 1
+| byte 0047 lines 0008 | OP_CONSTANT  position: 17  value: exp
+| byte 0049 lines 0008 | OP_DECL_FN with 2
+| byte 0051 lines 0009 | OP_CONSTANT  position: 18  value: println
+| byte 0053 lines 0009 | OP_DECL_FN with 3
+| byte 0055 lines 0009 | OP_END_NAMESPACE
+| byte 0056 lines 0009 | OP_BEGIN_SCOPE
+| byte 0057 lines 0010 | OP_CONSTANT  position: 19  value: Hello, World!
+| byte 0059 lines 0010 | OP_PRINT_TOP
+| byte 0060 lines 0011 | OP_END_SCOPE
+| byte 0061 lines -001 | OP_END_SCOPE
+== end ==
+
+== constants ==
+0: std
+1: OS_ANDR
+2: 0
+3: OS_FBSD
+4: 0
+5: OS_MAC
+6: 0
+7: OS_UNIX
+8: 0
+9: OS_WIN
+10: 1
+11: EXIT_FAILURE
+12: 1
+13: EXIT_SUCCESS
+14: 0
+15: assert
+16: input
+17: exp
+18: println
+19: Hello, World!
+== end ==
+
+== runtime ==
+Hello, World!
+EXIT_OK
+== end ==
+Time spent in runtime: 571 microseconds.
+
+== stack ==
+== end ==
+Total relevant time taken:
+1883 microseconds
+0.001883 seconds
+```
 
 ## Grammar EBNF ##
 ```EBNF

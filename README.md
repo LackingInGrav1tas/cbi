@@ -6,7 +6,7 @@ NOTE: Lists sometimes do weird stuff. Dunno why. There are also other things tha
 
 ## Working CBI ##
 
-It's recommended to add cbi\bin to your environment variables.
+It's recommended to add cbi\bin to your PATH.
 
 CBI is called through the command line:
 ```CMD

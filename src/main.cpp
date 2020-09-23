@@ -11,20 +11,37 @@
 
 int main(int argc, char **argv) {
     try {
-        if (2 <= argc <= 3) {
+        if (2 <= argc <= 4) {
 #define NOW() std::chrono::steady_clock::now()
 #define PASSED_TIME() std::chrono::duration_cast<std::chrono::microseconds>(NOW() - saved_time).count()
             bool debugmode = false;
             bool success = true;
             int total_relevant_time = 0;
-            if (argc == 3) {
-                if ((std::string)argv[2] == "-d" || (std::string)argv[2] == "-debug")
-                    debugmode = true;
-            }
+
             if ((std::string)argv[1] == "-h" || (std::string)argv[1] == "-help") {
                 std::cout << "Documentation: https://github.com/LackingInGrav1tas/cbi" << std::endl;
                 return 0;
             }
+
+            for (int i = 2; i < argc; i++) {
+                if ((std::string)argv[i] == "-h" || (std::string)argv[i] == "-help") {
+                    std::cout << "Unknown command '" << argv[i] << "'.\nDocumentation: https://github.com/LackingInGrav1tas/cbi" << std::endl;
+                    return 0;
+                } else if ((std::string)argv[i] == "-b" || (std::string)argv[i] == "-build") {
+                    std::ofstream build("build.bat");
+                    build << "@ECHO off\n";
+                    for (int a = 0; a < argc; a++) {
+                        build << argv[a] << " ";
+                    }
+                    build << "\npause";
+                } else if ((std::string)argv[i] == "-d" || (std::string)argv[i] == "-debug")
+                    debugmode = true;
+                else {
+                    std::cout << "Unknown command '" << argv[i] << "'.\nDocumentation: https://github.com/LackingInGrav1tas/cbi" << std::endl;
+                    return 0;
+                }
+            }
+            
     
             std::chrono::steady_clock::time_point saved_time;
             if (debugmode) {

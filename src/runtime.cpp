@@ -7,6 +7,7 @@
 #include <conio.h>
 #include <time.h>
 #include <math.h>
+#include <fstream>
 
 #include "color.hpp"
 #include "vm.hpp"
@@ -759,6 +760,36 @@ Value Machine::run() { // executes the program
                 value_stack.push(list);
                 break;
             }
+            case OP_WRITE_FILE: {
+                std::cout << "WF B" << std::endl;
+                // stack: BOT ..., a/w, text, file TOP
+                if (value_stack.size() < 3) ERROR("Stack underflow.");
+                Value file = value_stack.top();
+                value_stack.pop();
+
+                if (!IS_STRING(file)) ERROR("Expected a string path.");
+                Value text = value_stack.top();
+                value_stack.pop();
+                if (!IS_STRING(text)) ERROR("Expected text. You can use 'as STR' to convert.");
+
+                Value mode = value_stack.top();
+                value_stack.pop();
+                if (!IS_STRING(file)) ERROR("Expected a string mode, either 'a' or 'w'.");
+
+                std::ofstream f;
+                if (TRIM(mode.string).at(0) == 'a') f.open(TRIM(file.string), std::ios_base::app);
+                else f.open(TRIM(file.string));
+
+                if (!f) value_stack.push(boolValue(false));
+                else {
+                    f << TRIM(text.string);
+                    f.flush();
+                    value_stack.push(boolValue(true));
+                }
+                std::cout << "WF E" << std::endl;
+
+                break;
+            }
             case OP_BEGIN_NAMESPACE: {
                 TOP();
                 namespaces.push_back(top.string);
@@ -771,6 +802,18 @@ Value Machine::run() { // executes the program
             case OP_USE_NAMESPACE: {
                 TOP();
                 using_namespaces.back().push_back(top.string);
+                break;
+            }
+            case OP_FETCH_CLIP: {
+                std::string text;
+                if (OpenClipboard(NULL)) {
+                    HANDLE clip;
+                    clip = GetClipboardData(CF_TEXT);
+                    text = (LPSTR)GlobalLock(clip);
+                    GlobalUnlock(clip);
+                    CloseClipboard();
+                }
+                value_stack.push(stringValue("\"" + text + "\""));
                 break;
             }
             

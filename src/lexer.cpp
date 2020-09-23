@@ -71,7 +71,6 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "as") tokens.push_back(Token(AS, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "infix") tokens.push_back(Token(INFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "prefix") tokens.push_back(Token(PREFIX, lexeme, filename, line-lines.begin())); \
-                    else if (lexeme == "postfix") tokens.push_back(Token(POSTFIX, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "precedence") tokens.push_back(Token(PRECEDENCE, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "null") tokens.push_back(Token(TOKEN_NULL, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "list") tokens.push_back(Token(LIST, lexeme, filename, line-lines.begin())); \
@@ -87,6 +86,8 @@ std::vector<Token> lex(std::vector<std::string> lines, const char* filename, boo
                     else if (lexeme == "sleep") tokens.push_back(Token(SLEEP, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "rand") tokens.push_back(Token(RAND, lexeme, filename, line-lines.begin())); \
                     else if (lexeme == "floor") tokens.push_back(Token(FLOOR, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "clipboard") tokens.push_back(Token(CLIPBOARD, lexeme, filename, line-lines.begin())); \
+                    else if (lexeme == "write") tokens.push_back(Token(WRITE, lexeme, filename, line-lines.begin())); \
                     else tokens.push_back(Token(IDENTIFIER, lexeme, filename, line-lines.begin())); \
                     lexeme.clear(); } while (false)
 

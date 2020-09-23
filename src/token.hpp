@@ -29,7 +29,9 @@ enum Type {
 
     SIZEOF, ASCII,
 
-    LIST, PUSH, POP, BACK, FRONT,
+    LIST, PUSH, POP, BACK, FRONT, CLIPBOARD,
+    
+    WRITE, // write("file.txt", "thing", "a,w")
 
     NUM, STR, _VOID, _BOOL, _LIST, ANY, // type specifiers
 

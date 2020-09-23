@@ -162,6 +162,10 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                 vm.writeConstant(TOKEN.line, nullValue());
                 break;
             }
+            case CLIPBOARD: {
+                vm.writeOp(TOKEN.line, OP_FETCH_CLIP);
+                break;
+            }
             case LIST: {
                 if (NEXT.type == LEFT_PAREN) {
                     token += 2;
@@ -181,6 +185,26 @@ Machine compile(std::vector<Token> tokens, bool &success) { // preps bytecode
                     vm.writeOp(TOKEN.line, OP_LIST_FN);
                 } else
                     vm.writeConstant(TOKEN.line, listValue());
+                break;
+            }
+            case WRITE: {
+                token++;
+                if (!CHECK(LEFT_PAREN)) ERROR("Expected '('");
+                token++;
+                int arity = -1; // -1 because of )
+                while (true) {
+                    arity++;
+                    if (CHECK(RIGHT_PAREN)) break;
+                    expression(1);
+                    token++;
+                    if (CHECK(COMMA)) {
+                        token++;
+                        if (CHECK(RIGHT_PAREN)) ERROR("Expected an expression.");
+                    }
+                }
+                if (!CHECK(RIGHT_PAREN)) ERROR("Expected ')'.");
+                if (arity != 3) ERROR("The format for write is write(<path/to/file>, <text>, 'a'|'w')");
+                vm.writeOp(TOKEN.line, OP_LIST_FN);
                 break;
             }
             case IDENTIFIER: {
